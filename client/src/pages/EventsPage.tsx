@@ -1,116 +1,125 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { Calendar, MapPin, Users, Clock, ArrowRight, Filter, Search, Tag, Star } from "lucide-react";
+import { Calendar, MapPin, Users, Clock, ArrowRight, Filter, Search, Tag, Camera } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import EventPhotosModal from "@/components/EventPhotosModal";
 
 const allEvents = [
   {
-    id: 1,
-    title: "Literary Debate Championship",
-    date: "March 15, 2026",
-    time: "5:00 PM - 8:00 PM",
+    id: 12,
+    title: "Model United Nations Conference 2026",
+    date: "May 10-12, 2026",
+    time: "9:00 AM - 6:00 PM",
+    location: "International Conference Center",
+    attendees: 85,
+    maxAttendees: 200,
+    category: "MUN",
+    description: "Join us for the most prestigious MUN conference of the year. Debate global issues, enhance diplomatic skills, and network with delegates from various institutions.",
+    image: "https://picsum.photos/seed/mun-conference-2026/800/500.jpg",
+    featured: true,
+    registrationOpen: true,
+    status: "upcoming",
+    isMUN: true,
+  },
+  {
+    id: 13,
+    title: "Ignite: The Grand Kickoff",
+    date: "January 5, 2026",
+    time: "6:00 PM - 9:00 PM",
     location: "Main Auditorium",
-    attendees: 45,
-    maxAttendees: 60,
-    category: "Debate",
-    description: "Join us for an exciting evening of intellectual discourse as debaters tackle contemporary literary themes and classic philosophical questions.",
-    image: "https://picsum.photos/seed/literary-debate-2026/800/500.jpg",
-    featured: true,
-    registrationOpen: true,
-  },
-  {
-    id: 2,
-    title: "Poetry Slam Night",
-    date: "March 22, 2026",
-    time: "7:00 PM - 9:00 PM",
-    location: "Literary Café",
-    attendees: 32,
-    maxAttendees: 40,
-    category: "Poetry",
-    description: "Express your soul through verse. Open mic night for poets of all levels to share their original works and inspired performances.",
-    image: "https://picsum.photos/seed/poetry-slam-2026/800/500.jpg",
-    featured: true,
-    registrationOpen: true,
-  },
-  {
-    id: 3,
-    title: "Classic Literature Book Club",
-    date: "March 25, 2026",
-    time: "4:00 PM - 6:00 PM",
-    location: "Reading Circle",
-    attendees: 18,
-    maxAttendees: 25,
-    category: "Reading",
-    description: "Deep dive into classic literature. This month we're exploring '1984' by George Orwell and its modern relevance.",
-    image: "https://picsum.photos/seed/classic-literature-2026/800/500.jpg",
-    featured: false,
-    registrationOpen: true,
-  },
-  {
-    id: 4,
-    title: "Creative Writing Workshop",
-    date: "April 1, 2026",
-    time: "5:00 PM - 7:00 PM",
-    location: "Writer's Workshop",
-    attendees: 12,
-    maxAttendees: 20,
-    category: "Writing",
-    description: "Hone your craft with professional guidance. Learn techniques for character development, dialogue, and narrative structure.",
-    image: "https://picsum.photos/seed/writing-workshop-2026/800/500.jpg",
-    featured: false,
-    registrationOpen: true,
-  },
-  {
-    id: 5,
-    title: "Author Meet & Greet",
-    date: "April 8, 2026",
-    time: "6:00 PM - 8:00 PM",
-    location: "Main Library",
-    attendees: 52,
-    maxAttendees: 75,
+    attendees: 150,
+    maxAttendees: 200,
     category: "Special Event",
-    description: "Meet renowned author Sarah Mitchell as she discusses her latest novel and the journey of literary creation.",
-    image: "https://picsum.photos/seed/author-meet-2026/800/500.jpg",
-    featured: true,
-    registrationOpen: true,
-  },
-    {
-    id: 7,
-    title: "Community Book Drive",
-    date: "April 15, 2026",
-    time: "10:00 AM - 2:00 PM",
-    location: "Community Center",
-    attendees: 67,
-    maxAttendees: 100,
-    category: "Community",
-    description: "Help us promote literacy in our community. Bring your gently used books to donate to local schools and libraries.",
-    image: "https://picsum.photos/seed/book-drive-2026/800/500.jpg",
+    description: "An electrifying evening marking the grand launch of our literary club's most ambitious season yet. Experience performances, announcements, and the unveiling of our exclusive initiatives.",
+    image: "https://picsum.photos/seed/ignite-grand-kickoff-2026/800/500.jpg",
     featured: false,
     registrationOpen: false,
+    status: "done",
+    photos: [
+      "https://picsum.photos/seed/ignite-1-2026/800/600.jpg",
+      "https://picsum.photos/seed/ignite-2-2026/800/600.jpg",
+      "https://picsum.photos/seed/ignite-3-2026/800/600.jpg",
+      "https://picsum.photos/seed/ignite-4-2026/800/600.jpg",
+      "https://picsum.photos/seed/ignite-5-2026/800/600.jpg"
+    ]
   },
   {
-    id: 8,
-    title: "Spring Poetry Festival",
-    date: "April 20-21, 2026",
-    time: "10:00 AM - 6:00 PM",
-    location: "Outdoor Garden",
-    attendees: 120,
-    maxAttendees: 150,
-    category: "Festival",
-    description: "Two-day celebration of poetry featuring readings, workshops, open mic sessions, and guest poets from around the region.",
-    image: "https://picsum.photos/seed/poetry-festival-2026/800/500.jpg",
-    featured: true,
-    registrationOpen: true,
+    id: 14,
+    title: "Lexicon Clash",
+    date: "December 15, 2025",
+    time: "5:00 PM - 8:00 PM",
+    location: "Debate Hall",
+    attendees: 80,
+    maxAttendees: 100,
+    category: "Debate",
+    description: "An intense battle of words and wits where participants showcase their linguistic prowess in this ultimate vocabulary showdown.",
+    image: "https://picsum.photos/seed/lexicon-clash-2025/800/500.jpg",
+    featured: false,
+    registrationOpen: false,
+    status: "done",
+    photos: [
+      "https://picsum.photos/seed/lexicon-1-2025/800/600.jpg",
+      "https://picsum.photos/seed/lexicon-2-2025/800/600.jpg",
+      "https://picsum.photos/seed/lexicon-3-2025/800/600.jpg",
+      "https://picsum.photos/seed/lexicon-4-2025/800/600.jpg"
+    ]
   },
-];
+  {
+    id: 15,
+    title: "Seekh",
+    date: "November 20, 2025",
+    time: "4:00 PM - 7:00 PM",
+    location: "Library Conference Room",
+    attendees: 45,
+    maxAttendees: 60,
+    category: "Project Expo",
+    description: "A profound exploration of the art of learning and knowledge sharing through interactive workshops and literary discussions.",
+    image: "https://picsum.photos/seed/seekh-2025/800/500.jpg",
+    featured: false,
+    registrationOpen: false,
+    status: "done",
+    photos: [
+      "https://picsum.photos/seed/seekh-1-2025/800/600.jpg",
+      "https://picsum.photos/seed/seekh-2-2025/800/600.jpg",
+      "https://picsum.photos/seed/seekh-3-2025/800/600.jpg",
+      "https://picsum.photos/seed/seekh-4-2025/800/600.jpg",
+      "https://picsum.photos/seed/seekh-5-2025/800/600.jpg",
+      "https://picsum.photos/seed/seekh-6-2025/800/600.jpg"
+    ]
+  },
+  {
+    id: 16,
+    title: "Litera Hangout",
+    date: "October 15, 2025",
+    time: "5:00 PM - 8:00 PM",
+    location: "Student Lounge",
+    attendees: 65,
+    maxAttendees: 80,
+    category: "Social",
+    description: "A relaxed evening of literary conversations, book exchanges, and creative networking with fellow literature enthusiasts in a casual setting.",
+    image: "https://picsum.photos/seed/litera-hangout-2025/800/500.jpg",
+    featured: false,
+    registrationOpen: false,
+    status: "done",
+    photos: [
+      "https://picsum.photos/seed/hangout-1-2025/800/600.jpg",
+      "https://picsum.photos/seed/hangout-2-2025/800/600.jpg",
+      "https://picsum.photos/seed/hangout-3-2025/800/600.jpg",
+      "https://picsum.photos/seed/hangout-4-2025/800/600.jpg",
+      "https://picsum.photos/seed/hangout-5-2025/800/600.jpg"
+    ]
+  },
+  ];
 
-const categories = ["All", "Debate", "Poetry", "Reading", "Writing", "Special Event", "Community", "Festival"];
+const categories = ["All", "Debate", "Poetry", "Reading", "Writing", "Special Event", "Community", "Festival", "MUN", "Social"];
 
 export default function EventsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredEvents = allEvents.filter((event) => {
     const matchesCategory = selectedCategory === "All" || event.category === selectedCategory;
@@ -119,8 +128,20 @@ export default function EventsPage() {
     return matchesCategory && matchesSearch;
   });
 
-  const featuredEvents = allEvents.filter(event => event.featured);
-  const upcomingEvents = filteredEvents.filter(event => new Date(event.date) >= new Date());
+  const upcomingEvents = filteredEvents.filter(event => event.status === "upcoming");
+  const pastEvents = filteredEvents.filter(event => event.status === "done");
+
+  const handleEventClick = (event: any) => {
+    if (event.status === "done" && event.photos && event.photos.length > 0) {
+      setSelectedEvent(event);
+      setIsModalOpen(true);
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedEvent(null);
+  };
 
   return (
     <div className="min-h-screen pt-32 pb-24 px-6 lg:px-8 bg-cream">
@@ -173,64 +194,82 @@ export default function EventsPage() {
           </div>
         </div>
 
-        {/* Featured Events */}
-        {selectedCategory === "All" && !searchTerm && (
+        {/* Past Events */}
+        {pastEvents.length > 0 && (
           <section className="mb-20">
             <h2 className="font-display text-3xl font-bold text-ink mb-8 flex items-center gap-3">
-              <Star className="w-8 h-8 text-gold" />
-              Featured Events
+              <Camera className="w-8 h-8 text-gold" />
+              Our Events
+              <span className="font-body text-lg text-ink/60 ml-3">({pastEvents.length})</span>
             </h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {featuredEvents.map((event, index) => (
+              {pastEvents.map((event, index) => (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="group"
+                  whileHover={{ y: -5 }}
+                  onClick={() => handleEventClick(event)}
+                  className={`group relative overflow-hidden rounded-sm shadow-lg hover:shadow-2xl transition-all duration-300 ${
+                    event.photos && event.photos.length > 0 
+                      ? 'cursor-pointer' 
+                      : 'cursor-default'
+                  }`}
                 >
-                  <div className="relative overflow-hidden rounded-sm shadow-lg hover:shadow-2xl transition-all duration-300">
-                    <div className="aspect-[16/10] overflow-hidden">
-                      <img
-                        src={event.image}
-                        alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/50 to-transparent">
-                      <div className="absolute bottom-0 left-0 right-0 p-6 text-cream">
-                        <div className="flex items-center gap-3 mb-3">
-                          <span className="px-3 py-1 bg-gold text-ink text-xs font-accent uppercase tracking-wider rounded">
-                            {event.category}
-                          </span>
-                          {event.featured && (
-                            <span className="px-3 py-1 bg-rust text-cream text-xs font-accent uppercase tracking-wider rounded">
-                              Featured
-                            </span>
-                          )}
-                        </div>
-                        
-                        <h3 className="font-display text-2xl font-bold mb-2">{event.title}</h3>
-                        <p className="font-body text-cream/80 mb-4 line-clamp-2">{event.description}</p>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1 text-sm font-body text-cream/70">
-                            <div className="flex items-center gap-2">
-                              <Calendar className="w-4 h-4 text-gold" />
-                              {event.date}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4 text-gold" />
-                              {event.time}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MapPin className="w-4 h-4 text-gold" />
-                              {event.location}
-                            </div>
+                  <div className="aspect-[16/10] overflow-hidden">
+                    <img
+                      src={event.image}
+                      alt={event.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {event.photos && event.photos.length > 0 && (
+                      <div className="absolute top-4 right-4 bg-gold text-ink px-3 py-1 rounded-full text-xs font-accent uppercase tracking-wider flex items-center gap-1">
+                        <Camera className="w-3 h-3" />
+                        {event.photos.length} Photos
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/50 to-transparent">
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-cream">
+                      <div className="mb-3">
+                        <span className="px-3 py-1 bg-gold text-ink text-xs font-accent uppercase tracking-wider rounded">
+                          {event.category}
+                        </span>
+                      </div>
+                      
+                      <h3 className="font-display text-2xl font-bold mb-2">{event.title}</h3>
+                      <p className="font-body text-cream/80 mb-4 line-clamp-2">{event.description}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1 text-sm font-body text-cream/70">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-gold" />
+                            {event.date}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-gold" />
+                            {event.time}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-gold" />
+                            {event.location}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-gold" />
+                            {event.attendees} attended
                           </div>
                         </div>
+                        
+                        {event.photos && event.photos.length > 0 && (
+                          <div className="text-right">
+                            <span className="px-4 py-2 bg-gold text-ink text-sm font-accent uppercase tracking-wider rounded hover:bg-gold/80 transition-colors duration-300 inline-block">
+                              View Photos
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -241,7 +280,7 @@ export default function EventsPage() {
         )}
 
         {/* All Events */}
-        <section>
+        <section className={pastEvents.length > 0 ? "mt-20" : ""}>
           <h2 className="font-display text-3xl font-bold text-ink mb-8">
             {selectedCategory === "All" && !searchTerm ? "Upcoming Events" : "Search Results"}
             <span className="font-body text-lg text-ink/60 ml-3">({upcomingEvents.length})</span>
@@ -304,15 +343,30 @@ export default function EventsPage() {
                       </div>
                     </div>
                     
-                    <Button variant="outline" className="w-full border-gold text-gold hover:bg-gold hover:text-ink">
-                      Details
-                    </Button>
+                    {event.isMUN ? (
+                      <Link href="/mun">
+                        <Button variant="outline" className="w-full border-gold text-gold hover:bg-gold hover:text-ink">
+                          Details
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button variant="outline" className="w-full border-gold text-gold hover:bg-gold hover:text-ink">
+                        Details
+                      </Button>
+                    )}
                   </div>
                 </motion.div>
               ))}
             </div>
           )}
         </section>
+
+        {/* Event Photos Modal */}
+        <EventPhotosModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          event={selectedEvent}
+        />
       </div>
     </div>
   );

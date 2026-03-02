@@ -9,6 +9,7 @@ import NotFound from "@/pages/not-found";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
 import { AdminFab } from "@/components/AdminFab";
+import ScrollToTop from "@/components/ScrollToTop";
 
 import Home from "@/pages/Home";
 import About from "@/pages/About";
@@ -73,6 +74,7 @@ function Router() {
     <div className="flex flex-col min-h-screen">
       <NavBar />
       <main className="flex-grow flex flex-col">
+        <ScrollToTop />
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/about" component={About} />
