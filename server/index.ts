@@ -4,8 +4,11 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import { pool } from "./db";
+import MemoryStore from "memorystore";
+import path from "path";
+
+// Use memory store for SQLite (simpler for development)
+const MemoryStoreSession = MemoryStore(session);
 
 // Global error handlers
 process.on("uncaughtException", (error) => {
@@ -36,14 +39,14 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
-const PgStore = connectPgSimple(session);
+// Serve uploads folder for static files (images, PDFs, etc.)
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+// Use memory store for sessions (works with both SQLite and PostgreSQL)
 app.use(
   session({
-    store: new PgStore({
-      pool,
-      tableName: "session",
-      createTableIfMissing: true,
+    store: new MemoryStoreSession({
+      checkPeriod: 86400000 // prune expired entries every 24h
     }),
     secret: process.env.SESSION_SECRET || "change-me-in-production",
     resave: false,
@@ -51,6 +54,7 @@ app.use(
     cookie: {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
   }),
 );

@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { createServer } from "http";
+import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { existsSync, mkdirSync } from "fs";
@@ -771,7 +771,6 @@ export async function registerRoutes(
         name,
         email,
         phone: phone || null,
-        institution: institution || null,
         committee: committee || null,
         experience: experience || null
       });
@@ -795,6 +794,218 @@ export async function registerRoutes(
       return res.json(registrations);
     } catch (error) {
       next(error);
+    }
+  });
+
+  // Publications API
+  const publicationUpload = multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        const uploadDir = path.join(process.cwd(), "uploads", "publications");
+        if (!existsSync(uploadDir)) {
+          mkdirSync(uploadDir, { recursive: true });
+        }
+        cb(null, uploadDir);
+      },
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+      }
+    }),
+    limits: {
+      fileSize: 50 * 1024 * 1024, // 50MB limit for publications
+    },
+    fileFilter: (req, file, cb) => {
+      if (file.fieldname === 'coverImage') {
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (allowedTypes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(new Error('Invalid image type. Only JPEG, PNG, and WebP are allowed.'));
+        }
+      } else if (file.fieldname === 'pdfFile') {
+        if (file.mimetype === 'application/pdf') {
+          cb(null, true);
+        } else {
+          cb(new Error('Invalid file type. Only PDF files are allowed.'));
+        }
+      } else {
+        cb(null, true);
+      }
+    }
+  });
+
+  app.get(api.publications.list.path, async (req, res, next) => {
+    try {
+      const publicationsList = await storage.getPublications();
+      return res.json(publicationsList);
+    } catch (error) {
+      console.error("Publications fetch error:", error);
+      return res.json([]);
+    }
+  });
+
+  app.post(api.publications.create.path, publicationUpload.fields([
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'pdfFile', maxCount: 1 }
+  ]), async (req, res, next) => {
+    try {
+      const user = (req as any).user;
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const coverImage = files?.coverImage?.[0];
+      const pdfFile = files?.pdfFile?.[0];
+
+      const publicationData = {
+        ...req.body,
+        pages: req.body.pages ? parseInt(req.body.pages) : null,
+        featured: req.body.featured === 'true' || req.body.featured === true,
+        isActive: req.body.isActive === 'true' || req.body.isActive === true,
+        coverImage: coverImage ? `/uploads/publications/${coverImage.filename}` : null,
+        pdfFile: pdfFile ? `/uploads/publications/${pdfFile.filename}` : null,
+        pdfFileName: pdfFile ? pdfFile.originalname : null,
+      };
+
+      const publication = await storage.createPublication(publicationData);
+      return res.status(201).json(publication);
+    } catch (error) {
+      console.error("Publication creation error:", error);
+      const message = (error as any)?.message || "Failed to create publication";
+      return res.status(500).json({ message });
+    }
+  });
+
+  app.get("/api/publications/:id", async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      
+      // Increment views first
+      await storage.incrementPublicationViews(parseInt(id));
+      
+      // Then get the updated publication
+      const publication = await storage.getPublicationById(parseInt(id));
+      
+      if (!publication) {
+        return res.status(404).json({ message: "Publication not found" });
+      }
+      
+      return res.json(publication);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/publications/:id/download", async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const publication = await storage.getPublicationById(parseInt(id));
+      
+      if (!publication || !publication.pdfFile) {
+        return res.status(404).json({ message: "Publication file not found" });
+      }
+      
+      const filePath = path.join(process.cwd(), publication.pdfFile);
+      if (!existsSync(filePath)) {
+        return res.status(404).json({ message: "File not found on server" });
+      }
+      
+      // Increment downloads
+      await storage.incrementPublicationDownloads(parseInt(id));
+      
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${publication.pdfFileName || 'publication.pdf'}"`);
+      
+      return res.sendFile(filePath);
+    } catch (error) {
+      console.error("Publication download error:", error);
+      const message = (error as any)?.message || "Failed to download publication";
+      return res.status(500).json({ message });
+    }
+  });
+
+  app.put("/api/publications/:id", publicationUpload.fields([
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'pdfFile', maxCount: 1 }
+  ]), async (req, res, next) => {
+    try {
+      const user = (req as any).user;
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+
+      const { id } = req.params;
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const coverImage = files?.coverImage?.[0];
+      const pdfFile = files?.pdfFile?.[0];
+
+      const updates: any = { ...req.body };
+      
+      if (req.body.pages) updates.pages = parseInt(req.body.pages);
+      if (req.body.featured !== undefined) updates.featured = req.body.featured === 'true' || req.body.featured === true;
+      if (req.body.isActive !== undefined) updates.isActive = req.body.isActive === 'true' || req.body.isActive === true;
+      if (coverImage) updates.coverImage = `/uploads/publications/${coverImage.filename}`;
+      if (pdfFile) {
+        updates.pdfFile = `/uploads/publications/${pdfFile.filename}`;
+        updates.pdfFileName = pdfFile.originalname;
+      }
+
+      const publication = await storage.updatePublication(parseInt(id as string), updates);
+      
+      if (!publication) {
+        return res.status(404).json({ message: "Publication not found" });
+      }
+      
+      return res.json(publication);
+    } catch (error) {
+      console.error("Publication update error:", error);
+      const message = (error as any)?.message || "Failed to update publication";
+      return res.status(500).json({ message });
+    }
+  });
+
+  app.delete("/api/publications/:id", async (req, res, next) => {
+    try {
+      const user = (req as any).user;
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+      
+      const { id } = req.params;
+      const deleted = await storage.deletePublication(parseInt(id));
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Publication not found" });
+      }
+      
+      return res.status(204).end();
+    } catch (error) {
+      console.error("Publication deletion error:", error);
+      const message = (error as any)?.message || "Failed to delete publication";
+      return res.status(500).json({ message });
+    }
+  });
+
+  // Like a publication
+  app.post("/api/publications/:id/like", async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const publication = await storage.getPublicationById(parseInt(id));
+      
+      if (!publication) {
+        return res.status(404).json({ message: "Publication not found" });
+      }
+      
+      await storage.incrementPublicationLikes(parseInt(id as string));
+      
+      return res.json({ success: true, likes: (publication.likes || 0) + 1 });
+    } catch (error) {
+      console.error("Like error:", error);
+      const message = (error as any)?.message || "Failed to like publication";
+      return res.status(500).json({ message });
     }
   });
 

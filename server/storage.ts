@@ -9,6 +9,7 @@ import {
   submissions,
   eventRegistrations,
   munRegistrations,
+  publications,
   type User,
   type InsertUser,
   type ContactSubmission,
@@ -27,6 +28,8 @@ import {
   type InsertEventRegistration,
   type MunRegistration,
   type InsertMunRegistration,
+  type Publication,
+  type InsertPublication,
 } from "@shared/schema";
 import { eq, desc, and } from "drizzle-orm";
 
@@ -70,6 +73,16 @@ export interface IStorage {
   createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration>;
   getMunRegistrations(): Promise<MunRegistration[]>;
   checkMunRegistration(userId: string): Promise<MunRegistration | undefined>;
+
+  // Publications
+  createPublication(publication: InsertPublication): Promise<Publication>;
+  getPublications(): Promise<Publication[]>;
+  getPublicationById(id: number): Promise<Publication | undefined>;
+  updatePublication(id: number, updates: Partial<InsertPublication>): Promise<Publication | undefined>;
+  deletePublication(id: number): Promise<boolean>;
+  incrementPublicationViews(id: number): Promise<void>;
+  incrementPublicationDownloads(id: number): Promise<void>;
+  incrementPublicationLikes(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -392,6 +405,102 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error checking MUN registration:", error);
       throw new Error("Failed to check MUN registration");
+    }
+  }
+
+  // Publications
+  async createPublication(insertPublication: InsertPublication): Promise<Publication> {
+    try {
+      const [publication] = await db.insert(publications).values(insertPublication).returning();
+      return publication;
+    } catch (error) {
+      console.error("Error creating publication:", error);
+      throw new Error("Failed to create publication");
+    }
+  }
+
+  async getPublications(): Promise<Publication[]> {
+    try {
+      return await db.select().from(publications).where(eq(publications.isActive, true)).orderBy(desc(publications.publishDate));
+    } catch (error) {
+      console.error("Error fetching publications:", error);
+      throw new Error("Failed to fetch publications");
+    }
+  }
+
+  async getPublicationById(id: number): Promise<Publication | undefined> {
+    try {
+      const [publication] = await db.select().from(publications).where(eq(publications.id, id));
+      return publication;
+    } catch (error) {
+      console.error("Error fetching publication:", error);
+      throw new Error("Failed to fetch publication");
+    }
+  }
+
+  async updatePublication(id: number, updates: Partial<InsertPublication>): Promise<Publication | undefined> {
+    try {
+      const [updatedPublication] = await db
+        .update(publications)
+        .set(updates)
+        .where(eq(publications.id, id))
+        .returning();
+      return updatedPublication;
+    } catch (error) {
+      console.error("Error updating publication:", error);
+      throw new Error("Failed to update publication");
+    }
+  }
+
+  async deletePublication(id: number): Promise<boolean> {
+    try {
+      const result = await db.delete(publications).where(eq(publications.id, id));
+      return (result.rowCount ?? 0) > 0;
+    } catch (error) {
+      console.error("Error deleting publication:", error);
+      throw new Error("Failed to delete publication");
+    }
+  }
+
+  async incrementPublicationViews(id: number): Promise<void> {
+    try {
+      const publication = await this.getPublicationById(id);
+      if (publication) {
+        await db
+          .update(publications)
+          .set({ views: (publication.views || 0) + 1 })
+          .where(eq(publications.id, id));
+      }
+    } catch (error) {
+      console.error("Error incrementing publication views:", error);
+    }
+  }
+
+  async incrementPublicationDownloads(id: number): Promise<void> {
+    try {
+      const publication = await this.getPublicationById(id);
+      if (publication) {
+        await db
+          .update(publications)
+          .set({ downloads: (publication.downloads || 0) + 1 })
+          .where(eq(publications.id, id));
+      }
+    } catch (error) {
+      console.error("Error incrementing publication downloads:", error);
+    }
+  }
+
+  async incrementPublicationLikes(id: number): Promise<void> {
+    try {
+      const publication = await this.getPublicationById(id);
+      if (publication) {
+        await db
+          .update(publications)
+          .set({ likes: (publication.likes || 0) + 1 })
+          .where(eq(publications.id, id));
+      }
+    } catch (error) {
+      console.error("Error incrementing publication likes:", error);
     }
   }
 }

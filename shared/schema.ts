@@ -1,20 +1,19 @@
 import {
   pgTable,
   text,
-  serial,
   integer,
   boolean,
   timestamp,
-  date,
-  varchar,
   index,
+  serial,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
 
 export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
@@ -37,13 +36,13 @@ export const events = pgTable("events", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
-  eventDate: date("event_date"),
+  eventDate: text("event_date"),
   isActive: boolean("is_active").default(true),
 });
 
 export const gameScores = pgTable("game_scores", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   gameType: text("game_type").notNull(), // 'strands' or 'spellbee'
   score: integer("score"),
   completionTime: integer("completion_time"),
@@ -57,10 +56,9 @@ export const puzzles = pgTable("puzzles", {
   id: serial("id").primaryKey(),
   type: text("type").notNull(), // 'strands' or 'spellbee'
   data: text("data").notNull(), // JSON stringified puzzle data
-  publishDate: date("publish_date").notNull(),
+  publishDate: text("publish_date").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
-  // Composite index for fast daily puzzle lookup
   typeDateIdx: index("puzzles_type_date_idx").on(table.type, table.publishDate),
   publishDateIdx: index("puzzles_publish_date_idx").on(table.publishDate),
 }));
@@ -72,7 +70,7 @@ export const content = pgTable("content", {
   content: text("content").notNull(),
   answer: text("answer"), // for riddles
   author: text("author").notNull(),
-  date: date("date").notNull(),
+  date: text("date").notNull(),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -92,9 +90,28 @@ export const submissions = pgTable("submissions", {
   submittedAt: timestamp("submitted_at").defaultNow(),
 });
 
+export const publications = pgTable("publications", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  category: text("category").notNull(), // 'newspaper', 'magazine', 'journal', 'anthology'
+  author: text("author").notNull(),
+  description: text("description").notNull(),
+  coverImage: text("cover_image"), // path to cover image
+  pdfFile: text("pdf_file"), // path to PDF file
+  pdfFileName: text("pdf_file_name"),
+  pages: integer("pages"),
+  publishDate: text("publish_date").notNull(),
+  featured: boolean("featured").default(false),
+  views: integer("views").default(0),
+  downloads: integer("downloads").default(0),
+  likes: integer("likes").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const eventRegistrations = pgTable("event_registrations", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   eventId: integer("event_id").notNull(),
   eventTitle: text("event_title").notNull(),
   registeredAt: timestamp("registered_at").defaultNow(),
@@ -102,7 +119,7 @@ export const eventRegistrations = pgTable("event_registrations", {
 
 export const munRegistrations = pgTable("mun_registrations", {
   id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone"),
@@ -130,6 +147,7 @@ export const insertContentSchema = createInsertSchema(content).omit({
 export const insertSubmissionSchema = createInsertSchema(submissions).omit({ id: true, submittedAt: true });
 export const insertEventRegistrationSchema = createInsertSchema(eventRegistrations).omit({ id: true, registeredAt: true });
 export const insertMunRegistrationSchema = createInsertSchema(munRegistrations).omit({ id: true, registeredAt: true });
+export const insertPublicationSchema = createInsertSchema(publications).omit({ id: true, createdAt: true, views: true, downloads: true, likes: true });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -149,3 +167,5 @@ export type EventRegistration = typeof eventRegistrations.$inferSelect;
 export type InsertEventRegistration = z.infer<typeof insertEventRegistrationSchema>;
 export type MunRegistration = typeof munRegistrations.$inferSelect;
 export type InsertMunRegistration = z.infer<typeof insertMunRegistrationSchema>;
+export type Publication = typeof publications.$inferSelect;
+export type InsertPublication = z.infer<typeof insertPublicationSchema>;

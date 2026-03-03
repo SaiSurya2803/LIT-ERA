@@ -5,12 +5,14 @@ import {
   insertGameScoreSchema,
   insertPuzzleSchema,
   insertContentSchema,
+  insertPublicationSchema,
   users,
   contactSubmissions,
   events,
   gameScores,
   puzzles,
   content,
+  publications,
 } from "./schema";
 
 export const errorSchemas = {
@@ -172,6 +174,49 @@ export const api = {
     delete: {
       method: "DELETE" as const,
       path: "/api/content/:id" as const,
+      responses: {
+        204: z.undefined(),
+        404: errorSchemas.notFound,
+      },
+    },
+  },
+  publications: {
+    list: {
+      method: "GET" as const,
+      path: "/api/publications" as const,
+      responses: {
+        200: z.array(z.custom<typeof publications.$inferSelect>()),
+      },
+    },
+    create: {
+      method: "POST" as const,
+      path: "/api/publications" as const,
+      input: insertPublicationSchema,
+      responses: {
+        201: z.custom<typeof publications.$inferSelect>(),
+        400: errorSchemas.validation,
+      },
+    },
+    get: {
+      method: "GET" as const,
+      path: "/api/publications/:id" as const,
+      responses: {
+        200: z.custom<typeof publications.$inferSelect>(),
+        404: errorSchemas.notFound,
+      },
+    },
+    update: {
+      method: "PUT" as const,
+      path: "/api/publications/:id" as const,
+      input: insertPublicationSchema.partial(),
+      responses: {
+        200: z.custom<typeof publications.$inferSelect>(),
+        404: errorSchemas.notFound,
+      },
+    },
+    delete: {
+      method: "DELETE" as const,
+      path: "/api/publications/:id" as const,
       responses: {
         204: z.undefined(),
         404: errorSchemas.notFound,
