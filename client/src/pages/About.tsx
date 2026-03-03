@@ -298,6 +298,34 @@ export default function About() {
               <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
+                    src="/images/keerthana.jpeg"
+                    alt="Kambadur Sai Keerthana"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Kambadur Sai Keerthana</h3>
+              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Social and PR</p>
+              <p className="font-body text-ink/70 text-sm leading-relaxed">
+                Amplifying our voice across digital platforms and engaging our community online.
+              </p>
+            </motion.div>
+          </div>
+
+          {/* Additional Team Members Row 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mt-16">
+            {/* Team Member 7 - Lahari */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1 }}
+              whileHover={{ y: -10 }}
+              className="text-center group"
+            >
+              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <div className="aspect-[3/4] overflow-hidden">
+                  <img
                     src="/images/lahari.jpeg"
                     alt="Lahari Meshram"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -309,34 +337,6 @@ export default function About() {
               <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Social and PR</p>
               <p className="font-body text-ink/70 text-sm leading-relaxed">
                 Building community relationships and managing public outreach initiatives for the club.
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Additional Team Members Row 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mt-16">
-            {/* Team Member 7 - Keerthana */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/keerthana.jpeg"
-                    alt="Keerthana"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Keerthana</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Social and PR</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Amplifying our voice across digital platforms and engaging our community online.
               </p>
             </motion.div>
 
