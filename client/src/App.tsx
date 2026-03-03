@@ -9,11 +9,10 @@ import NotFound from "@/pages/not-found";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
 import { AdminFab } from "@/components/AdminFab";
+import ScrollToTop from "@/components/ScrollToTop";
 
 import Home from "@/pages/Home";
 import About from "@/pages/About";
-import Zones from "@/pages/Zones";
-import ZoneDetail from "@/pages/ZoneDetail";
 import EventsPage from "@/pages/EventsPage";
 import Contact from "@/pages/Contact";
 import MUN from "@/pages/MUN";
@@ -75,11 +74,10 @@ function Router() {
     <div className="flex flex-col min-h-screen">
       <NavBar />
       <main className="flex-grow flex flex-col">
+        <ScrollToTop />
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/about" component={About} />
-          <Route path="/zones" component={Zones} />
-          <Route path="/zones/:zoneId" component={ZoneDetail} />
           <Route path="/events" component={EventsPage} />
           <Route path="/mun" component={MUN} />
           <Route path="/magazine" component={Magazine} />

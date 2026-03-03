@@ -100,22 +100,13 @@ export const eventRegistrations = pgTable("event_registrations", {
   registeredAt: timestamp("registered_at").defaultNow(),
 });
 
-export const zoneMemberships = pgTable("zone_memberships", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").references(() => users.id),
-  zoneId: text("zone_id").notNull(),
-  zoneName: text("zone_name").notNull(),
-  joinedAt: timestamp("joined_at").defaultNow(),
-});
-
 export const munRegistrations = pgTable("mun_registrations", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").references(() => users.id),
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone"),
-  institution: text("institution"),
-  committee: text("committee"),
+  committee: text("committee").notNull(),
   experience: text("experience"),
   registeredAt: timestamp("registered_at").defaultNow(),
 });
@@ -138,7 +129,6 @@ export const insertContentSchema = createInsertSchema(content).omit({
 });
 export const insertSubmissionSchema = createInsertSchema(submissions).omit({ id: true, submittedAt: true });
 export const insertEventRegistrationSchema = createInsertSchema(eventRegistrations).omit({ id: true, registeredAt: true });
-export const insertZoneMembershipSchema = createInsertSchema(zoneMemberships).omit({ id: true, joinedAt: true });
 export const insertMunRegistrationSchema = createInsertSchema(munRegistrations).omit({ id: true, registeredAt: true });
 
 export type User = typeof users.$inferSelect;
@@ -157,7 +147,5 @@ export type Submission = typeof submissions.$inferSelect;
 export type InsertSubmission = z.infer<typeof insertSubmissionSchema>;
 export type EventRegistration = typeof eventRegistrations.$inferSelect;
 export type InsertEventRegistration = z.infer<typeof insertEventRegistrationSchema>;
-export type ZoneMembership = typeof zoneMemberships.$inferSelect;
-export type InsertZoneMembership = z.infer<typeof insertZoneMembershipSchema>;
 export type MunRegistration = typeof munRegistrations.$inferSelect;
 export type InsertMunRegistration = z.infer<typeof insertMunRegistrationSchema>;

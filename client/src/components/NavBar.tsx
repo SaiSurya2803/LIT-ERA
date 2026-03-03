@@ -23,7 +23,7 @@ export function NavBar() {
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
     { name: "MUN", path: "/mun" },
-    { name: "Zones", path: "/zones" },
+    { name: "Events", path: "/events" },
     { name: "Magazine", path: "/magazine" },
     { name: "Contact", path: "/contact" },
   ];

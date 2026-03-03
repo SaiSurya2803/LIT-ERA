@@ -129,19 +129,19 @@ export default function Home() {
       {/* Content Display Section */}
       <ContentDisplay />
 
-      {/* Features/Zones Teaser */}
+      {/* Events/Activities Teaser */}
       <section className="py-24 px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-display text-4xl text-ink font-bold mb-4">Realms of <span className="italic text-gold font-light">Exploration</span></h2>
-          <p className="font-body text-lg text-ink/60 max-w-2xl mx-auto">Discover our specialized zones designed to nurture every facet of your creative and intellectual journey.</p>
+          <h2 className="font-display text-4xl text-ink font-bold mb-4">Literary <span className="italic text-gold font-light">Activities</span></h2>
+          <p className="font-body text-lg text-ink/60 max-w-2xl mx-auto">Discover our vibrant literary activities and events designed to nurture your creative journey.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { title: "Literature", icon: Book, desc: "Dive deep into classic and contemporary texts.", link: "/zones/reading" },
-            { title: "Creative Writing", icon: Feather, desc: "Express yourself through creative writing.", link: "/zones/writing" },
-            { title: "Poetry & Debate", icon: Sparkles, desc: "Engage in poetic expression and intellectual discourse.", link: "/zones/poetry" },
-            { title: "Community", icon: Users, desc: "Connect, volunteer, and grow together.", link: "/zones/cafe" },
+            { title: "Literary Events", icon: Book, desc: "Join our exciting literary events and workshops.", link: "/events" },
+            { title: "Model UN", icon: Users, desc: "Develop diplomatic skills through Model United Nations.", link: "/mun" },
+            { title: "Magazine", icon: Feather, desc: "Share your creative writing in our literary magazine.", link: "/magazine" },
+            { title: "Community", icon: Sparkles, desc: "Connect with fellow literature enthusiasts.", link: "/contact" },
           ].map((feature, i) => (
             <motion.div 
               key={i}

@@ -746,55 +746,6 @@ export async function registerRoutes(
     }
   });
 
-  // Zone Memberships
-  app.post("/api/zones/:id/join", async (req, res, next) => {
-    try {
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
-      
-      const { id } = req.params;
-      const { zoneName } = req.body;
-      
-      if (!zoneName) {
-        return res.status(400).json({ message: "Zone name is required" });
-      }
-      
-      // Check if already member
-      const existing = await storage.checkZoneMembership(user.id, id);
-      if (existing) {
-        return res.status(400).json({ message: "Already a member of this zone" });
-      }
-      
-      const membership = await storage.createZoneMembership({
-        userId: user.id,
-        zoneId: id,
-        zoneName
-      });
-      
-      return res.status(201).json(membership);
-    } catch (error) {
-      console.error("Zone membership error:", error);
-      const message = (error as any)?.message || "Failed to join zone";
-      return res.status(500).json({ message });
-    }
-  });
-
-  app.get("/api/zones/memberships", async (req, res, next) => {
-    try {
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
-      
-      const memberships = await storage.getZoneMemberships(user.id);
-      return res.json(memberships);
-    } catch (error) {
-      next(error);
-    }
-  });
-
   // MUN Registrations
   app.post("/api/mun/register", async (req, res, next) => {
     try {

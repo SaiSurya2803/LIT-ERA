@@ -86,45 +86,6 @@ export default function GuidelinesModal({ isOpen, onClose }: GuidelinesModalProp
               </div>
             </section>
 
-            {/* Zone Guidelines */}
-            <section>
-              <h3 className="font-display text-xl text-ink font-bold mb-4">Zone Guidelines</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  { 
-                    zone: "Reading Circle", 
-                    rules: ["Complete assigned readings", "Participate in discussions", "Respect diverse interpretations"] 
-                  },
-                  { 
-                    zone: "Writer's Workshop", 
-                    rules: ["Share original work", "Provide constructive feedback", "Maintain confidentiality"] 
-                  },
-                  { 
-                    zone: "Poetry Society", 
-                    rules: ["Original compositions only", "Respect poetic forms", "Encourage experimental expressions"] 
-                  },
-                  { 
-                    zone: "Literary Debate", 
-                    rules: ["Evidence-based arguments", "Respect opposing views", "Maintain academic integrity"] 
-                  },
-                  { 
-                    zone: "Literary Café", 
-                    rules: ["Informal respectful discourse", "Include all participants", "Share literary recommendations"] 
-                  }
-                ].map((zoneData, index) => (
-                  <div key={index} className="bg-cream/50 p-4 border border-gold/20 rounded-sm">
-                    <h4 className="font-accent text-ink text-sm tracking-widest uppercase mb-2">{zoneData.zone}</h4>
-                    <ul className="font-body text-ink/70 text-sm space-y-1">
-                      {Array.isArray(zoneData.rules) ? 
-                        zoneData.rules.map((rule, i) => <li key={i} className="flex items-start gap-2"><span className="text-gold mt-1">•</span> {rule}</li>) :
-                        <li className="flex items-start gap-2"><span className="text-gold mt-1">•</span> {zoneData.rules}</li>
-                      }
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </section>
-
             {/* Event Guidelines */}
             <section>
               <h3 className="font-display text-xl text-ink font-bold mb-4">Event Guidelines</h3>

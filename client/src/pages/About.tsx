@@ -69,11 +69,85 @@ export default function About() {
 
         </div>
 
-        {/* Our Team Section */}
+        {/* Faculty Coordinator Section */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
+          className="mt-32"
+        >
+          <div className="text-center mb-16">
+            <span className="font-accent text-gold text-sm tracking-[0.3em] uppercase mb-4 block">Guidance</span>
+            <h2 className="font-display text-4xl md:text-5xl text-ink font-bold mb-6">
+              Faculty <span className="italic font-light text-gold">Coordinator</span>
+            </h2>
+            <div className="w-24 h-px bg-gold mx-auto"></div>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              whileHover={{ y: -5 }}
+              className="bg-white border border-ink/5 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-sm overflow-hidden"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+                {/* Faculty Image */}
+                <div className="md:col-span-1 flex items-center justify-center py-4 px-8 bg-ink/5">
+                  <div className="w-64 h-64 rounded-sm overflow-hidden border-4 border-gold shadow-lg">
+                    <img
+                      src="/images/faculty.jpeg"
+                      alt="Faculty Coordinator"
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                </div>
+
+                {/* Faculty Details */}
+                <div className="md:col-span-2 p-8 md:p-12 flex flex-col justify-center">
+                  <h3 className="font-display text-3xl text-ink font-bold mb-2">Dr. [Faculty Name]</h3>
+                  <p className="font-accent text-gold text-sm tracking-widest uppercase mb-4">Faculty Coordinator</p>
+                  <p className="font-accent text-ink/70 text-sm tracking-widest uppercase mb-6">Department of English</p>
+                  
+                  <div className="space-y-4 font-body text-ink/80 leading-relaxed">
+                    <p>
+                      With over [X] years of experience in academia and literature, our faculty coordinator brings invaluable expertise and guidance to LIT'ERA Club. Their passion for literature and commitment to student development has been instrumental in shaping our literary community.
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                      <div className="bg-cream/50 p-4 rounded-sm border border-gold/20">
+                        <h4 className="font-accent text-ink text-sm tracking-widest uppercase mb-2">Expertise</h4>
+                        <ul className="font-body text-ink/70 text-sm space-y-1">
+                          <li>• Contemporary Literature</li>
+                          <li>• Creative Writing</li>
+                          <li>• Literary Criticism</li>
+                          <li>• Academic Research</li>
+                        </ul>
+                      </div>
+                      
+                      <div className="bg-cream/50 p-4 rounded-sm border border-gold/20">
+                        <h4 className="font-accent text-ink text-sm tracking-widest uppercase mb-2">Contributions</h4>
+                        <ul className="font-body text-ink/70 text-sm space-y-1">
+                          <li>• Mentorship Programs</li>
+                          <li>• Literary Workshops</li>
+                          <li>• Research Guidance</li>
+                          <li>• Curriculum Development</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Our Team Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
           className="mt-32"
         >
           <div className="text-center mb-16">
@@ -96,14 +170,14 @@ export default function About() {
               <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src="https://picsum.photos/seed/sudeepthi-kalisapudi/400/600.jpg"
-                    alt="Sudeepthi Kalisapudi"
+                    src="/images/jaahnavi.jpeg"
+                    alt="Jaahnavi Yeturi"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Sudeepthi Kalisapudi</h3>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Jaahnavi Yeturi</h3>
               <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">President</p>
               <p className="font-body text-ink/70 text-sm leading-relaxed">
                 Leading our literary community with vision and passion for fostering creative expression.
@@ -121,14 +195,14 @@ export default function About() {
               <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src="https://picsum.photos/seed/supritha-akula/400/600.jpg"
-                    alt="Supritha Akula"
+                    src="/images/lakshya.jpeg"
+                    alt="Lakhshya"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Supritha Akula</h3>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Lakshaya Agnihotri</h3>
               <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Vice President</p>
               <p className="font-body text-ink/70 text-sm leading-relaxed">
                 Supporting our mission through innovative programs and community engagement initiatives.
@@ -146,14 +220,14 @@ export default function About() {
               <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src="https://picsum.photos/seed/jsai-neelima/400/600.jpg"
-                    alt="J Sai Neelima"
+                    src="/images/neha.jpeg"
+                    alt="Neha"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">J Sai Neelima</h3>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Gunda Neha</h3>
               <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Secretary</p>
               <p className="font-body text-ink/70 text-sm leading-relaxed">
                 Managing our resources with precision to support our literary endeavors and events.
@@ -174,14 +248,14 @@ export default function About() {
               <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src="https://picsum.photos/seed/namrata-mokshgundam/400/600.jpg"
-                    alt="Namrata Mokshgundam"
+                    src="/images/manaswitha.jpeg"
+                    alt="Manaswitha"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Namrata Mokshgundam</h3>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Manaswitha</h3>
               <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Treasurer</p>
               <p className="font-body text-ink/70 text-sm leading-relaxed">
                 Bringing our literary vision to life through stunning visual design and creative direction.
@@ -199,14 +273,14 @@ export default function About() {
               <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src="https://picsum.photos/seed/psanjana/400/600.jpg"
-                    alt="P Sanjana"
+                    src="/images/aashitha.jpeg"
+                    alt="Aashitha Koganti"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">P Sanjana</h3>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Aashitha Koganti</h3>
               <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Docs Lead</p>
               <p className="font-body text-ink/70 text-sm leading-relaxed">
                 Building bridges with our community and fostering meaningful connections through outreach.
@@ -224,20 +298,200 @@ export default function About() {
               <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src="https://picsum.photos/seed/swetha-sivakumar/400/600.jpg"
-                    alt="Swetha Sivakumar"
+                    src="/images/keerthana.jpeg"
+                    alt="Keerthana"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Swetha Sivakumar</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Social Media Head</p>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Keerthana</h3>
+              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Social and PR</p>
               <p className="font-body text-ink/70 text-sm leading-relaxed">
                 Amplifying our voice across digital platforms and engaging our community online.
               </p>
             </motion.div>
           </div>
+
+          {/* Additional Team Members Row 2 */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mt-16">
+            {/* Team Member 7 - Lahari */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1 }}
+              whileHover={{ y: -10 }}
+              className="text-center group"
+            >
+              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <div className="aspect-[3/4] overflow-hidden">
+                  <img
+                    src="/images/lahari.jpeg"
+                    alt="Lahari Meshram"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Lahari Meshram</h3>
+              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Social and PR</p>
+              <p className="font-body text-ink/70 text-sm leading-relaxed">
+                Building community relationships and managing public outreach initiatives for the club.
+              </p>
+            </motion.div>
+
+            {/* Team Member 8 - Gnaneshwari */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+              whileHover={{ y: -10 }}
+              className="text-center group"
+            >
+              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <div className="aspect-[3/4] overflow-hidden">
+                  <img
+                    src="/images/gnaneshwari.jpeg"
+                    alt="Gnaneshwari"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Gnaneshwari</h3>
+              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Event Management</p>
+              <p className="font-body text-ink/70 text-sm leading-relaxed">
+                Coordinating and executing club events with precision and creative vision.
+              </p>
+            </motion.div>
+
+            {/* Team Member 9 - Sneha Satapathy */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.3 }}
+              whileHover={{ y: -10 }}
+              className="text-center group"
+            >
+              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <div className="aspect-[3/4] overflow-hidden">
+                  <img
+                    src="/images/sneha.jpeg"
+                    alt="Sneha Satapathy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Sneha Satapathy</h3>
+              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Event Management</p>
+              <p className="font-body text-ink/70 text-sm leading-relaxed">
+                Orchestrating memorable literary events and ensuring seamless execution.
+              </p>
+            </motion.div>
+
+            {/* Team Member 10 - Azra */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.4 }}
+              whileHover={{ y: -10 }}
+              className="text-center group"
+            >
+              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <div className="aspect-[3/4] overflow-hidden">
+                  <img
+                    src="/images/azra.jpeg"
+                    alt="Azra"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Shaik Azra Anisha</h3>
+              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Content Head</p>
+              <p className="font-body text-ink/70 text-sm leading-relaxed">
+                Crafting compelling narratives and overseeing all written content for the club.
+              </p>
+            </motion.div>
+
+            {/* Team Member 11 - Deepika */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.5 }}
+              whileHover={{ y: -10 }}
+              className="text-center group"
+            >
+              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
+                <div className="aspect-[3/4] overflow-hidden">
+                  <img
+                    src="/images/deepika.jpeg"
+                    alt="Deepika"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+              <h3 className="font-display text-2xl text-ink font-bold mb-2">Deepika</h3>
+              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Content Head</p>
+              <p className="font-body text-ink/70 text-sm leading-relaxed">
+                Curating engaging literary content and managing editorial initiatives.
+              </p>
+            </motion.div>
+          </div>
+
+          {/* Core Team Section */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.6 }}
+            className="mt-20"
+          >
+            <div className="text-center mb-12">
+              <span className="font-accent text-gold text-sm tracking-[0.3em] uppercase mb-4 block">Foundation</span>
+              <h3 className="font-display text-3xl text-ink font-bold mb-4">
+                Core <span className="italic font-light text-gold">Team</span>
+              </h3>
+              <div className="w-16 h-px bg-gold mx-auto"></div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+              {[
+                { name: "Varnika Mishra", img: "varnika.jpeg" },
+                { name: "Nandipati Charitha Reddy", img: "charitha.jpeg" },
+                { name: "Yerrozu Navodith Charan", img: "navodith.jpeg" },
+                { name: "B. Ravi Teja", img: "ravi.jpeg" },
+                { name: "Bhanu Teja", img: "bhanu.jpeg" }
+              ].map((member, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.7 + index * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                  className="text-center group"
+                >
+                  <div className="relative mb-3 overflow-hidden rounded-full shadow-md group-hover:shadow-lg transition-all duration-300">
+                    <div className="aspect-square overflow-hidden">
+                      <img
+                        src={`/images/${member.img}`}
+                        alt={member.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  </div>
+                  <h4 className="font-body text-sm text-ink font-medium group-hover:text-gold transition-colors duration-300">
+                    {member.name}
+                  </h4>
+                  <p className="font-accent text-xs text-gold/70 tracking-widest uppercase">
+                    Core
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
 
           {/* Litera Members Section */}
           <motion.div 
@@ -257,14 +511,24 @@ export default function About() {
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
               {/* Litera Members */}
               {[
-                "Bheema Sai Surya", "Charitha", "Keerthana", "Varnika Mishra", "Hasika Reddy",
-                "Akshitha Reddy", "Akshaya Thummala", "Nirali Chowdary", "Siri Anusha", "Sathwika",
-                "Navodith", "Sudhiksha", "Ravi Teja", "Bhanu Teja", "Jaahnavi Yeturi",
-                "Azra", "Afiya Sulthana", "Navya Sri", "Satya Sahithi", "Lahari",
-                "Shashank Seera", "Hemtej", "Surya Vadan", "Neha", "Sneha",
-                "Gnaneshwari", "Lakshaya", "Sushrutha", "Deepika", "Aashitha",
-                "Yashwanth", "Manaswitha", "Shalini"
-              ].map((name, index) => (
+                { name: "Bheema Sai Surya", img: "saisurya.jpeg" },
+                { name: "Polaki Navya Sri", img: "navya.jpeg" },
+                { name: "Shalini", img: "shalini.jpeg" },
+                { name: "Sudhiksha Chiluvuri", img: "sudhiksha.jpeg" },
+                { name: "Akshaya Thummala", img: "akshaya.jpeg" },
+                { name: "T. Akshitha Reddy", img: "akshitha.jpeg" },
+                { name: "Nirrali Chowdary", img: "nirrali.jpeg" },
+                { name: "Yashwanth Rishindra Varma", img: "yashwanth.jpeg" },
+                { name: "S. Sai Sushrutha", img: "sushrutha.jpeg" },
+                { name: "Afiya Sulthana", img: "afiya.jpeg" },
+                { name: "K. Sree Satya Sahithi", img: "sahithi.jpeg" },
+                { name: "Shashank Seera", img: "shashank.jpeg" },
+                { name: "Kalyanam Surya Vadan", img: "surya.jpeg" },
+                { name: "Siri Anusha", img: "siri.jpeg" },
+                { name: "Sathwika", img: "sathwika.jpeg" },
+                { name: "A.S.V Kailash Keerthan", img: "kailash.jpg" },
+                { name: "Hemtej", img: "hemtej.jpeg" }
+              ].map((member, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -276,15 +540,15 @@ export default function About() {
                   <div className="relative mb-3 overflow-hidden rounded-full shadow-md group-hover:shadow-lg transition-all duration-300">
                     <div className="aspect-square overflow-hidden">
                       <img
-                        src={`https://picsum.photos/seed/litera-member-${index}/200/200.jpg`}
-                        alt={name}
+                        src={`/images/${member.img}`}
+                        alt={member.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <h4 className="font-body text-sm text-ink font-medium group-hover:text-gold transition-colors duration-300">
-                    {name}
+                    {member.name}
                   </h4>
                   <p className="font-accent text-xs text-gold/70 tracking-widest uppercase">
                     Member

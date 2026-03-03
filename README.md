@@ -1,6 +1,6 @@
-# 🌟 Litera Club – Literary Magazine Platform
+# 🌟 Litera Club – Literary Platform
 
-A modern full-stack literary magazine platform built with **React, Node.js, and PostgreSQL**, featuring submission management, admin dashboard, authentication, interactive games, and file upload capabilities.
+A modern full-stack literary magazine platform built with **React, Node.js, and PostgreSQL**, featuring submission management, admin dashboard, authentication,  and file upload capabilities.
 
 ---
 

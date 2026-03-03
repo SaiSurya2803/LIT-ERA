@@ -29,18 +29,17 @@ export function Footer() {
           <h4 className="font-accent text-gold text-sm tracking-[0.2em] uppercase mb-6">Explore</h4>
           <ul className="space-y-4 font-body text-lg">
             <li><Link href="/about" className="text-cream/70 hover:text-gold transition-colors">Our Story</Link></li>
-            <li><Link href="/zones" className="text-cream/70 hover:text-gold transition-colors">Club Zones</Link></li>
+            <li><Link href="/events" className="text-cream/70 hover:text-gold transition-colors">Upcoming Events</Link></li>
             <li><Link href="/contact" className="text-cream/70 hover:text-gold transition-colors">Get in Touch</Link></li>
           </ul>
         </div>
         
         <div>
-          <h4 className="font-accent text-gold text-sm tracking-[0.2em] uppercase mb-6">Zones</h4>
+          <h4 className="font-accent text-gold text-sm tracking-[0.2em] uppercase mb-6">Activities</h4>
           <ul className="space-y-4 font-body text-lg">
-            <li><Link href="/zones/reading" className="text-cream/70 hover:text-gold transition-colors">Reading Circle</Link></li>
-            <li><Link href="/zones/writing" className="text-cream/70 hover:text-gold transition-colors">Writer's Workshop</Link></li>
-            <li><Link href="/zones/poetry" className="text-cream/70 hover:text-gold transition-colors">Poetry Society</Link></li>
-            <li><Link href="/zones/debate" className="text-cream/70 hover:text-gold transition-colors">Literary Debate</Link></li>
+            <li><Link href="/mun" className="text-cream/70 hover:text-gold transition-colors">Model UN</Link></li>
+            <li><Link href="/magazine" className="text-cream/70 hover:text-gold transition-colors">Literary Magazine</Link></li>
+            <li><Link href="/events" className="text-cream/70 hover:text-gold transition-colors">Literary Events</Link></li>
           </ul>
         </div>
         

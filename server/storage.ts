@@ -8,7 +8,6 @@ import {
   content,
   submissions,
   eventRegistrations,
-  zoneMemberships,
   munRegistrations,
   type User,
   type InsertUser,
@@ -26,8 +25,6 @@ import {
   type InsertSubmission,
   type EventRegistration,
   type InsertEventRegistration,
-  type ZoneMembership,
-  type InsertZoneMembership,
   type MunRegistration,
   type InsertMunRegistration,
 } from "@shared/schema";
@@ -68,11 +65,6 @@ export interface IStorage {
   createEventRegistration(registration: InsertEventRegistration): Promise<EventRegistration>;
   getEventRegistrations(userId: string): Promise<EventRegistration[]>;
   checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined>;
-
-  // Zone Memberships
-  createZoneMembership(membership: InsertZoneMembership): Promise<ZoneMembership>;
-  getZoneMemberships(userId: string): Promise<ZoneMembership[]>;
-  checkZoneMembership(userId: string, zoneId: string): Promise<ZoneMembership | undefined>;
 
   // MUN Registrations
   createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration>;
@@ -370,41 +362,6 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error("Error checking event registration:", error);
       throw new Error("Failed to check event registration");
-    }
-  }
-
-  // Zone Memberships
-  async createZoneMembership(membership: InsertZoneMembership): Promise<ZoneMembership> {
-    try {
-      const [zoneMember] = await db.insert(zoneMemberships).values(membership).returning();
-      return zoneMember;
-    } catch (error) {
-      console.error("Error creating zone membership:", error);
-      throw new Error("Failed to join zone");
-    }
-  }
-
-  async getZoneMemberships(userId: string): Promise<ZoneMembership[]> {
-    try {
-      return await db.select().from(zoneMemberships).where(eq(zoneMemberships.userId, userId)).orderBy(desc(zoneMemberships.joinedAt));
-    } catch (error) {
-      console.error("Error fetching zone memberships:", error);
-      throw new Error("Failed to fetch zone memberships");
-    }
-  }
-
-  async checkZoneMembership(userId: string, zoneId: string): Promise<ZoneMembership | undefined> {
-    try {
-      const [membership] = await db.select().from(zoneMemberships).where(
-        and(
-          eq(zoneMemberships.userId, userId),
-          eq(zoneMemberships.zoneId, zoneId)
-        )
-      );
-      return membership;
-    } catch (error) {
-      console.error("Error checking zone membership:", error);
-      throw new Error("Failed to check zone membership");
     }
   }
 
