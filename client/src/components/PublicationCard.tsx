@@ -6,10 +6,9 @@ import { Card, CardContent } from "@/components/ui/card";
 interface PublicationCardProps {
   publication: any;
   index: number;
-  onDownload: (id: number, pdfFile: string | null, fileName: string | null) => void;
+  onDownload: (pdfFile: string | null, fileName: string | null) => void;
   onView: (id: number, pdfFile: string | null) => void;
   onLike: (id: number) => void;
-  onShare: (publication: any) => void;
 }
 
 export default function PublicationCard({
@@ -18,7 +17,6 @@ export default function PublicationCard({
   onDownload,
   onView,
   onLike,
-  onShare
 }: PublicationCardProps) {
   const isArticle = publication.category === 'article';
 
@@ -64,7 +62,7 @@ export default function PublicationCard({
           <h3 className="font-display text-xl font-bold text-ink mb-2 group-hover:text-gold transition-colors">
             {publication.title}
           </h3>
-          {!isArticle && publication.description && (
+          {publication.description && (
             <p className="font-body text-ink/70 text-sm mb-4 line-clamp-2">
               {publication.description}
             </p>
@@ -102,12 +100,22 @@ export default function PublicationCard({
             </div>
           </div>
           <div className="flex gap-2">
-            {!isArticle && (
+            {publication.pdfFile ? (
+              <a 
+                href={publication.pdfFile} 
+                download={publication.pdfFileName || 'publication.pdf'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-ink text-cream font-accent text-xs uppercase tracking-widest hover:bg-gold hover:text-ink transition-all shadow-sm inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium min-h-8"
+              >
+                <Download className="w-3 h-3" />
+                Download
+              </a>
+            ) : (
               <Button 
                 size="sm" 
-                className="flex-1 bg-ink text-cream font-accent text-xs uppercase tracking-widest hover:bg-gold hover:text-ink transition-all shadow-sm"
-                onClick={() => onDownload(publication.id, publication.pdfFile, publication.pdfFileName)}
-                disabled={!publication.pdfFile}
+                className="flex-1 bg-ink text-cream font-accent text-xs uppercase tracking-widest hover:bg-gold hover:text-ink transition-all shadow-sm opacity-50 cursor-not-allowed"
+                disabled
               >
                 <Download className="w-3 h-3 mr-1" />
                 Download
@@ -116,22 +124,13 @@ export default function PublicationCard({
             <Button 
               size="sm" 
               variant="outline"
-              className={`border-ink text-ink font-accent text-xs uppercase tracking-widest hover:bg-ink hover:text-cream transition-all shadow-sm ${isArticle ? 'flex-1' : ''}`}
+              className="border-ink text-ink font-accent text-xs uppercase tracking-widest hover:bg-ink hover:text-cream transition-all shadow-sm"
               onClick={() => onView(publication.id, publication.pdfFile)}
               disabled={!publication.pdfFile}
               title="View PDF"
             >
               <Eye className="w-3 h-3 mr-1" />
               View
-            </Button>
-            <Button 
-              size="sm" 
-              variant="outline"
-              className={`border-ink text-ink font-accent text-xs uppercase tracking-widest hover:bg-ink hover:text-cream transition-all shadow-sm ${isArticle ? 'flex-1' : ''}`}
-              onClick={() => onShare(publication)}
-              title="Share"
-            >
-              <Share2 className="w-3 h-3" />
             </Button>
           </div>
         </CardContent>

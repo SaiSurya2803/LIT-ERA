@@ -5,6 +5,7 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import session from "express-session";
 import MemoryStore from "memorystore";
+import path from "path";
 
 // Use memory store for SQLite (simpler for development)
 const MemoryStoreSession = MemoryStore(session);
@@ -39,7 +40,7 @@ app.use(
 app.use(express.urlencoded({ extended: false }));
 
 // Serve uploads folder for static files (images, PDFs, etc.)
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Use memory store for sessions (works with both SQLite and PostgreSQL)
 app.use(

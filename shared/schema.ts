@@ -1,78 +1,82 @@
 import {
-  sqliteTable,
+  pgTable,
   text,
   integer,
+  boolean,
+  timestamp,
   index,
-} from "drizzle-orm/sqlite-core";
+  serial,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
 
-export const users = sqliteTable("users", {
-  id: text("id").primaryKey().default(sql`(lower(hex(randomblob(16))))`),
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   club: text("club").default("LIT'ERA"),
-  isAdmin: integer("is_admin", { mode: 'boolean' }).default(false),
-  joinDate: integer("join_date", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  isAdmin: boolean("is_admin").default(false),
+  joinDate: timestamp("join_date").defaultNow(),
 });
 
-export const contactSubmissions = sqliteTable("contact_submissions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const contactSubmissions = pgTable("contact_submissions", {
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   country: text("country"),
   reason: text("reason"),
   message: text("message").notNull(),
-  submissionDate: integer("submission_date", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  submissionDate: timestamp("submission_date").defaultNow(),
 });
 
-export const events = sqliteTable("events", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const events = pgTable("events", {
+  id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
-  eventDate: text("event_date"), // SQLite uses text for dates
-  isActive: integer("is_active", { mode: 'boolean' }).default(true),
+  eventDate: text("event_date"),
+  isActive: boolean("is_active").default(true),
 });
 
-export const gameScores = sqliteTable("game_scores", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: text("user_id").references(() => users.id),
+export const gameScores = pgTable("game_scores", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   gameType: text("game_type").notNull(), // 'strands' or 'spellbee'
   score: integer("score"),
   completionTime: integer("completion_time"),
-  completedDate: integer("completed_date", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  completedDate: timestamp("completed_date").defaultNow(),
 }, (table) => ({
   gameTypeIdx: index("game_scores_game_type_idx").on(table.gameType),
   userIdIdx: index("game_scores_user_id_idx").on(table.userId),
 }));
 
-export const puzzles = sqliteTable("puzzles", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const puzzles = pgTable("puzzles", {
+  id: serial("id").primaryKey(),
   type: text("type").notNull(), // 'strands' or 'spellbee'
   data: text("data").notNull(), // JSON stringified puzzle data
   publishDate: text("publish_date").notNull(),
-  createdAt: integer("created_at", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  createdAt: timestamp("created_at").defaultNow(),
 }, (table) => ({
   typeDateIdx: index("puzzles_type_date_idx").on(table.type, table.publishDate),
   publishDateIdx: index("puzzles_publish_date_idx").on(table.publishDate),
 }));
 
-export const content = sqliteTable("content", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const content = pgTable("content", {
+  id: serial("id").primaryKey(),
   type: text("type").notNull(), // 'thought', 'riddle', 'quote', 'fact', 'poem'
   title: text("title").notNull(),
   content: text("content").notNull(),
   answer: text("answer"), // for riddles
   author: text("author").notNull(),
   date: text("date").notNull(),
-  isActive: integer("is_active", { mode: 'boolean' }).default(true),
-  createdAt: integer("created_at", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const submissions = sqliteTable("submissions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const submissions = pgTable("submissions", {
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   title: text("title").notNull(),
@@ -83,11 +87,11 @@ export const submissions = sqliteTable("submissions", {
   originalFileName: text("original_file_name"),
   filePath: text("file_path"),
   status: text("status").default("pending"), // 'pending', 'approved', 'rejected'
-  submittedAt: integer("submitted_at", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  submittedAt: timestamp("submitted_at").defaultNow(),
 });
 
-export const publications = sqliteTable("publications", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const publications = pgTable("publications", {
+  id: serial("id").primaryKey(),
   title: text("title").notNull(),
   category: text("category").notNull(), // 'newspaper', 'magazine', 'journal', 'anthology'
   author: text("author").notNull(),
@@ -97,31 +101,31 @@ export const publications = sqliteTable("publications", {
   pdfFileName: text("pdf_file_name"),
   pages: integer("pages"),
   publishDate: text("publish_date").notNull(),
-  featured: integer("featured", { mode: 'boolean' }).default(false),
+  featured: boolean("featured").default(false),
   views: integer("views").default(0),
   downloads: integer("downloads").default(0),
   likes: integer("likes").default(0),
-  isActive: integer("is_active", { mode: 'boolean' }).default(true),
-  createdAt: integer("created_at", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const eventRegistrations = sqliteTable("event_registrations", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: text("user_id").references(() => users.id),
+export const eventRegistrations = pgTable("event_registrations", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   eventId: integer("event_id").notNull(),
   eventTitle: text("event_title").notNull(),
-  registeredAt: integer("registered_at", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  registeredAt: timestamp("registered_at").defaultNow(),
 });
 
-export const munRegistrations = sqliteTable("mun_registrations", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  userId: text("user_id").references(() => users.id),
+export const munRegistrations = pgTable("mun_registrations", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   email: text("email").notNull(),
   phone: text("phone"),
   committee: text("committee").notNull(),
   experience: text("experience"),
-  registeredAt: integer("registered_at", { mode: 'timestamp' }).default(sql`(unixepoch())`),
+  registeredAt: timestamp("registered_at").defaultNow(),
 });
 
 // Zod Schemas

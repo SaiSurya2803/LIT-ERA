@@ -1,5 +1,5 @@
 import type { Express } from "express";
-import { createServer } from "http";
+import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
 import { existsSync, mkdirSync } from "fs";
@@ -771,7 +771,6 @@ export async function registerRoutes(
         name,
         email,
         phone: phone || null,
-        institution: institution || null,
         committee: committee || null,
         experience: experience || null
       });
@@ -954,7 +953,7 @@ export async function registerRoutes(
         updates.pdfFileName = pdfFile.originalname;
       }
 
-      const publication = await storage.updatePublication(parseInt(id), updates);
+      const publication = await storage.updatePublication(parseInt(id as string), updates);
       
       if (!publication) {
         return res.status(404).json({ message: "Publication not found" });
@@ -1000,9 +999,7 @@ export async function registerRoutes(
         return res.status(404).json({ message: "Publication not found" });
       }
       
-      await storage.updatePublication(parseInt(id), {
-        likes: (publication.likes || 0) + 1
-      });
+      await storage.incrementPublicationLikes(parseInt(id as string));
       
       return res.json({ success: true, likes: (publication.likes || 0) + 1 });
     } catch (error) {

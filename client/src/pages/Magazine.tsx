@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { FileText, BookOpen, Newspaper, Plus } from "lucide-react";
+import { FileText, BookOpen, Newspaper, Plus, Search, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import SubmissionModal from "@/components/SubmissionModal";
@@ -11,6 +11,8 @@ export default function Magazine() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [submissionOpen, setSubmissionOpen] = useState(false);
   const [guidelinesOpen, setGuidelinesOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [magazineLikes, setMagazineLikes] = useState(0);
   
   // Fetch publications from database
   const { data: publicationsFromDB = [], isLoading, refetch } = usePublications();
@@ -27,92 +29,274 @@ export default function Magazine() {
     {
       id: 1,
       title: "19th Year on Earth",
-      category: "Book",
+      category: "book",
       author: "Yashwanth Rishindra",
       date: "January 11, 2026",
       description: "The 19th year on Earth represents a critical bridge between adolescence and adulthood, often characterized by intense personal growth, self-discovery, and significant life shifts. It is a phase of exploring identity, purpose, and independence, marking the transition away from high school and into higher education, early career, or personal freedom.",
       image: "https://www.amazon.in/19th-Year-Earth-YASHWANTH-RISHINDRA-ebook/dp/B0GG6GTKJ4",
       type: "Book",
       pages: 24,
-      downloads: 145,
+      downloads: 234,
       views: 892,
       likes: 67,
-      featured: true
+      featured: true,
+      pdfFile: "/uploads/publications/19th-Year-on-Earth.pdf",
+      pdfFileName: "19th-Year-on-Earth.pdf"
     },
     {
       id: 2,
-      title: "Literary Voices - Spring Collection",
+      title: "You Just Made My Day",
       category: "magazine",
-      author: "Creative Writing Team",
+      author: "Pooja Sirasala",
       date: "March 10, 2026",
-      description: "Collection of poetry, short stories, and creative writing from club members.",
-      image: "https://picsum.photos/seed/literary-voices-spring/400/300.jpg",
+      description: "A heartwarming short story about the small moments that bring joy and meaning to our lives.",
+      image: "https://picsum.photos/seed/you-made-my-day/400/300.jpg",
       type: "Magazine",
-      pages: 24,
-      downloads: 89,
-      views: 456,
+      pages: 12,
+      downloads: 67,
+      views: 234,
       likes: 43,
-      featured: true
+      featured: true,
+      pdfFile: "/uploads/publications/You Just Made My Day Short Story- Pooja Sirasala.pdf",
+      pdfFileName: "You-Just-Made-My-Day.pdf"
     },
     {
       id: 3,
-      title: "Research Journal - Literary Analysis",
+      title: "Unipath",
       category: "journal",
-      author: "Academic Committee",
+      author: "Pranathi Chitte",
       date: "March 5, 2026",
-      description: "Peer-reviewed research papers on contemporary literary themes and analysis.",
-      image: "https://picsum.photos/seed/research-journal/400/300.jpg",
+      description: "A personal journey through the paths of self-discovery and academic exploration.",
+      image: "https://picsum.photos/seed/unipath-journey/400/300.jpg",
       type: "Research Journal",
-      pages: 36,
-      downloads: 67,
-      views: 234,
+      pages: 24,
+      downloads: 45,
+      views: 156,
       likes: 29,
-      featured: false
+      featured: false,
+      pdfFile: "/uploads/publications/Unipath - Pranathi Chitte.pdf",
+      pdfFileName: "Unipath-Pranathi-Chitte.pdf"
     },
     {
       id: 4,
-      title: "Litera Times - February 2026 Edition",
+      title: "Turning Point",
       category: "newspaper",
-      author: "Editorial Team",
+      author: "N SADHRIKA",
       date: "February 15, 2026",
-      description: "Previous edition with event coverage, interviews, and literary news.",
-      image: "https://picsum.photos/seed/litera-times-february/400/300.jpg",
+      description: "An insightful exploration of life's defining moments - those critical junctures where decisions shape our future, challenges test our resolve, and new paths emerge from old ones. This article examines how recognizing and navigating these turning points can lead to personal growth and transformative change.",
+      image: "https://picsum.photos/seed/turning-point/400/300.jpg",
       type: "Newspaper",
-      pages: 10,
-      downloads: 123,
-      views: 678,
+      pages: 6,
+      downloads: 89,
+      views: 234,
       likes: 54,
-      featured: false
+      featured: false,
+      pdfFile: "/uploads/publications/Turning point - N SADHRIKA.pdf",
+      pdfFileName: "Turning-Point-N-SADHRIKA.pdf"
     },
     {
       id: 5,
-      title: "Poetry Anthology 2026",
+      title: "The Summit",
       category: "anthology",
-      author: "Poetry Society",
+      author: "Sri Charan Kota",
       date: "February 28, 2026",
-      description: "Annual collection of original poetry from club members and guest poets.",
-      image: "https://picsum.photos/seed/poetry-anthology/400/300.jpg",
+      description: "A poetic exploration of reaching new heights and overcoming challenges.",
+      image: "https://picsum.photos/seed/the-summit/400/300.jpg",
       type: "Anthology",
-      pages: 48,
-      downloads: 156,
-      views: 789,
+      pages: 32,
+      downloads: 178,
+      views: 445,
       likes: 89,
-      featured: true
+      featured: true,
+      pdfFile: "/uploads/publications/The Summit- sri charan kota.pdf",
+      pdfFileName: "The-Summit-Sri-Charan-Kota.pdf"
     },
     {
       id: 6,
-      title: "Literary Criticism Quarterly",
+      title: "The Courage to Be Delulu",
       category: "journal",
-      author: "Critics Circle",
+      author: "VINEETHA N",
       date: "February 20, 2026",
-      description: "Quarterly publication featuring critical essays and book reviews.",
-      image: "https://picsum.photos/seed/criticism-quarterly/400/300.jpg",
+      description: "A critical analysis of modern social phenomena and the courage to embrace authenticity.",
+      image: "https://picsum.photos/seed/courage-delulu/400/300.jpg",
       type: "Journal",
-      pages: 18,
-      downloads: 45,
+      pages: 16,
+      downloads: 34,
       views: 189,
       likes: 23,
-      featured: false
+      featured: false,
+      pdfFile: "/uploads/publications/The Courage to Be Delulu - VINEETHA N.pdf",
+      pdfFileName: "The-Courage-to-Be-Delulu-VINEETHA-N.pdf"
+    },
+    {
+      id: 7,
+      title: "The Chapter I'm in",
+      category: "article",
+      author: "Shaik Azra",
+      date: "March 1, 2026",
+      description: "A reflective journey through the chapters of life, exploring how each phase brings its own lessons, challenges, and opportunities for growth. This personal narrative delves into the transitions between different stages of existence, examining how we navigate the spaces between who we were and who we are becoming.",
+      image: "https://picsum.photos/seed/chapter-im-in/400/300.jpg",
+      type: "Article",
+      pages: 4,
+      downloads: 28,
+      views: 89,
+      likes: 18,
+      featured: false,
+      pdfFile: "/uploads/publications/The Chapter I'm in - Shaik Azra.pdf",
+      pdfFileName: "The-Chapter-Im-in-Shaik-Azra.pdf"
+    },
+    {
+      id: 8,
+      title: "Poem Collection",
+      category: "anthology",
+      author: "Yasaswy Potturi",
+      date: "February 25, 2026",
+      description: "A collection of original poems exploring themes of love, loss, and hope.",
+      image: "https://picsum.photos/seed/poem-collection/400/300.jpg",
+      type: "Anthology",
+      pages: 28,
+      downloads: 92,
+      views: 167,
+      likes: 45,
+      featured: true,
+      pdfFile: "/uploads/publications/Poem - Yasaswy Potturi.pdf",
+      pdfFileName: "Poem-Collection-Yasaswy-Potturi.pdf"
+    },
+    {
+      id: 9,
+      title: "Literary Voices",
+      category: "magazine",
+      author: "Various Authors",
+      date: "March 15, 2026",
+      description: "A collection of diverse literary works from our talented community members, showcasing different writing styles and perspectives.",
+      image: "https://picsum.photos/seed/literary-voices/400/300.jpg",
+      type: "Magazine",
+      pages: 48,
+      downloads: 156,
+      views: 445,
+      likes: 78,
+      featured: true,
+      pdfFile: "/uploads/publications/Literary Voices - Various Authors.pdf",
+      pdfFileName: "Literary-Voices-Various-Authors.pdf"
+    },
+    {
+      id: 10,
+      title: "Campus Chronicles",
+      category: "newspaper",
+      author: "Student Editorial Team",
+      date: "March 8, 2026",
+      description: "Monthly updates on campus events, student achievements, and institutional developments from our dedicated editorial team.",
+      image: "https://picsum.photos/seed/campus-chronicles/400/300.jpg",
+      type: "Newspaper",
+      pages: 12,
+      downloads: 89,
+      views: 234,
+      likes: 34,
+      featured: false,
+      pdfFile: "/uploads/publications/Campus Chronicles - Student Editorial Team.pdf",
+      pdfFileName: "Campus-Chronicles-Student-Editorial-Team.pdf"
+    },
+    {
+      id: 11,
+      title: "Digital Poetry Review",
+      category: "article",
+      author: "Sarah Mitchell",
+      date: "March 12, 2026",
+      description: "An in-depth analysis of contemporary digital poetry platforms and their impact on traditional poetic expression.",
+      image: "https://picsum.photos/seed/digital-poetry-review/400/300.jpg",
+      type: "Article",
+      pages: 6,
+      downloads: 45,
+      views: 123,
+      likes: 28,
+      featured: false,
+      pdfFile: "/uploads/publications/Digital Poetry Review - Sarah Mitchell.pdf",
+      pdfFileName: "Digital-Poetry-Review-Sarah-Mitchell.pdf"
+    },
+    {
+      id: 12,
+      title: "Creative Writing Workshop",
+      category: "article",
+      author: "Michael Chen",
+      date: "March 18, 2026",
+      description: "A comprehensive guide to creative writing techniques, exercises, and best practices for aspiring writers.",
+      image: "https://picsum.photos/seed/creative-writing-workshop/400/300.jpg",
+      type: "Article",
+      pages: 8,
+      downloads: 67,
+      views: 189,
+      likes: 41,
+      featured: false,
+      pdfFile: "/uploads/publications/Creative Writing Workshop - Michael Chen.pdf",
+      pdfFileName: "Creative-Writing-Workshop-Michael-Chen.pdf"
+    },
+    {
+      id: 13,
+      title: "Annual Literary Awards",
+      category: "magazine",
+      author: "Literature Department",
+      date: "March 22, 2026",
+      description: "Celebrating excellence in literary achievement across all categories including poetry, fiction, non-fiction, and academic writing.",
+      image: "https://picsum.photos/seed/annual-literary-awards/400/300.jpg",
+      type: "Magazine",
+      pages: 24,
+      downloads: 234,
+      views: 567,
+      likes: 89,
+      featured: true,
+      pdfFile: "/uploads/publications/Annual Literary Awards - Literature Department.pdf",
+      pdfFileName: "Annual-Literary-Awards-Literature-Department.pdf"
+    },
+    {
+      id: 14,
+      title: "Research Symposium",
+      category: "journal",
+      author: "Dr. Rachel Green",
+      date: "March 25, 2026",
+      description: "Academic proceedings from our annual research symposium featuring scholarly articles on literary theory and contemporary literature.",
+      image: "https://picsum.photos/seed/research-symposium/400/300.jpg",
+      type: "Research Journal",
+      pages: 36,
+      downloads: 78,
+      views: 234,
+      likes: 56,
+      featured: false,
+      pdfFile: "/uploads/publications/Research Symposium - Dr. Rachel Green.pdf",
+      pdfFileName: "Research-Symposium-Dr-Rachel-Green.pdf"
+    },
+    {
+      id: 15,
+      title: "Student Spotlight",
+      category: "magazine",
+      author: "Emma Thompson",
+      date: "March 28, 2026",
+      description: "Featuring outstanding student writers and their exceptional works selected from our monthly submissions and writing workshops.",
+      image: "https://picsum.photos/seed/student-spotlight/400/300.jpg",
+      type: "Magazine",
+      pages: 16,
+      downloads: 145,
+      views: 389,
+      likes: 67,
+      featured: true,
+      pdfFile: "/uploads/publications/Student Spotlight - Emma Thompson.pdf",
+      pdfFileName: "Student-Spotlight-Emma-Thompson.pdf"
+    },
+    {
+      id: 16,
+      title: "Poetry Slam Results",
+      category: "anthology",
+      author: "Various Poets",
+      date: "March 30, 2026",
+      description: "Collection of winning poems and performances from our annual poetry slam competition, showcasing raw talent and emotional expression.",
+      image: "https://picsum.photos/seed/poetry-slam-results/400/300.jpg",
+      type: "Anthology",
+      pages: 20,
+      downloads: 89,
+      views: 345,
+      likes: 78,
+      featured: false,
+      pdfFile: "/uploads/publications/Poetry Slam Results - Various Poets.pdf",
+      pdfFileName: "Poetry-Slam-Results-Various-Poets.pdf"
     }
   ];
 
@@ -161,34 +345,37 @@ export default function Magazine() {
   }));
 
   const filteredPublications = selectedCategory === "all" 
-    ? publicationsDisplay 
-    : publicationsDisplay.filter((pub: any) => pub.category === selectedCategory);
+    ? publicationsDisplay.filter((pub: any) => 
+        pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pub.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : publicationsDisplay.filter((pub: any) => 
+        (pub.category === selectedCategory) && 
+        (pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         pub.description?.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
 
-  const featuredPublications = publicationsDisplay.filter((pub: any) => pub.featured);
-
-  const handleDownload = async (id: number, pdfFile: string | null, fileName: string | null) => {
+  const handleDownload = (id: number, pdfFile: string | null, fileName: string | null) => {
     if (!pdfFile) {
       alert("PDF file not available");
       return;
     }
-    
-    try {
-      const response = await fetch(`/api/publications/${id}/download`);
-      if (!response.ok) throw new Error("Download failed");
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName || 'publication.pdf';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error("Download error:", error);
-      alert("Failed to download file");
-    }
+
+    const link = document.createElement("a");
+    link.href = pdfFile;
+    link.setAttribute("download", fileName || "publication.pdf");
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Wrapper function for PublicationCard compatibility
+  const handleDownloadWrapper = (pdfFile: string | null, fileName: string | null) => {
+    handleDownload(0, pdfFile, fileName); // id is not used in new implementation
   };
 
   const handleView = async (id: number, pdfFile: string | null) => {
@@ -224,6 +411,11 @@ export default function Magazine() {
       console.error("Like error:", error);
       alert("Failed to like publication");
     }
+  };
+
+  const handleLikeMagazine = () => {
+    setMagazineLikes(prev => prev + 1);
+    alert("You liked LIT'ERA Magazine! ❤️");
   };
 
   const handleShare = async (publication: any) => {
@@ -282,75 +474,59 @@ export default function Magazine() {
               Explore our collection of newspapers, magazines, research journals, and creative anthologies. 
               Discover the voices of our literary community and stay updated with club news and events.
             </p>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-wrap items-center justify-center gap-4 mt-8 mx-auto max-w-lg w-full"
-          >
-            <Button 
-              className="!bg-gold !text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-cream hover:!text-ink transition-all"
-              onClick={() => setSubmissionOpen(true)}
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Submit Publication
-            </Button>
+            <div className="flex items-center justify-center gap-4 mt-6">
+              <Button 
+                className="!bg-gold !text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-cream hover:!text-ink transition-all"
+                onClick={() => setSubmissionOpen(true)}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Submit Publication
+              </Button>
+              <Button 
+                className="bg-cream text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:bg-ink hover:text-cream transition-all border border-ink/20"
+                onClick={handleLikeMagazine}
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Like Magazine ({magazineLikes})
+              </Button>
+            </div>
           </motion.div>
         </div>
       </motion.section>
 
-      {/* Featured Publications */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-ink mb-4">
-              Featured Publications
-            </h2>
-            <p className="font-body text-ink/70 max-w-2xl mx-auto">
-              Highlighted works from our literary community, showcasing exceptional writing and editorial excellence.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredPublications.map((publication: any, index: number) => (
-              <PublicationCard
-                key={publication.id}
-                publication={publication}
-                index={index}
-                onDownload={handleDownload}
-                onView={handleView}
-                onLike={handleLike}
-                onShare={handleShare}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       {/* Category Filter */}
-      <section className="py-12 px-6 bg-cream">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-8 mx-auto max-w-lg">
+      <section className="py-6 px-6 bg-cream">
+        <div className="flex items-center justify-between max-w-7xl mx-auto gap-6">
+          {/* Search Bar */}
+          <div className="w-80">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink/40" />
+              <input
+                type="text"
+                placeholder="Search publications..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 h-10 border border-ink/20 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold text-sm"
+              />
+            </div>
+          </div>
+          
+          {/* Filter Buttons */}
+          <div className="flex gap-2">
             {categories.map((category: any) => (
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full font-accent text-xs uppercase tracking-widest transition-all border ${
-                  selectedCategory === category.id
-                    ? "bg-ink text-cream border-ink"
-                    : "bg-cream text-ink border-ink/30 hover:bg-ink hover:text-cream hover:border-ink"
-                }`}
-              >
-                {category.icon}
-                {category.name}
-              </button>
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={
+                    selectedCategory === category.id
+                      ? "bg-ink text-white px-4 py-2 rounded-md"
+                      : "border border-gold text-gold bg-transparent px-4 py-2 rounded-md hover:bg-gold hover:text-black"
+                  }
+                >
+                  {category.icon}
+                  {category.name}
+                </button>
             ))}
           </div>
         </div>
@@ -363,7 +539,7 @@ export default function Magazine() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-12"
+            className="text-center mb-16"
           >
             <h2 className="font-display text-3xl md:text-4xl font-bold text-ink mb-4">
               All Publications
@@ -379,10 +555,9 @@ export default function Magazine() {
                 key={publication.id}
                 publication={publication}
                 index={index}
-                onDownload={handleDownload}
+                onDownload={handleDownloadWrapper}
                 onView={handleView}
                 onLike={handleLike}
-                onShare={handleShare}
               />
             ))}
           </div>

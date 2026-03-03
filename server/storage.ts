@@ -82,6 +82,7 @@ export interface IStorage {
   deletePublication(id: number): Promise<boolean>;
   incrementPublicationViews(id: number): Promise<void>;
   incrementPublicationDownloads(id: number): Promise<void>;
+  incrementPublicationLikes(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -486,6 +487,20 @@ export class DatabaseStorage implements IStorage {
       }
     } catch (error) {
       console.error("Error incrementing publication downloads:", error);
+    }
+  }
+
+  async incrementPublicationLikes(id: number): Promise<void> {
+    try {
+      const publication = await this.getPublicationById(id);
+      if (publication) {
+        await db
+          .update(publications)
+          .set({ likes: (publication.likes || 0) + 1 })
+          .where(eq(publications.id, id));
+      }
+    } catch (error) {
+      console.error("Error incrementing publication likes:", error);
     }
   }
 }
