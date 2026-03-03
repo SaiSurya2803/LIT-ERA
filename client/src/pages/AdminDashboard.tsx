@@ -15,12 +15,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { Plus, Edit, Trash2, Brain, Lightbulb, MessageSquare, FileText, Download, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, Brain, Lightbulb, MessageSquare, FileText, Download, Eye, RefreshCw } from "lucide-react";
 
 export default function AdminDashboard() {
   const { user, isAdmin, isLoading: authLoading } = useAuth();
   const { data: contacts, isLoading: contactsLoading } = useContacts();
-  const { data: contentItems, isLoading: contentLoading, error: contentError } = useContent();
+  const { data: contentItems, isLoading: contentLoading, error: contentError, refetch: refetchContent } = useContent();
   const { data: submissions, isLoading: submissionsLoading } = useQuery({
     queryKey: ["/api/submissions"],
     queryFn: async () => {
@@ -360,16 +360,26 @@ export default function AdminDashboard() {
             <div className="bg-white border border-ink/10 p-6 shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="font-display text-2xl font-bold text-ink">Content Management</h2>
-                <Button 
-                  onClick={() => {
-                    setEditingContent(null);
-                    setShowContentForm(true);
-                  }}
-                  className="bg-gold text-ink font-accent tracking-widest uppercase flex items-center gap-2"
-                >
-                  <Plus className="w-4 h-4" />
-                  Add Content
-                </Button>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={() => refetchContent()}
+                    variant="outline"
+                    className="border-ink text-ink hover:bg-ink hover:text-cream font-accent tracking-widest uppercase flex items-center gap-2"
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                    Refresh
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setEditingContent(null);
+                      setShowContentForm(true);
+                    }}
+                    className="bg-gold text-ink font-accent tracking-widest uppercase flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Content
+                  </Button>
+                </div>
               </div>
 
               {showContentForm && (

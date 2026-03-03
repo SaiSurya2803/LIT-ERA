@@ -7,7 +7,7 @@ import session from "express-session";
 import MemoryStore from "memorystore";
 import path from "path";
 
-// Use memory store for SQLite (simpler for development)
+// Use memory store for PostgreSQL sessions
 const MemoryStoreSession = MemoryStore(session);
 
 // Global error handlers
@@ -42,7 +42,7 @@ app.use(express.urlencoded({ extended: false }));
 // Serve uploads folder for static files (images, PDFs, etc.)
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// Use memory store for sessions (works with both SQLite and PostgreSQL)
+// Use memory store for PostgreSQL sessions
 app.use(
   session({
     store: new MemoryStoreSession({
