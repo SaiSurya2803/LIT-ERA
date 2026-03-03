@@ -51,11 +51,11 @@ export default function Magazine() {
     {
       id: 2,
       title: "You Just Made My Day",
-      category: "Short Story",
+      category: "Story",
       author: "Pooja Sirasala",
       date: "December 5, 2025",
       image: "https://picsum.photos/seed/you-made-my-day/400/300.jpg",
-      type: "Short Story",
+      type: "Story",
       pages: 1,
       downloads: 67,
       views: 234,
@@ -308,11 +308,10 @@ export default function Magazine() {
 
   const categories = [
     { id: "all", name: "All Publications", icon: <BookOpen className="w-4 h-4" /> },
-    { id: "newspaper", name: "Newspapers", icon: <Newspaper className="w-4 h-4" /> },
-    { id: "magazine", name: "Magazines", icon: <FileText className="w-4 h-4" /> },
-    { id: "journal", name: "Journals", icon: <BookOpen className="w-4 h-4" /> },
-    { id: "anthology", name: "Anthologies", icon: <FileText className="w-4 h-4" /> },
-    { id: "article", name: "Articles", icon: <FileText className="w-4 h-4" /> }
+    { id: "Book", name: "Books", icon: <BookOpen className="w-4 h-4" /> },
+    { id: "Story", name: "Stories", icon: <FileText className="w-4 h-4" /> },
+    { id: "Poem", name: "Poems", icon: <FileText className="w-4 h-4" /> },
+    { id: "Article", name: "Articles", icon: <FileText className="w-4 h-4" /> }
   ];
 
   // Use database publications if available, otherwise use fallback
