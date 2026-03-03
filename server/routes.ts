@@ -989,6 +989,27 @@ export async function registerRoutes(
     }
   });
 
+  // Like endpoint for publications
+  app.post("/api/publications/:id/like", async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      
+      // Increment likes
+      await storage.incrementPublicationLikes(parseInt(id));
+      
+      return res.status(200).json({ 
+        success: true,
+        message: "Publication liked successfully"
+      });
+    } catch (error) {
+      console.error("Like error:", error);
+      return res.status(500).json({ 
+        success: false,
+        message: "Failed to like publication"
+      });
+    }
+  });
+
   // Like a publication
   app.post("/api/publications/:id/like", async (req, res, next) => {
     try {

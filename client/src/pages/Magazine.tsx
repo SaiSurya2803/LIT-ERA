@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
-import { FileText, BookOpen, Newspaper, Plus, Search, Heart } from "lucide-react";
+import { FileText, BookOpen, Newspaper, Plus, Search, Heart, Eye, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import SubmissionModal from "@/components/SubmissionModal";
 import MagazineGuidelinesModal from "@/components/MagazineGuidelinesModal";
-import PublicationCard from "@/components/PublicationCard";
 import { usePublications } from "@/hooks/use-publications";
 
 export default function Magazine() {
@@ -13,6 +12,7 @@ export default function Magazine() {
   const [guidelinesOpen, setGuidelinesOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [magazineLikes, setMagazineLikes] = useState(0);
+  const [localPublications, setLocalPublications] = useState<any[]>([]);
   
   // Fetch publications from database
   const { data: publicationsFromDB = [], isLoading, refetch } = usePublications();
@@ -24,16 +24,21 @@ export default function Magazine() {
     return () => window.removeEventListener('openSubmissionModal', handleOpenSubmission);
   }, []);
 
+  // Sync local publications state with database data
+  useEffect(() => {
+    setLocalPublications(publicationsFromDB.length > 0 ? publicationsFromDB : fallbackPublications);
+  }, [publicationsFromDB]);
+
   // Fallback publications for display (will be replaced by database data)
   const fallbackPublications = [
     {
       id: 1,
       title: "19th Year on Earth",
-      category: "book",
+      category: "Book",
       author: "Yashwanth Rishindra",
       date: "January 11, 2026",
       description: "The 19th year on Earth represents a critical bridge between adolescence and adulthood, often characterized by intense personal growth, self-discovery, and significant life shifts. It is a phase of exploring identity, purpose, and independence, marking the transition away from high school and into higher education, early career, or personal freedom.",
-      image: "https://www.amazon.in/19th-Year-Earth-YASHWANTH-RISHINDRA-ebook/dp/B0GG6GTKJ4",
+      image: "https://m.media-amazon.com/images/I/61WYKDK6nSL._UF1000,1000_QL80_.jpg",
       type: "Book",
       pages: 24,
       downloads: 234,
@@ -46,30 +51,28 @@ export default function Magazine() {
     {
       id: 2,
       title: "You Just Made My Day",
-      category: "magazine",
+      category: "Short Story",
       author: "Pooja Sirasala",
-      date: "March 10, 2026",
-      description: "A heartwarming short story about the small moments that bring joy and meaning to our lives.",
+      date: "December 5, 2025",
       image: "https://picsum.photos/seed/you-made-my-day/400/300.jpg",
-      type: "Magazine",
-      pages: 12,
+      type: "Short Story",
+      pages: 1,
       downloads: 67,
       views: 234,
       likes: 43,
-      featured: true,
+      featured: false,
       pdfFile: "/uploads/publications/You Just Made My Day Short Story- Pooja Sirasala.pdf",
       pdfFileName: "You-Just-Made-My-Day.pdf"
     },
     {
       id: 3,
       title: "Unipath",
-      category: "journal",
+      category: "Poem",
       author: "Pranathi Chitte",
-      date: "March 5, 2026",
-      description: "A personal journey through the paths of self-discovery and academic exploration.",
+      date: "December 10, 2025",
       image: "https://picsum.photos/seed/unipath-journey/400/300.jpg",
-      type: "Research Journal",
-      pages: 24,
+      type: "Poem",
+      pages: 1,
       downloads: 45,
       views: 156,
       likes: 29,
@@ -80,13 +83,12 @@ export default function Magazine() {
     {
       id: 4,
       title: "Turning Point",
-      category: "newspaper",
+      category: "Story",
       author: "N SADHRIKA",
-      date: "February 15, 2026",
-      description: "An insightful exploration of life's defining moments - those critical junctures where decisions shape our future, challenges test our resolve, and new paths emerge from old ones. This article examines how recognizing and navigating these turning points can lead to personal growth and transformative change.",
+      date: "December 2, 2025",
       image: "https://picsum.photos/seed/turning-point/400/300.jpg",
-      type: "Newspaper",
-      pages: 6,
+      type: " Article ",
+      pages: 4,
       downloads: 89,
       views: 234,
       likes: 54,
@@ -97,30 +99,28 @@ export default function Magazine() {
     {
       id: 5,
       title: "The Summit",
-      category: "anthology",
+      category: "Story",
       author: "Sri Charan Kota",
-      date: "February 28, 2026",
-      description: "A poetic exploration of reaching new heights and overcoming challenges.",
+      date: "December 4, 2025",
       image: "https://picsum.photos/seed/the-summit/400/300.jpg",
-      type: "Anthology",
-      pages: 32,
+      type: "Story",
+      pages: 2,
       downloads: 178,
       views: 445,
       likes: 89,
-      featured: true,
+      featured: false,
       pdfFile: "/uploads/publications/The Summit- sri charan kota.pdf",
       pdfFileName: "The-Summit-Sri-Charan-Kota.pdf"
     },
     {
       id: 6,
       title: "The Courage to Be Delulu",
-      category: "journal",
-      author: "VINEETHA N",
-      date: "February 20, 2026",
-      description: "A critical analysis of modern social phenomena and the courage to embrace authenticity.",
+      category: "Poem",
+      author: "Vineetha N",
+      date: "December 17, 2025",
       image: "https://picsum.photos/seed/courage-delulu/400/300.jpg",
-      type: "Journal",
-      pages: 16,
+      type: "Poem",
+      pages: 1,
       downloads: 34,
       views: 189,
       likes: 23,
@@ -131,13 +131,12 @@ export default function Magazine() {
     {
       id: 7,
       title: "The Chapter I'm in",
-      category: "article",
+      category: "Poem",
       author: "Shaik Azra",
-      date: "March 1, 2026",
-      description: "A reflective journey through the chapters of life, exploring how each phase brings its own lessons, challenges, and opportunities for growth. This personal narrative delves into the transitions between different stages of existence, examining how we navigate the spaces between who we were and who we are becoming.",
+      date: "December 2, 2025",
       image: "https://picsum.photos/seed/chapter-im-in/400/300.jpg",
-      type: "Article",
-      pages: 4,
+      type: "Poem",
+      pages: 1,
       downloads: 28,
       views: 89,
       likes: 18,
@@ -147,156 +146,163 @@ export default function Magazine() {
     },
     {
       id: 8,
-      title: "Poem Collection",
-      category: "anthology",
+      title: "Fire In Every Footstep",
+      category: "Poem",
       author: "Yasaswy Potturi",
-      date: "February 25, 2026",
-      description: "A collection of original poems exploring themes of love, loss, and hope.",
+      date: "December 11, 2025",
       image: "https://picsum.photos/seed/poem-collection/400/300.jpg",
-      type: "Anthology",
-      pages: 28,
+      type: "Poem",
+      pages: 1,
       downloads: 92,
       views: 167,
       likes: 45,
-      featured: true,
+      featured: false,
       pdfFile: "/uploads/publications/Poem - Yasaswy Potturi.pdf",
       pdfFileName: "Poem-Collection-Yasaswy-Potturi.pdf"
     },
     {
       id: 9,
-      title: "Literary Voices",
-      category: "magazine",
-      author: "Various Authors",
-      date: "March 15, 2026",
-      description: "A collection of diverse literary works from our talented community members, showcasing different writing styles and perspectives.",
+      title: "A Fresh Start",
+      category: "Poem",
+      author: "Pranavi",
+      date: "December 7, 2025",
       image: "https://picsum.photos/seed/literary-voices/400/300.jpg",
-      type: "Magazine",
-      pages: 48,
+      type: "Poem",
+      pages: 1,
       downloads: 156,
       views: 445,
       likes: 78,
-      featured: true,
-      pdfFile: "/uploads/publications/Literary Voices - Various Authors.pdf",
-      pdfFileName: "Literary-Voices-Various-Authors.pdf"
+      featured: false,
+      pdfFile: "uploads/publications/A Fresh Start- Pranavi.pdf",
+      pdfFileName: "A Fresh Start- Pranavi.pdf"
     },
     {
       id: 10,
-      title: "Campus Chronicles",
-      category: "newspaper",
-      author: "Student Editorial Team",
-      date: "March 8, 2026",
-      description: "Monthly updates on campus events, student achievements, and institutional developments from our dedicated editorial team.",
+      title: "Am I really an Engineer",
+      category: "Poem",
+      author: "Rohith Mangamuri",
+      date: "December 17, 2025",
       image: "https://picsum.photos/seed/campus-chronicles/400/300.jpg",
-      type: "Newspaper",
-      pages: 12,
+      type: "Poem",
+      pages: 2,
       downloads: 89,
       views: 234,
       likes: 34,
       featured: false,
-      pdfFile: "/uploads/publications/Campus Chronicles - Student Editorial Team.pdf",
-      pdfFileName: "Campus-Chronicles-Student-Editorial-Team.pdf"
+      pdfFile: "uploads/publications/Am I really an Engineer - Rohith Mangamuri.pdf",
+      pdfFileName: "Am-I-really-an-Engineer-Rohith-Mangamuri.pdf"
     },
     {
       id: 11,
-      title: "Digital Poetry Review",
-      category: "article",
-      author: "Sarah Mitchell",
-      date: "March 12, 2026",
-      description: "An in-depth analysis of contemporary digital poetry platforms and their impact on traditional poetic expression.",
+      title: "Are You Niche or Performative",
+      category: "Poem",
+      author: "Ikshita",
+      date: "December 17, 2025",
       image: "https://picsum.photos/seed/digital-poetry-review/400/300.jpg",
-      type: "Article",
-      pages: 6,
+      type: "Poem",
+      pages: 1,
       downloads: 45,
       views: 123,
       likes: 28,
       featured: false,
-      pdfFile: "/uploads/publications/Digital Poetry Review - Sarah Mitchell.pdf",
-      pdfFileName: "Digital-Poetry-Review-Sarah-Mitchell.pdf"
+      pdfFile: "uploads/publications/Are You Niche or Performative - Ikshita.pdf",
+      pdfFileName: "Are You Niche or Performative - Ikshita.pdf"
     },
     {
       id: 12,
-      title: "Creative Writing Workshop",
-      category: "article",
-      author: "Michael Chen",
-      date: "March 18, 2026",
-      description: "A comprehensive guide to creative writing techniques, exercises, and best practices for aspiring writers.",
+      title: "Before the next bomb falls",
+      category: "Poem",
+      author: "Tasneem Firdous",
+      date: "December 7, 2025",
       image: "https://picsum.photos/seed/creative-writing-workshop/400/300.jpg",
-      type: "Article",
-      pages: 8,
+      type: "Poem",
+      pages: 1,
       downloads: 67,
       views: 189,
       likes: 41,
       featured: false,
-      pdfFile: "/uploads/publications/Creative Writing Workshop - Michael Chen.pdf",
-      pdfFileName: "Creative-Writing-Workshop-Michael-Chen.pdf"
+      pdfFile: "uploads/publications/Before the next bomb falls - Tasneem Firdous.pdf",
+      pdfFileName: "Before the next bomb falls - Tasneem Firdous.pdf"
     },
     {
       id: 13,
-      title: "Annual Literary Awards",
-      category: "magazine",
-      author: "Literature Department",
-      date: "March 22, 2026",
-      description: "Celebrating excellence in literary achievement across all categories including poetry, fiction, non-fiction, and academic writing.",
+      title: "Being vs Doing",
+      category: "Poem",
+      author: "sheripally Rakesh Goud",
+      date: "December 17, 2025",
       image: "https://picsum.photos/seed/annual-literary-awards/400/300.jpg",
-      type: "Magazine",
-      pages: 24,
+      type: "Poem",
+      pages: 1,
       downloads: 234,
       views: 567,
       likes: 89,
-      featured: true,
-      pdfFile: "/uploads/publications/Annual Literary Awards - Literature Department.pdf",
-      pdfFileName: "Annual-Literary-Awards-Literature-Department.pdf"
+      featured: false,
+      pdfFile: "uploads/publications/Being vs Doing- sheripally Rakesh Goud.pdf",
+      pdfFileName: "Being vs Doing- sheripally Rakesh Goud.pdf"
     },
     {
       id: 14,
-      title: "Research Symposium",
-      category: "journal",
-      author: "Dr. Rachel Green",
-      date: "March 25, 2026",
-      description: "Academic proceedings from our annual research symposium featuring scholarly articles on literary theory and contemporary literature.",
+      title: "Celestial Serenade",
+      category: "Poem",
+      author: "Dhruu",
+      date: "December 17, 2025",
       image: "https://picsum.photos/seed/research-symposium/400/300.jpg",
-      type: "Research Journal",
-      pages: 36,
+      type: " Poem ",
+      pages: 1,
       downloads: 78,
       views: 234,
       likes: 56,
       featured: false,
-      pdfFile: "/uploads/publications/Research Symposium - Dr. Rachel Green.pdf",
-      pdfFileName: "Research-Symposium-Dr-Rachel-Green.pdf"
+      pdfFile: "uploads/publications/Celestial Serenade - Dhruu.pdf",
+      pdfFileName: "Celestial-Serenade - Dhruu.pdf"
     },
     {
       id: 15,
-      title: "Student Spotlight",
-      category: "magazine",
-      author: "Emma Thompson",
-      date: "March 28, 2026",
-      description: "Featuring outstanding student writers and their exceptional works selected from our monthly submissions and writing workshops.",
+      title: "The Weight of Packed Bags",
+      category: "Article",
+      author: "Asiya Beig",
+      date: "December 17, 2025",
       image: "https://picsum.photos/seed/student-spotlight/400/300.jpg",
-      type: "Magazine",
-      pages: 16,
+      type: " Article ",
+      pages: 2,
       downloads: 145,
       views: 389,
       likes: 67,
-      featured: true,
-      pdfFile: "/uploads/publications/Student Spotlight - Emma Thompson.pdf",
-      pdfFileName: "Student-Spotlight-Emma-Thompson.pdf"
+      featured: false,
+      pdfFile: "uploads/publications/Document from Asiyabeig - Asiya Beig.pdf",
+      pdfFileName: "Document from Asiyabeig - Asiya Beig.pdf"
     },
     {
       id: 16,
-      title: "Poetry Slam Results",
-      category: "anthology",
-      author: "Various Poets",
-      date: "March 30, 2026",
-      description: "Collection of winning poems and performances from our annual poetry slam competition, showcasing raw talent and emotional expression.",
+      title: "Finding yourself",
+      category: "Article",
+      author: "sasamrutha Moganti",
+      date: "December 8, 2025",
       image: "https://picsum.photos/seed/poetry-slam-results/400/300.jpg",
-      type: "Anthology",
-      pages: 20,
+      type: "Article",
+      pages: 1,
       downloads: 89,
       views: 345,
       likes: 78,
       featured: false,
-      pdfFile: "/uploads/publications/Poetry Slam Results - Various Poets.pdf",
-      pdfFileName: "Poetry-Slam-Results-Various-Poets.pdf"
+      pdfFile: "uploads/publications/Finding yourself - Sasamrutha Moganti.pdf",
+      pdfFileName: "Finding yourself - Sasamrutha Moganti.pdf"
+    },
+    {
+      id: 17,
+      title: "Part",
+      category: "Story",
+      author: "Chikkam Radhakrishna",
+      date: "December 2, 2025",
+      image: "https://picsum.photos/seed/poetry-slam-results/400/300.jpg",
+      type: "Story",
+      pages: 2,
+      downloads: 89,
+      views: 345,
+      likes: 78,
+      featured: false,
+      pdfFile: "uploads/publications/Part - Chikkam Radhakrishna.pdf",
+      pdfFileName: "Part - Chikkam Radhakrishna.pdf"
     }
   ];
 
@@ -345,24 +351,44 @@ export default function Magazine() {
   }));
 
   const filteredPublications = selectedCategory === "all" 
-    ? publicationsDisplay.filter((pub: any) => 
+    ? localPublications.filter((pub: any) => 
         pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
         pub.description?.toLowerCase().includes(searchTerm.toLowerCase())
       )
-    : publicationsDisplay.filter((pub: any) => 
+    : localPublications.filter((pub: any) => 
         (pub.category === selectedCategory) && 
         (pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
          pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
          pub.description?.toLowerCase().includes(searchTerm.toLowerCase()))
       );
 
-  const handleDownload = (id: number, pdfFile: string | null, fileName: string | null) => {
+  const handleDownload = async (id: number, pdfFile: string | null, fileName: string | null) => {
     if (!pdfFile) {
       alert("PDF file not available");
       return;
     }
 
+    // Show immediate feedback
+    const updatedPublications = localPublications.map((pub: any) => 
+      pub.id === id ? { ...pub, downloads: pub.downloads + 1 } : pub
+    );
+    setLocalPublications(updatedPublications);
+
+    // Update database and then refetch
+    try {
+      const response = await fetch(`/api/publications/${id}/download`, { method: 'POST' });
+      console.log('Download response:', response);
+      if (response.ok) {
+        console.log('Download count updated in database');
+        // Refetch after a short delay to ensure database is updated
+        setTimeout(() => refetch(), 1000);
+      }
+    } catch (error) {
+      console.error("Error tracking download:", error);
+    }
+    
+    // Download file
     const link = document.createElement("a");
     link.href = pdfFile;
     link.setAttribute("download", fileName || "publication.pdf");
@@ -384,11 +410,21 @@ export default function Magazine() {
       return;
     }
     
-    // Increment view count
+    // Show immediate feedback
+    const updatedPublications = localPublications.map((pub: any) => 
+      pub.id === id ? { ...pub, views: pub.views + 1 } : pub
+    );
+    setLocalPublications(updatedPublications);
+    
+    // Update database and then refetch
     try {
-      await fetch(`/api/publications/${id}`, { method: 'GET' });
-      // Refetch publications to show updated view count
-      refetch();
+      const response = await fetch(`/api/publications/${id}`, { method: 'POST' });
+      console.log('View response:', response);
+      if (response.ok) {
+        console.log('View count updated in database');
+        // Refetch after a short delay to ensure database is updated
+        setTimeout(() => refetch(), 1000);
+      }
     } catch (error) {
       console.error("Error tracking view:", error);
     }
@@ -398,17 +434,45 @@ export default function Magazine() {
   };
 
   const handleLike = async (id: number) => {
+    // Show immediate feedback
+    const updatedPublications = localPublications.map((pub: any) => 
+      pub.id === id ? { ...pub, likes: pub.likes + 1 } : pub
+    );
+    setLocalPublications(updatedPublications);
+    
     try {
+      console.log('Attempting to like publication:', id);
       const response = await fetch(`/api/publications/${id}/like`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
+      console.log('Like response status:', response.status);
+      console.log('Like response ok:', response.ok);
+      
+      const responseData = await response.json();
+      console.log('Like response data:', responseData);
       
       if (response.ok) {
-        // Refetch publications to show updated like count
-        refetch();
+        console.log('Like count updated in database');
+        // Refetch after a short delay to ensure database is updated
+        setTimeout(() => refetch(), 1000);
+      } else {
+        console.error('Like failed:', responseData);
+        // Revert local change if API failed
+        const revertedPublications = localPublications.map((pub: any) => 
+          pub.id === id ? { ...pub, likes: pub.likes - 1 } : pub
+        );
+        setLocalPublications(revertedPublications);
       }
     } catch (error) {
       console.error("Like error:", error);
+      // Revert local change if API failed
+      const revertedPublications = localPublications.map((pub: any) => 
+        pub.id === id ? { ...pub, likes: pub.likes - 1 } : pub
+      );
+      setLocalPublications(revertedPublications);
       alert("Failed to like publication");
     }
   };
@@ -551,14 +615,99 @@ export default function Magazine() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPublications.map((publication: any, index: number) => (
-              <PublicationCard
+              <motion.div
                 key={publication.id}
-                publication={publication}
-                index={index}
-                onDownload={handleDownloadWrapper}
-                onView={handleView}
-                onLike={handleLike}
-              />
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              >
+                <div className="relative">
+                  <img 
+                    src={publication.image} 
+                    alt={publication.title}
+                    className="w-full h-48 object-cover"
+                  />
+                  {publication.featured && (
+                    <div className="absolute top-4 right-4 bg-gold text-ink px-3 py-1 rounded-full text-xs font-accent uppercase tracking-wider">
+                      Featured
+                    </div>
+                  )}
+                </div>
+                
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-gold font-accent uppercase tracking-wider">
+                      {publication.type}
+                    </span>
+                    <span className="text-sm text-ink/60">
+                      {publication.pages} pages
+                    </span>
+                  </div>
+                  
+                  <h3 className="font-display text-xl font-bold text-ink mb-2">
+                    {publication.title}
+                  </h3>
+                  
+                  <p className="font-body text-ink/70 text-sm mb-4 line-clamp-3">
+                    {publication.description}
+                  </p>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-accent text-sm text-ink/60">
+                      {publication.author}
+                    </span>
+                    <span className="font-accent text-sm text-ink/60">
+                      {publication.date}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4 text-sm text-ink/60">
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        {publication.views}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Download className="w-4 h-4" />
+                        {publication.downloads}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-4 h-4" />
+                        {publication.likes}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="flex-1 bg-ink text-cream hover:bg-gold hover:text-ink transition-colors"
+                      onClick={() => handleView(publication.id, publication.pdfFile)}
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 border-ink text-ink hover:bg-ink hover:text-cream transition-colors"
+                      onClick={() => handleDownload(publication.id, publication.pdfFile, publication.pdfFileName)}
+                    >
+                      <Download className="w-4 h-4 mr-1" />
+                      Download
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-gold text-gold hover:bg-gold hover:text-ink transition-colors"
+                      onClick={() => handleLike(publication.id)}
+                    >
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>
