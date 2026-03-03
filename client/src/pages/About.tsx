@@ -74,7 +74,7 @@ export default function About() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mt-32"
+          className="mt-32 mb-24"
         >
           <div className="text-center mb-16">
             <span className="font-accent text-gold text-sm tracking-[0.3em] uppercase mb-4 block">Guidance</span>
@@ -90,11 +90,11 @@ export default function About() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
               whileHover={{ y: -5 }}
-              className="bg-white border border-ink/5 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-sm overflow-hidden"
+              className="bg-white border border-ink/5 shadow-lg hover:shadow-2xl transition-all duration-300 rounded-sm overflow-hidden p-10"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+              <div className="flex flex-col md:flex-row items-center gap-12">
                 {/* Faculty Image */}
-                <div className="md:col-span-1 flex items-center justify-center py-4 px-8 bg-ink/5">
+                <div className="w-full md:w-[320px] flex-shrink-0 flex justify-center md:justify-start">
                   <div className="w-64 h-64 rounded-sm overflow-hidden border-4 border-gold shadow-lg">
                     <img
                       src="/images/faculty.jpeg"
@@ -105,34 +105,40 @@ export default function About() {
                 </div>
 
                 {/* Faculty Details */}
-                <div className="md:col-span-2 p-8 md:p-12 flex flex-col justify-center">
-                  <h3 className="font-display text-3xl text-ink font-bold mb-2">Dr. [Faculty Name]</h3>
+                <div className="flex-1">
+                  <h3 className="font-display text-3xl text-ink font-bold mb-2">Dr. Hepsiba Nirmala V</h3>
                   <p className="font-accent text-gold text-sm tracking-widest uppercase mb-4">Faculty Coordinator</p>
                   <p className="font-accent text-ink/70 text-sm tracking-widest uppercase mb-6">Department of English</p>
                   
                   <div className="space-y-4 font-body text-ink/80 leading-relaxed">
                     <p>
-                      With over [X] years of experience in academia and literature, our faculty coordinator brings invaluable expertise and guidance to LIT'ERA Club. Their passion for literature and commitment to student development has been instrumental in shaping our literary community.
+                      With over 5+ years of experience in teaching and academic mentoring, Dr. Hepsiba Nirmala V brings dynamic expertise in English Literature, innovative pedagogy, and student-centered learning methodologies to LIT'ERA Club. Her dedication to experiential, inquiry-based, and skill-based education, combined with strong classroom management and technology-integrated teaching practices, has significantly contributed to nurturing creativity, critical thinking, and holistic student development.
                     </p>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                      <div className="bg-cream/50 p-4 rounded-sm border border-gold/20">
+                    <div className="grid grid-cols-2 gap-6 mt-6">
+                      <div className="bg-cream/50 p-4 rounded-sm border border-gold/20 h-full">
                         <h4 className="font-accent text-ink text-sm tracking-widest uppercase mb-2">Expertise</h4>
                         <ul className="font-body text-ink/70 text-sm space-y-1">
                           <li>• Contemporary Literature</li>
                           <li>• Creative Writing</li>
                           <li>• Literary Criticism</li>
                           <li>• Academic Research</li>
+                          <li>• Women's Writing</li>
+                          <li>• American Literature</li>
+                          <li>• Children's Literature</li>
+                          <li>• African Literature</li>
                         </ul>
                       </div>
                       
-                      <div className="bg-cream/50 p-4 rounded-sm border border-gold/20">
+                      <div className="bg-cream/50 p-4 rounded-sm border border-gold/20 h-full">
                         <h4 className="font-accent text-ink text-sm tracking-widest uppercase mb-2">Contributions</h4>
                         <ul className="font-body text-ink/70 text-sm space-y-1">
-                          <li>• Mentorship Programs</li>
-                          <li>• Literary Workshops</li>
-                          <li>• Research Guidance</li>
-                          <li>• Curriculum Development</li>
+                          <li>• Mentorship and Student Development Programs</li>
+                          <li>• Literary Workshops and Language Training</li>
+                          <li>• Research and Curriculum Development</li>
+                          <li>• Implementation of NEP 2020 & Competency-Based Education</li>
+                          <li>• Integration of Digital Assessment Tools (Google Forms, Padlet, Online Quizzes)</li>
+                          <li>• Promotion of Experiential and Self-Learning Practices</li>
                         </ul>
                       </div>
                     </div>
@@ -144,302 +150,119 @@ export default function About() {
         </motion.div>
 
         {/* Our Team Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-32"
-        >
-          <div className="text-center mb-16">
-            <span className="font-accent text-gold text-sm tracking-[0.3em] uppercase mb-4 block">Leadership</span>
-            <h2 className="font-display text-4xl md:text-5xl text-ink font-bold mb-6">
-              Our <span className="italic font-light text-gold">Team</span>
-            </h2>
-            <div className="w-24 h-px bg-gold mx-auto"></div>
-          </div>
+        <div className="text-center mb-16">
+  <span className="font-accent text-gold text-sm tracking-[0.3em] uppercase mb-4 block">
+    Leadership
+  </span>
+  <h2 className="font-display text-4xl md:text-5xl text-ink font-bold mb-6">
+    Our <span className="italic font-light text-gold">Team</span>
+  </h2>
+  <div className="w-24 h-px bg-gold mx-auto"></div>
+</div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Team Member 1 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/jaahnavi.jpeg"
-                    alt="Jaahnavi Yeturi"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Jaahnavi Yeturi</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">President</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Leading our literary community with vision and passion for fostering creative expression.
-              </p>
-            </motion.div>
+{/* Team Grid */}
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 max-w-6xl mx-auto">
+  {[
+    {
+      name: "Jaahnavi",
+      role: "President",
+      img: "jaahnavi.jpeg",
+      desc: "Leading our literary community with vision and passion for fostering creative expression."
+    },
+    {
+      name: "Lakshaya Agnihotri",
+      role: "Vice President",
+      img: "lakshya.jpeg",
+      desc: "Supporting our mission through innovative programs and community engagement initiatives."
+    },
+    {
+      name: "Gunda Neha",
+      role: "Secretary",
+      img: "neha.jpeg",
+      desc: "Managing our resources with precision to support our literary endeavors and events."
+    },
+    {
+      name: "Manaswitha Gajji",
+      role: "Treasurer",
+      img: "manaswitha.jpeg",
+      desc: "Bringing our literary vision to life through stunning visual design and creative direction."
+    },
+    {
+      name: "Aashitha Koganti",
+      role: "Docs Lead",
+      img: "aashitha.jpeg",
+      desc: "Building bridges with our community and fostering meaningful connections through outreach."
+    },
+    {
+      name: "K.Sai Keerthana",
+      role: "Social and PR",
+      img: "keerthana.jpeg",
+      desc: "Amplifying our voice across digital platforms and engaging our community online."
+    },
+    {
+      name: "Lahari Meshram",
+      role: "Social and PR",
+      img: "lahari.jpeg",
+      desc: "Building community relationships and managing public outreach initiatives for the club."
+    },
+    {
+      name: "Gnaneshwari",
+      role: "Event Management",
+      img: "gnaneshwari.jpeg",
+      desc: "Coordinating and executing club events with precision and creative vision."
+    },
+    {
+      name: "Sneha Satapathy",
+      role: "Event Management",
+      img: "sneha.jpeg",
+      desc: "Orchestrating memorable literary events and ensuring seamless execution."
+    },
+    {
+      name: "Shaik Azra Anisha",
+      role: "Content Head",
+      img: "azra.jpeg",
+      desc: "Crafting compelling narratives and overseeing all written content for the club."
+    },
+    {
+      name: "Deepika",
+      role: "Content Head",
+      img: "deepika.jpeg",
+      desc: "Curating engaging literary content and managing editorial initiatives."
+    }
+  ].map((member, index) => (
+    <motion.div
+      key={index}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.7 + index * 0.05 }}
+      whileHover={{ y: -10 }}
+      className="text-center group"
+    >
+      <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
+        <div className="aspect-[3/4] overflow-hidden">
+          <img
+            src={`/images/${member.img}`}
+            alt={member.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      </div>
 
-            {/* Team Member 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/lakshya.jpeg"
-                    alt="Lakhshya"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Lakshaya Agnihotri</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Vice President</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Supporting our mission through innovative programs and community engagement initiatives.
-              </p>
-            </motion.div>
+      <h3 className="font-display text-2xl text-ink font-bold mb-2">
+        {member.name}
+      </h3>
 
-            {/* Team Member 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/neha.jpeg"
-                    alt="Neha"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Gunda Neha</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Secretary</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Managing our resources with precision to support our literary endeavors and events.
-              </p>
-            </motion.div>
-          </div>
+      <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">
+        {member.role}
+      </p>
 
-          {/* Additional Team Members */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-16">
-            {/* Team Member 4 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/manaswitha.jpeg"
-                    alt="Manaswitha"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Manaswitha Gajji</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Treasurer</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Bringing our literary vision to life through stunning visual design and creative direction.
-              </p>
-            </motion.div>
-
-            {/* Team Member 5 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/aashitha.jpeg"
-                    alt="Aashitha Koganti"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Aashitha Koganti</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Docs Lead</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Building bridges with our community and fostering meaningful connections through outreach.
-              </p>
-            </motion.div>
-
-            {/* Team Member 6 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.0 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/keerthana.jpeg"
-                    alt="Kambadur Sai Keerthana"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Kambadur Sai Keerthana</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Social and PR</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Amplifying our voice across digital platforms and engaging our community online.
-              </p>
-            </motion.div>
-          </div>
-
-          {/* Additional Team Members Row 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mt-16">
-            {/* Team Member 7 - Lahari */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/lahari.jpeg"
-                    alt="Lahari Meshram"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Lahari Meshram</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Social and PR</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Building community relationships and managing public outreach initiatives for the club.
-              </p>
-            </motion.div>
-
-            {/* Team Member 8 - Gnaneshwari */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/gnaneshwari.jpeg"
-                    alt="Gnaneshwari"
-                    className="w-full h-full object-cover scale-[2] group-hover:scale-[2.05] transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Gnaneshwari</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Event Management</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Coordinating and executing club events with precision and creative vision.
-              </p>
-            </motion.div>
-
-            {/* Team Member 9 - Sneha Satapathy */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.3 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/sneha.jpeg"
-                    alt="Sneha Satapathy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Sneha Satapathy</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Event Management</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Orchestrating memorable literary events and ensuring seamless execution.
-              </p>
-            </motion.div>
-
-            {/* Team Member 10 - Azra */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/azra.jpeg"
-                    alt="Azra"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Shaik Azra Anisha</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Content Head</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Crafting compelling narratives and overseeing all written content for the club.
-              </p>
-            </motion.div>
-
-            {/* Team Member 11 - Deepika */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.5 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
-            >
-              <div className="relative mb-6 overflow-hidden rounded-sm shadow-lg group-hover:shadow-2xl transition-all duration-300">
-                <div className="aspect-[3/4] overflow-hidden">
-                  <img
-                    src="/images/deepika.jpeg"
-                    alt="Deepika"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-              <h3 className="font-display text-2xl text-ink font-bold mb-2">Deepika</h3>
-              <p className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Content Head</p>
-              <p className="font-body text-ink/70 text-sm leading-relaxed">
-                Curating engaging literary content and managing editorial initiatives.
-              </p>
-            </motion.div>
-          </div>
+      <p className="font-body text-ink/70 text-sm leading-relaxed">
+        {member.desc}
+      </p>
+    </motion.div>
+  ))}
+</div>
 
           {/* Core Team Section */}
           <motion.div 
@@ -557,8 +380,6 @@ export default function About() {
               ))}
             </div>
           </motion.div>
-        </motion.div>
-
       </div>
     </div>
   );
