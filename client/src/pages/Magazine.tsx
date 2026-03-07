@@ -13,7 +13,7 @@ export default function Magazine() {
   const [searchTerm, setSearchTerm] = useState("");
   const [magazineLikes, setMagazineLikes] = useState(0);
   const [localPublications, setLocalPublications] = useState<any[]>([]);
-  
+
   // Fetch publications from database
   const { data: publicationsFromDB = [], isLoading, refetch } = usePublications();
 
@@ -349,18 +349,18 @@ export default function Magazine() {
     pdfFileName: pub.pdfFileName || null
   }));
 
-  const filteredPublications = selectedCategory === "all" 
-    ? localPublications.filter((pub: any) => 
-        pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredPublications = selectedCategory === "all"
+    ? localPublications.filter((pub: any) =>
+      pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      pub.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    : localPublications.filter((pub: any) =>
+      (pub.category === selectedCategory) &&
+      (pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.description?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : localPublications.filter((pub: any) => 
-        (pub.category === selectedCategory) && 
-        (pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-         pub.description?.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+        pub.description?.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
 
   const handleDownload = async (id: number, pdfFile: string | null, fileName: string | null) => {
     if (!pdfFile) {
@@ -369,7 +369,7 @@ export default function Magazine() {
     }
 
     // Show immediate feedback
-    const updatedPublications = localPublications.map((pub: any) => 
+    const updatedPublications = localPublications.map((pub: any) =>
       pub.id === id ? { ...pub, downloads: pub.downloads + 1 } : pub
     );
     setLocalPublications(updatedPublications);
@@ -386,7 +386,7 @@ export default function Magazine() {
     } catch (error) {
       console.error("Error tracking download:", error);
     }
-    
+
     // Download file
     const link = document.createElement("a");
     link.href = pdfFile;
@@ -408,13 +408,13 @@ export default function Magazine() {
       alert("PDF file not available");
       return;
     }
-    
+
     // Show immediate feedback
-    const updatedPublications = localPublications.map((pub: any) => 
+    const updatedPublications = localPublications.map((pub: any) =>
       pub.id === id ? { ...pub, views: pub.views + 1 } : pub
     );
     setLocalPublications(updatedPublications);
-    
+
     // Update database and then refetch
     try {
       const response = await fetch(`/api/publications/${id}`, { method: 'POST' });
@@ -427,18 +427,18 @@ export default function Magazine() {
     } catch (error) {
       console.error("Error tracking view:", error);
     }
-    
+
     // Open PDF in new tab
     window.open(pdfFile, '_blank');
   };
 
   const handleLike = async (id: number) => {
     // Show immediate feedback
-    const updatedPublications = localPublications.map((pub: any) => 
+    const updatedPublications = localPublications.map((pub: any) =>
       pub.id === id ? { ...pub, likes: pub.likes + 1 } : pub
     );
     setLocalPublications(updatedPublications);
-    
+
     try {
       console.log('Attempting to like publication:', id);
       const response = await fetch(`/api/publications/${id}/like`, {
@@ -449,10 +449,10 @@ export default function Magazine() {
       });
       console.log('Like response status:', response.status);
       console.log('Like response ok:', response.ok);
-      
+
       const responseData = await response.json();
       console.log('Like response data:', responseData);
-      
+
       if (response.ok) {
         console.log('Like count updated in database');
         // Refetch after a short delay to ensure database is updated
@@ -460,7 +460,7 @@ export default function Magazine() {
       } else {
         console.error('Like failed:', responseData);
         // Revert local change if API failed
-        const revertedPublications = localPublications.map((pub: any) => 
+        const revertedPublications = localPublications.map((pub: any) =>
           pub.id === id ? { ...pub, likes: pub.likes - 1 } : pub
         );
         setLocalPublications(revertedPublications);
@@ -468,7 +468,7 @@ export default function Magazine() {
     } catch (error) {
       console.error("Like error:", error);
       // Revert local change if API failed
-      const revertedPublications = localPublications.map((pub: any) => 
+      const revertedPublications = localPublications.map((pub: any) =>
         pub.id === id ? { ...pub, likes: pub.likes - 1 } : pub
       );
       setLocalPublications(revertedPublications);
@@ -512,7 +512,7 @@ export default function Magazine() {
   return (
     <div className="min-h-screen bg-cream">
       {/* Hero Section */}
-      <motion.section 
+      <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="relative py-20 px-6"
@@ -534,18 +534,18 @@ export default function Magazine() {
               Literary Publications & News
             </p>
             <p className="font-body text-ink/70 max-w-2xl mx-auto text-lg leading-relaxed">
-              Explore our collection of newspapers, magazines, research journals, and creative anthologies. 
+              Explore our collection of newspapers, magazines, research journals, and creative anthologies.
               Discover the voices of our literary community and stay updated with club news and events.
             </p>
             <div className="flex items-center justify-center gap-4 mt-6">
-              <Button 
+              <Button
                 className="!bg-gold !text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-cream hover:!text-ink transition-all"
                 onClick={() => setSubmissionOpen(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Submit Publication
               </Button>
-              <Button 
+              <Button
                 className="bg-cream text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:bg-ink hover:text-cream transition-all border border-ink/20"
                 onClick={handleLikeMagazine}
               >
@@ -557,39 +557,38 @@ export default function Magazine() {
         </div>
       </motion.section>
 
-      
+
       {/* Category Filter */}
-      <section className="py-6 px-6 bg-cream">
-        <div className="flex items-center justify-between max-w-7xl mx-auto gap-6">
+      <section className="py-8 px-6 bg-cream">
+        <div className="flex flex-col lg:flex-row items-center justify-center max-w-7xl mx-auto gap-6 lg:gap-8">
           {/* Search Bar */}
-          <div className="w-80">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ink/40" />
+          <div className="w-full sm:w-[28rem] lg:w-96 flex-shrink-0">
+            <div className="relative shadow-sm rounded-md overflow-hidden">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink/40" />
               <input
                 type="text"
                 placeholder="Search publications..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 h-10 border border-ink/20 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold text-sm"
+                className="w-full pl-12 pr-4 py-3 h-[52px] border border-ink/20 bg-white focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold text-sm shadow-inner transition-all duration-200"
               />
             </div>
           </div>
-          
+
           {/* Filter Buttons */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap justify-center gap-3">
             {categories.map((category: any) => (
               <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className={
-                    selectedCategory === category.id
-                      ? "bg-ink text-white px-4 py-2 rounded-md"
-                      : "border border-gold text-gold bg-transparent px-4 py-2 rounded-md hover:bg-gold hover:text-black"
-                  }
-                >
-                  {category.icon}
-                  {category.name}
-                </button>
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`flex items-center gap-2 px-5 py-3 rounded-md font-accent text-sm tracking-wide transition-all duration-200 ${selectedCategory === category.id
+                  ? "bg-ink text-white shadow-md border border-ink"
+                  : "bg-white text-gold border border-gold hover:bg-gold hover:text-ink shadow-sm hover:shadow-md"
+                  }`}
+              >
+                {category.icon}
+                {category.name}
+              </button>
             ))}
           </div>
         </div>
@@ -622,8 +621,8 @@ export default function Magazine() {
                 className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
               >
                 <div className="relative">
-                  <img 
-                    src={publication.image} 
+                  <img
+                    src={publication.image}
                     alt={publication.title}
                     className="w-full h-48 object-cover"
                   />
@@ -633,7 +632,7 @@ export default function Magazine() {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gold font-accent uppercase tracking-wider">
@@ -643,15 +642,15 @@ export default function Magazine() {
                       {publication.pages} pages
                     </span>
                   </div>
-                  
+
                   <h3 className="font-display text-xl font-bold text-ink mb-2">
                     {publication.title}
                   </h3>
-                  
+
                   <p className="font-body text-ink/70 text-sm mb-4 line-clamp-3">
                     {publication.description}
                   </p>
-                  
+
                   <div className="flex items-center justify-between mb-4">
                     <span className="font-accent text-sm text-ink/60">
                       {publication.author}
@@ -660,7 +659,7 @@ export default function Magazine() {
                       {publication.date}
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4 text-sm text-ink/60">
                       <span className="flex items-center gap-1">
@@ -677,7 +676,7 @@ export default function Magazine() {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2">
                     <Button
                       size="sm"
@@ -724,18 +723,18 @@ export default function Magazine() {
               Submit Your Work
             </h2>
             <p className="font-body text-ink/70 mb-8">
-              Share your literary creations with our community. We accept articles, poetry, short stories, 
+              Share your literary creations with our community. We accept articles, poetry, short stories,
               research papers, and creative writing for publication in our magazines and journals.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 mx-auto max-w-lg w-full">
-              <Button 
+              <Button
                 className="!bg-ink !text-cream font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-gold hover:!text-ink transition-all"
                 onClick={() => setSubmissionOpen(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Submit Article
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 className="!border-ink !text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-ink hover:!text-cream transition-all"
                 onClick={() => setGuidelinesOpen(true)}
@@ -749,7 +748,7 @@ export default function Magazine() {
 
       {/* Submission Modal */}
       <SubmissionModal isOpen={submissionOpen} onClose={() => setSubmissionOpen(false)} />
-      
+
       {/* Magazine Guidelines Modal */}
       <MagazineGuidelinesModal isOpen={guidelinesOpen} onClose={() => setGuidelinesOpen(false)} />
     </div>

@@ -56,7 +56,7 @@ export function Footer() {
             </li>
             <li className="flex items-center gap-3 text-cream/70">
               <Mail className="w-5 h-5 text-gold shrink-0" />
-              <a href="mailto:litera@gmail.com" className="hover:text-gold transition-colors">litera@gmail.com</a>
+              <a href="mailto:litera.glec2026@gmail.com" className="hover:text-gold transition-colors">litera.glec2026@gmail.com</a>
             </li>
             <li className="flex items-center gap-3 text-cream/70">
               <Instagram className="w-5 h-5 text-gold shrink-0" />

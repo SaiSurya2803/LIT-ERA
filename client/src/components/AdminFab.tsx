@@ -19,12 +19,9 @@ export function AdminFab() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       onClick={handleClick}
-      className="fixed bottom-6 right-6 z-50 group inline-flex items-center gap-3 px-4 py-3 rounded-full bg-ink text-cream shadow-xl shadow-ink/40 hover:bg-gold hover:text-ink transition-colors duration-300 font-accent text-xs tracking-[0.2em] uppercase"
+      className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full bg-gold text-ink shadow-xl hover:bg-ink hover:text-cream transition-colors duration-300"
     >
-      <span className="w-8 h-8 rounded-full bg-gold text-ink flex items-center justify-center group-hover:bg-ink group-hover:text-cream transition-colors">
-        <Settings className="w-4 h-4" />
-      </span>
-      <span>Admin Panel</span>
+      <Settings className="w-5 h-5" />
     </motion.button>
   );
 }

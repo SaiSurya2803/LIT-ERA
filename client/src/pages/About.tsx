@@ -112,7 +112,7 @@ export default function About() {
                   
                   <div className="space-y-4 font-body text-ink/80 leading-relaxed">
                     <p>
-                      With over 5+ years of experience in teaching and academic mentoring, Dr. Hepsiba Nirmala V brings dynamic expertise in English Literature, innovative pedagogy, and student-centered learning methodologies to LIT'ERA Club. Her dedication to experiential, inquiry-based, and skill-based education, combined with strong classroom management and technology-integrated teaching practices, has significantly contributed to nurturing creativity, critical thinking, and holistic student development.
+                      With over 8+ years of experience in teaching and academic mentoring, Dr. Hepsiba Nirmala V brings dynamic expertise in English Literature, innovative pedagogy, and student-centered learning methodologies to LIT'ERA Club. Her dedication to experiential, inquiry-based, and skill-based education, combined with strong classroom management and technology-integrated teaching practices, has significantly contributed to nurturing creativity, critical thinking, and holistic student development.
                     </p>
                     
                     <div className="grid grid-cols-2 gap-6 mt-6">
@@ -243,7 +243,7 @@ export default function About() {
           <img
             src={`/images/${member.img}`}
             alt={member.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover object-[center_20%] group-hover:scale-105 transition-transform duration-500"
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -300,7 +300,7 @@ export default function About() {
                       <img
                         src={`/images/${member.img}`}
                         alt={member.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover object-[center_20%] group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -336,12 +336,12 @@ export default function About() {
               {[
                 { name: "Bheema Sai Surya", img: "saisurya.jpeg" },
                 { name: "Polaki Navya Sri", img: "navya.jpeg" },
-                { name: "Shalini Medam", img: "shalini.jpeg", position: "object-[center_20%]" },
+                { name: "Shalini Medam", img: "shalini.jpeg" },
                 { name: "Sudhiksha Chiluvuri", img: "sudhiksha.jpeg" },
                 { name: "Akshaya Thummala", img: "akshaya.jpeg" },
                 { name: "T. Akshitha Reddy", img: "akshitha.jpeg" },
                 { name: "Nirrali Chowdary", img: "nirrali.jpeg" },
-                { name: "Yashwanth Rishindra Varma", img: "yashwanth.jpeg" },
+                { name: "Yashwanth Rishindra Varma", img: "rishi.jpeg" },
                 { name: "S. Sai Sushrutha", img: "sushrutha.jpeg" },
                 { name: "Afiya Sulthana", img: "afiya.jpeg" },
                 { name: "K. Sree Satya Sahithi", img: "sahithi.jpeg" },
@@ -349,7 +349,7 @@ export default function About() {
                 { name: "Kalyanam Surya Vadan", img: "surya.jpeg" },
                 { name: "Siri Anusha", img: "siri.jpeg" },
                 { name: "Sathwika", img: "sathwika.jpeg" },
-                { name: "A.S.V Kailash Keerthan", img: "kailash.jpg" },
+                { name: "A.S.V Kailash Keerthan", img: "kailash.jpeg" },
                 { name: "Hemtej", img: "hemtej.jpeg" }
               ].map((member, index) => (
                 <motion.div
@@ -365,7 +365,7 @@ export default function About() {
                       <img
                         src={`/images/${member.img}`}
                         alt={member.name}
-                        className={`w-full h-full object-cover ${member.position || 'object-center'} group-hover:scale-110 transition-transform duration-500`}
+                        className="w-full h-full object-cover object-[center_20%] group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                     <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

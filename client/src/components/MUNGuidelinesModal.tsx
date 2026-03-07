@@ -39,8 +39,8 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
                 <span className="w-8 h-px bg-gold"></span>
               </h3>
               <p className="font-body text-ink/70 leading-relaxed">
-                LIT'ERA MUN 2026 is a Model United Nations conference designed to simulate United Nations committees. 
-                Participants will engage in diplomatic discourse, debate international issues, and develop solutions 
+                MUN-GLEC 2026 is a Model United Nations conference designed to simulate United Nations committees.
+                Participants will engage in diplomatic discourse, debate international issues, and develop solutions
                 to global challenges while following UN procedures and protocols.
               </p>
             </section>
@@ -58,7 +58,7 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
                     <li>National dress is permitted if it's formal and respectful</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-2">Prohibited Items</h4>
                   <ul className="font-body text-ink/70 space-y-2 list-disc list-inside">
@@ -103,7 +103,7 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
                     <li>Participate actively in all committee sessions</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-2">Prohibited Actions</h4>
                   <ul className="font-body text-ink/70 space-y-2 list-disc list-inside">
@@ -127,10 +127,10 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
                     <li>Maximum 2 pages, double-spaced, Times New Roman, 12pt font</li>
                     <li>Include country name, committee name, and delegate name</li>
                     <li>Headers: Country's Position, International Actions, Proposed Solutions</li>
-                    <li>Submit via email to litera@gmail.com by April 10, 2026</li>
+                    <li>Submit via email to litera.glec2026@gmail.com by April 4, 2026</li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-2">Content Guidelines</h4>
                   <ul className="font-body text-ink/70 space-y-2 list-disc list-inside">
@@ -143,26 +143,57 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
               </div>
             </section>
 
+            {/* Registration Fees */}
+            <section>
+              <h3 className="font-display text-xl text-ink font-bold mb-4">Registration Fees</h3>
+              <div className="bg-white p-6 border border-ink/10 rounded-sm space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-cream/50 p-4 border border-gold/20 rounded-sm text-center">
+                    <h4 className="font-display text-lg font-bold text-ink mb-1">Individual Delegate</h4>
+                    <p className="font-accent text-gold text-xl font-bold">₹1,000</p>
+                    <p className="font-body text-ink/60 text-sm mt-1">per delegate</p>
+                  </div>
+                  <div className="bg-cream/50 p-4 border border-gold/20 rounded-sm text-center">
+                    <h4 className="font-display text-lg font-bold text-ink mb-1">Group Registration</h4>
+                    <p className="font-accent text-gold text-xl font-bold">₹1,200</p>
+                    <p className="font-body text-ink/60 text-sm mt-1">per delegate</p>
+                    <p className="font-body text-ink/50 text-xs mt-2 italic">(Must include multiple delegates registering together)</p>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Registration Includes:</h4>
+                  <ul className="grid grid-cols-2 gap-2 font-body text-ink/70 text-sm list-disc list-inside">
+                    <li>Delegate Kit</li>
+                    <li>Lunch</li>
+                    <li>Conference Materials</li>
+                    <li>Access to Committee Sessions</li>
+                    <li>Participation Certificate</li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+
             {/* Awards & Recognition */}
             <section>
               <h3 className="font-display text-xl text-ink font-bold mb-4">Awards & Recognition</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[
-                  { 
-                    award: "Best Delegate", 
-                    criteria: "Outstanding diplomacy, research, and debate skills" 
+                  {
+                    award: "Best Delegate",
+                    criteria: "Outstanding diplomacy, research, and debate skills"
                   },
-                  { 
-                    award: "Outstanding Delegate", 
-                    criteria: "Excellent participation and contribution to committee" 
+                  {
+                    award: "Honorable Mention",
+                    criteria: "Notable performance in specific aspects of debate"
                   },
-                  { 
-                    award: "Best Position Paper", 
-                    criteria: "Well-researched, articulate, and policy-aligned paper" 
+                  {
+                    award: "Special Mention",
+                    criteria: "Excellent participation and contribution to committee"
                   },
-                  { 
-                    award: "Honorable Mention", 
-                    criteria: "Notable performance in specific aspects of debate" 
+                  {
+                    award: "Best Photographer",
+                    criteria: "Exceptional capture of the conference's defining moments"
                   }
                 ].map((awardData, index) => (
                   <div key={index} className="bg-cream/50 p-4 border border-gold/20 rounded-sm">
@@ -179,21 +210,22 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
               <div className="bg-white p-6 border border-ink/10 rounded-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">April 16, 2026</h4>
+                    <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">April 10, 2026</h4>
                     <ul className="font-body text-ink/70 text-sm space-y-1">
-                      <li>9:00 AM - Registration & Opening Ceremony</li>
-                      <li>10:30 AM - Committee Session 1</li>
-                      <li>2:00 PM - Committee Session 2</li>
-                      <li>4:00 PM - Cultural Program</li>
+                      <li>9:00 AM - 10:00 AM - Inauguration</li>
+                      <li>10:00 AM - 1:00 PM - Debate</li>
+                      <li>1:00 PM - 1:45 PM - Lunch</li>
+                      <li>2:00 PM - 5:00 PM - Debate</li>
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">April 17, 2026</h4>
+                    <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">April 11, 2026</h4>
                     <ul className="font-body text-ink/70 text-sm space-y-1">
-                      <li>9:00 AM - Committee Session 3</li>
-                      <li>11:00 AM - Committee Session 4</li>
-                      <li>2:00 PM - Crisis Simulation</li>
-                      <li>4:00 PM - Awards & Closing Ceremony</li>
+                      <li>9:30 AM - 12:30 PM - Debate Session</li>
+                      <li>12:30 PM - 1:15 PM - Lunch</li>
+                      <li>1:30 PM - 3:30 PM - Wrap Up</li>
+                      <li>3:30 PM - 5:00 PM - Awards</li>
+                      <li>5:00 PM - 5:30 PM - Disperse</li>
                     </ul>
                   </div>
                 </div>
@@ -208,16 +240,16 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
                   <div>
                     <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Leadership Team</h4>
                     <ul className="font-body text-ink/70 space-y-1 text-sm">
-                      <li><strong>Secretary General:</strong> Sudeepthi Kalisapudi</li>
-                      <li><strong>Deputy Secretary General:</strong> Supritha Akula</li>
-                      <li><strong>Chief of Staff:</strong> J Sai Neelima</li>
-                      <li><strong>Under Secretary General:</strong> Namrata Mokshgundam</li>
+                      <li><strong>Secretary-General:</strong> Manju Bodi (+91 79813 67371)</li>
+                      <li><strong>Deputy Secretary-General:</strong> Jaahnavi Yeturi (+91 70138 42994)</li>
+                      <li><strong>Director-General:</strong> Lakshaya Agnihotri (+91 80084 06331)</li>
+                      <li><strong>Head of Operations:</strong> Gnaneshwari Thippareddy (+91 62811 30205)</li>
                     </ul>
                   </div>
                   <div>
                     <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Get in Touch</h4>
                     <ul className="font-body text-ink/70 space-y-1 text-sm">
-                      <li><strong>Email:</strong> litera@gmail.com</li>
+                      <li><strong>Email:</strong> litera.glec2026@gmail.com</li>
                       <li><strong>Phone:</strong> +91 7013842994</li>
                       <li><strong>Instagram:</strong> @litera.official_glec</li>
                       <li><strong>Location:</strong> GLEC Campus, Hyderabad</li>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { Calendar, Users, MapPin, Pause, Play } from "lucide-react";
+import { Calendar, Users, MapPin } from "lucide-react";
 import { useState } from "react";
 
 const eventPhotos = [
@@ -44,8 +44,6 @@ const eventPhotos = [
 ];
 
 export default function EventPhotoGallery() {
-  const [isPaused, setIsPaused] = useState(false);
-
   // Duplicate photos for seamless scrolling
   const duplicatedPhotos = [...eventPhotos, ...eventPhotos];
 
@@ -70,21 +68,11 @@ export default function EventPhotoGallery() {
         </div>
 
         {/* Photo Carousel */}
-        <div className="relative"
-             onMouseEnter={() => setIsPaused(true)}
-             onMouseLeave={() => setIsPaused(false)}>
-          {/* Pause/Play Button */}
-          <button
-            onClick={() => setIsPaused(!isPaused)}
-            className="absolute top-4 right-4 z-30 w-10 h-10 bg-ink/80 text-cream rounded-full flex items-center justify-center hover:bg-gold hover:text-ink transition-all duration-300 shadow-lg backdrop-blur-sm"
-          >
-            {isPaused ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-          </button>
-
+        <div className="relative">
           {/* Photo Container */}
           <div className="overflow-hidden mx-16">
             <motion.div
-              animate={{ x: isPaused ? 0 : "-50%" }}
+              animate={{ x: "-50%" }}
               transition={{ 
                 duration: 20, 
                 ease: "linear", 
@@ -92,8 +80,6 @@ export default function EventPhotoGallery() {
                 repeatType: "loop"
               }}
               className="flex gap-6"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
             >
               {duplicatedPhotos.map((photo, index) => (
                 <motion.div

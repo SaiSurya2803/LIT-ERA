@@ -78,7 +78,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-display text-xl font-bold text-ink mb-1">Electronic Post</h3>
-                  <p className="font-body text-ink/70">litera@gmail.com<br/>events@litera.gmail.com</p>
+                  <p className="font-body text-ink/70">litera.glec2026@gmail.com</p>
                 </div>
               </div>
             </div>

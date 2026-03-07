@@ -252,7 +252,7 @@ export default function MagazineGuidelinesModal({ isOpen, onClose }: MagazineGui
                   <div>
                     <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Get in Touch</h4>
                     <ul className="font-body text-ink/70 space-y-1 text-sm">
-                      <li><strong>Email:</strong> litera@gmail.com</li>
+                      <li><strong>Email:</strong> litera.glec2026@gmail.com</li>
                       <li><strong>Phone:</strong> +91 7013842994</li>
                       <li><strong>Instagram:</strong> @litera.official_glec</li>
                       <li><strong>Location:</strong> GLEC Campus, Hyderabad</li>

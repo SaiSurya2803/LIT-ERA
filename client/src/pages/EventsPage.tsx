@@ -11,7 +11,7 @@ const allEvents = [
   {
     id: 12,
     title: "Model United Nations Conference 2026",
-    date: "May 10-12, 2026",
+    date: "April 10-11, 2026",
     time: "9:00 AM - 6:00 PM",
     location: "International Conference Center",
     attendees: 85,
@@ -94,7 +94,7 @@ const allEvents = [
     structure: "The club organized three stalls featuring a variety of interactive activities such as word-based challenges, logical puzzles, and creative exercises. The stalls were managed by volunteers who guided participants and ensured smooth coordination throughout the day. Attractive displays, structured activity rules, and small incentives encouraged consistent participation and interaction among students.",
     impact: "The activity zone witnessed continuous student participation and positive engagement. It enhanced creative thinking, collaboration, and quick reasoning skills among participants. The event also strengthened the visibility and recognition of LITERA within the campus community, reflecting its active contribution to academic and co-curricular development."
   },
-  ];
+];
 
 const categories = ["All", "Debate", "Poetry", "Reading", "Writing", "Special Event", "Community", "Festival", "MUN", "Social"];
 
@@ -109,7 +109,7 @@ export default function EventsPage() {
   const filteredEvents = allEvents.filter((event) => {
     const matchesCategory = selectedCategory === "All" || event.category === selectedCategory;
     const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          event.description.toLowerCase().includes(searchTerm.toLowerCase());
+      event.description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -149,13 +149,13 @@ export default function EventsPage() {
             <span className="font-accent text-gold text-sm tracking-[0.3em] uppercase">Club Calendar</span>
             <div className="w-12 h-px bg-gold"></div>
           </div>
-          
+
           <h1 className="font-display text-5xl md:text-6xl font-bold text-ink leading-[1.1] mb-6">
             Literary <span className="italic text-gold font-light">Events</span>
           </h1>
-          
+
           <p className="font-body text-xl text-ink/70 leading-relaxed max-w-3xl mx-auto">
-            Join us for engaging literary events, workshops, debates, and community gatherings. 
+            Join us for engaging literary events, workshops, debates, and community gatherings.
             Expand your horizons and connect with fellow literature enthusiasts.
           </p>
         </div>
@@ -171,7 +171,7 @@ export default function EventsPage() {
               className="pl-10 border-ink/20 focus:border-gold"
             />
           </div>
-          
+
           <div className="flex gap-2 flex-wrap">
             {categories.map((category) => (
               <Button
@@ -198,7 +198,7 @@ export default function EventsPage() {
               Our Events
               <span className="font-body text-lg text-ink/60 ml-3">({pastEvents.length})</span>
             </h2>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {pastEvents.map((event, index) => (
                 <motion.div
@@ -208,11 +208,10 @@ export default function EventsPage() {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ y: -5 }}
                   onClick={() => handleEventClick(event)}
-                  className={`group relative overflow-hidden rounded-sm shadow-lg hover:shadow-2xl transition-all duration-300 ${
-                    event.photos && event.photos.length > 0 
-                      ? 'cursor-pointer' 
-                      : 'cursor-default'
-                  }`}
+                  className={`group relative overflow-hidden rounded-sm shadow-lg hover:shadow-2xl transition-all duration-300 ${event.photos && event.photos.length > 0
+                    ? 'cursor-pointer'
+                    : 'cursor-default'
+                    }`}
                 >
                   <div className="aspect-[16/10] overflow-hidden">
                     <img
@@ -227,7 +226,7 @@ export default function EventsPage() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent">
                     <div className="absolute bottom-0 left-0 right-0 p-6 text-cream">
                       <div className="mb-3">
@@ -235,10 +234,10 @@ export default function EventsPage() {
                           {event.category}
                         </span>
                       </div>
-                      
+
                       <h3 className="font-display text-2xl font-bold mb-2">{event.title}</h3>
                       <p className="font-body text-cream/80 mb-4 line-clamp-2">{event.description}</p>
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="space-y-1 text-sm font-body text-cream/70">
                           <div className="flex items-center gap-2">
@@ -246,7 +245,7 @@ export default function EventsPage() {
                             {event.date}
                           </div>
                         </div>
-                        
+
                         <div className="flex flex-col gap-2">
                           <button
                             onClick={(e) => handleAboutClick(event, e)}
@@ -275,7 +274,7 @@ export default function EventsPage() {
             {selectedCategory === "All" && !searchTerm ? "Upcoming Events" : "Search Results"}
             <span className="font-body text-lg text-ink/60 ml-3">({upcomingEvents.length})</span>
           </h2>
-          
+
           {upcomingEvents.length === 0 ? (
             <div className="text-center py-16">
               <p className="font-body text-xl text-ink/60">No events found matching your criteria.</p>
@@ -298,7 +297,7 @@ export default function EventsPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  
+
                   <div className="p-6">
                     <div className="flex items-center gap-2 mb-3">
                       <span className="px-2 py-1 bg-cream text-ink text-xs font-accent uppercase tracking-wider rounded">
@@ -310,17 +309,17 @@ export default function EventsPage() {
                         </span>
                       )}
                     </div>
-                    
+
                     <h3 className="font-display text-xl font-bold text-ink mb-2">{event.title}</h3>
                     <p className="font-body text-ink/70 mb-4 line-clamp-3">{event.description}</p>
-                    
+
                     <div className="space-y-2 text-sm font-body text-ink/60 mb-4">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gold" />
                         {event.date}
                       </div>
                     </div>
-                    
+
                     {event.isMUN ? (
                       <Link href="/mun">
                         <Button variant="outline" className="w-full border-gold text-gold hover:bg-gold hover:text-ink">

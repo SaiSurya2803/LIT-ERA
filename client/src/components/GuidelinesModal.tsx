@@ -120,17 +120,24 @@ export default function GuidelinesModal({ isOpen, onClose }: GuidelinesModalProp
                   <div>
                     <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Leadership Team</h4>
                     <ul className="font-body text-ink/70 space-y-1 text-sm">
-                      <li><strong>President:</strong> Sudeepthi Kalisapudi</li>
-                      <li><strong>Vice President:</strong> Supritha Akula</li>
-                      <li><strong>Secretary:</strong> J Sai Neelima</li>
-                      <li><strong>Treasurer:</strong> Namrata Mokshgundam</li>
+                      <li><strong>President:</strong> Jaahnavi</li>
+                      <li><strong>Vice President:</strong> Lakshaya Agnihotri</li>
+                      <li><strong>Secretary:</strong> Gunda Neha</li>
+                      <li><strong>Treasurer:</strong> Manaswiha Gajji</li>
+                      <li><strong>Docs Lead:</strong> Aashitha Koganti</li>
                       <li><strong>Docs Lead:</strong> P Sanjana</li>
+                      <li><strong>Social and PR:</strong> K. Sai Keerthana</li>
+                      <li><strong>Social and PR:</strong> Lahari Meshram</li>
+                      <li><strong>Event Management:</strong> Gnaneshwari</li>
+                      <li><strong>Event Management:</strong> Sneha Satapathy</li> 
+                      <li><strong>Content Head:</strong> Shaik Azra Anisha</li>
+                      <li><strong>Content Head:</strong> Deepika</li>
                     </ul>
                   </div>
                   <div>
                     <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">Get in Touch</h4>
                     <ul className="font-body text-ink/70 space-y-1 text-sm">
-                      <li><strong>Email:</strong> litera@gmail.com</li>
+                      <li><strong>Email:</strong> litera.glec2026@gmail.com</li>
                       <li><strong>Phone:</strong> +91 7013842994</li>
                       <li><strong>Instagram:</strong> @litera.official_glec</li>
                       <li><strong>Location:</strong> GRIET Campus, Hyderabad</li>
