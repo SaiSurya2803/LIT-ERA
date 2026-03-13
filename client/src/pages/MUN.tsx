@@ -60,21 +60,6 @@ export default function MUN() {
       ],
       agenda: "Protecting the rights of climate refugees and populations displaced by environmental disasters."
     },
-    {
-      name: "UNODC",
-      topic: "United Nations Office on Drugs and Crime",
-      description: "Works on global issues related to drugs, crime prevention, corruption, and terrorism.",
-      difficulty: "Advanced",
-      delegates: 30,
-      fullDescription: "The UN Office on Drugs and Crime operates globally to combat illicit drugs and international crime. Delegates will tackle complex webs of transnational organized crime, formulate policies for drug control, and establish protocols against terrorism.",
-      rules: [
-        "Crisis updates may be introduced by the Executive Board at any time.",
-        "Directives may be issued by delegates if pertinent to their national powers.",
-        "Extensive research into international law and extradition treaties is highly recommended.",
-        "Alliances must not violate existing UN sanctions."
-      ],
-      agenda: "Combatting the rise of narco-terrorism and illicit trafficking in conflict zones."
-    },
   ];
 
   const events = [
@@ -183,11 +168,11 @@ export default function MUN() {
           <div className="text-center mb-16">
             <h2 className="font-display text-4xl font-bold text-ink mb-4">Committees & Topics</h2>
             <p className="font-body text-lg text-ink/60 max-w-2xl mx-auto">
-              Four dynamic committees addressing contemporary global challenges
+              Three dynamic committees addressing contemporary global challenges
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {committees.map((committee, index) => (
               <motion.div
                 key={index}
