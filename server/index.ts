@@ -20,7 +20,11 @@ process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
 
+import cors from "cors";
+
 const app = express();
+app.set("trust proxy", 1);
+app.use(cors({ origin: true, credentials: true }));
 const httpServer = createServer(app);
 
 declare module "http" {
