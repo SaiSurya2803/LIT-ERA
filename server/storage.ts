@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { db } from "./db";
 import {
   users,
@@ -108,7 +109,8 @@ export class DatabaseStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     try {
-      await db.insert(users).values(insertUser);
+      const id = crypto.randomUUID();
+      await db.insert(users).values({ ...insertUser, id });
       const [user] = await db.select().from(users).where(eq(users.email, insertUser.email));
       return user;
     } catch (error: any) {

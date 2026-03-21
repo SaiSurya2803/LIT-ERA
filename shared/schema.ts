@@ -13,7 +13,7 @@ import { z } from "zod";
 import { sql } from "drizzle-orm";
 
 export const users = mysqlTable("users", {
-  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: varchar("id", { length: 36 }).primaryKey(),
   name: text("name").notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
