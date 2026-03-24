@@ -127,7 +127,7 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
                     <li>Maximum 2 pages, double-spaced, Times New Roman, 12pt font</li>
                     <li>Include country name, committee name, and delegate name</li>
                     <li>Headers: Country's Position, International Actions, Proposed Solutions</li>
-                    <li>Submit via email to litera.glec2026@gmail.com by April 4, 2026</li>
+                    <li>Submit via email to litera.glec2026@gmail.com by April 15, 2026</li>
                   </ul>
                 </div>
 
@@ -150,12 +150,12 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-cream/50 p-4 border border-gold/20 rounded-sm text-center">
                     <h4 className="font-display text-lg font-bold text-ink mb-1">Individual Delegate</h4>
-                    <p className="font-accent text-gold text-xl font-bold">₹1,000</p>
+                    <p className="font-accent text-gold text-xl font-bold">₹1,100</p>
                     <p className="font-body text-ink/60 text-sm mt-1">per delegate</p>
                   </div>
                   <div className="bg-cream/50 p-4 border border-gold/20 rounded-sm text-center">
                     <h4 className="font-display text-lg font-bold text-ink mb-1">Group Registration</h4>
-                    <p className="font-accent text-gold text-xl font-bold">₹1,200</p>
+                    <p className="font-accent text-gold text-xl font-bold">₹1,000</p>
                     <p className="font-body text-ink/60 text-sm mt-1">per delegate</p>
                     <p className="font-body text-ink/50 text-xs mt-2 italic">(Must include multiple delegates registering together)</p>
                   </div>
@@ -210,7 +210,7 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
               <div className="bg-white p-6 border border-ink/10 rounded-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">April 10, 2026</h4>
+                    <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">April 21, 2026</h4>
                     <ul className="font-body text-ink/70 text-sm space-y-1">
                       <li>9:00 AM - 10:00 AM - Inauguration</li>
                       <li>10:00 AM - 1:00 PM - Debate</li>
@@ -219,7 +219,7 @@ export default function MUNGuidelinesModal({ isOpen, onClose }: MUNGuidelinesMod
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">April 11, 2026</h4>
+                    <h4 className="font-accent text-gold text-sm tracking-widest uppercase mb-3">April 22, 2026</h4>
                     <ul className="font-body text-ink/70 text-sm space-y-1">
                       <li>9:30 AM - 12:30 PM - Debate Session</li>
                       <li>12:30 PM - 1:15 PM - Lunch</li>
