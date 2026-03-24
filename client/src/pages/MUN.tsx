@@ -20,7 +20,7 @@ export default function MUN() {
       topic: "All India Political Parties Meet",
       description: "A committee where delegates represent Indian political leaders and debate key national political issues and policies.",
       difficulty: "Intermediate",
-      delegates: 30,
+      delegates: 50,
       fullDescription: "The All India Political Parties Meet (AIPPM) is a dynamic platform simulating the functioning of a non-technical yet powerful committee where delegates step into the shoes of Indian politicians. Expect fiery debates, complex policy negotiations, and strategic alliances.",
       rules: [
         "Debate format follows standard parliamentary procedures with provisions for unmoderated caucuses.",
@@ -35,7 +35,7 @@ export default function MUN() {
       topic: "Disarmament and International Security",
       description: "Discusses global security challenges including arms control, disarmament, and international peace.",
       difficulty: "Advanced",
-      delegates: 30,
+      delegates: 50,
       fullDescription: "The First Committee of the United Nations General Assembly deals with disarmament, global challenges, and threats to peace that affect the international community. Delegates will focus on reducing global arsenals and regulating emerging military technologies.",
       rules: [
         "Standard UNGA rules of procedure apply.",
@@ -50,7 +50,7 @@ export default function MUN() {
       topic: "United Nations Human Rights Council",
       description: "Focuses on protecting human rights and addressing global human rights violations.",
       difficulty: "Intermediate",
-      delegates: 30,
+      delegates: 50,
       fullDescription: "The UN Human Rights Council is the principal intergovernmental body within the UN system responsible for strengthening the promotion and protection of human rights around the globe and addressing situations of human rights violations.",
       rules: [
         "Debate must strictly adhere to the Universal Declaration of Human Rights.",
@@ -142,7 +142,7 @@ export default function MUN() {
             <div className="w-16 h-16 bg-gold text-ink flex items-center justify-center rounded-full mx-auto mb-4">
               <Calendar className="w-8 h-8" />
             </div>
-            <h3 className="font-display text-2xl font-bold text-ink mb-2">May 1-2, 2026</h3>
+            <h3 className="font-display text-2xl font-bold text-ink mb-2">April 21-22, 2026</h3>
             <p className="font-body text-ink/60">Two days of intense debate and diplomacy</p>
           </motion.div>
 

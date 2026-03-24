@@ -11,7 +11,7 @@ const allEvents = [
   {
     id: 12,
     title: "Model United Nations Conference 2026",
-    date: "May 1-2, 2026",
+    date: "April 21-22, 2026",
     time: "9:00 AM - 6:00 PM",
     location: "International Conference Center",
     attendees: 85,
