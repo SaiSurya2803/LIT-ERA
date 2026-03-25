@@ -32,6 +32,23 @@ export default function Magazine() {
   // Fallback publications for display (will be replaced by database data)
   const fallbackPublications = [
     {
+      id: 18,
+      title: "Litera Club Newsletter",
+      category: "Magazine",
+      author: "Litera Club",
+      date: "March 25, 2026",
+      description: "The official newsletter of the Litera Club, featuring literary news, updates, and more.",
+      image: "https://picsum.photos/seed/litera-newsletter/400/300.jpg",
+      type: "Magazine",
+      pages: 1,
+      downloads: 12,
+      views: 45,
+      likes: 8,
+      featured: true,
+      pdfFile: "/uploads/publications/Litera-Club-Newsletter.pdf",
+      pdfFileName: "Litera-Club-Newsletter.pdf"
+    },
+    {
       id: 1,
       title: "19th Year on Earth",
       category: "Book",
