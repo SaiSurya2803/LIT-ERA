@@ -53,6 +53,15 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
+    /* Disable text selection globally */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Allow text selection in inputs and textareas */
+  input, textarea {
+    user-select: text;
+    -webkit-user-select: text;
   }
 
   /* Paper texture overlay for that classic literary feel */
