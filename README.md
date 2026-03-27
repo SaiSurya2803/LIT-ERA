@@ -1,6 +1,4 @@
-Here is a detailed `README.md` file tailored to your project. You can copy the code block below and paste it directly into your project's `README.md` file.
 
-```markdown
 # LIT-ERA 📚
 
 Welcome to **LIT-ERA**, the official website and application for the Litera Club. This platform is designed to showcase the club's magazines, manage events, and provide comprehensive information and registration guidelines for our Model United Nations (MUN).
