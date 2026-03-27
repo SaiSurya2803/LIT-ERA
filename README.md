@@ -1,289 +1,104 @@
-# 🌟 Litera Club – Literary Platform
+Here is a detailed `README.md` file tailored to your project. You can copy the code block below and paste it directly into your project's `README.md` file.
 
-A modern full-stack literary magazine platform built with **React, Node.js, and PostgreSQL**, featuring submission management, admin dashboard, authentication,  and file upload capabilities.
+```markdown
+# LIT-ERA 📚
 
----
+Welcome to **LIT-ERA**, the official website and application for the Litera Club. This platform is designed to showcase the club's magazines, manage events, and provide comprehensive information and registration guidelines for our Model United Nations (MUN).
 
-## 🚀 Quick Start
+## ✨ Features
 
-### 📌 Prerequisites
-- Node.js (v18 or higher)
-- PostgreSQL (or SQLite for development)
-- npm or yarn
+- **📖 Magazine & Newsletter:** A dedicated section where users can read the latest club newsletters and other literary publications (supports PDF viewing).
+- **🏛️ Model United Nations (MUN):** Detailed guidelines, pricing (Individual and Group delegate fees), and important dates (April 21st-22nd) for the upcoming MUN conference.
+- **📅 Events:** View and stay updated on the latest events hosted by the Litera Club.
+- **📱 Responsive Design:** A fully responsive, modern web interface tailored for both desktop and mobile viewing.
 
----
+## 🛠️ Tech Stack
 
-## ⚙️ Installation
+This project is built using a modern Full-Stack TypeScript architecture:
 
-### 1️⃣ Clone and Install Dependencies
-```bash
-git clone <your-repo-url>
-cd litera-club
-npm install
-```
+### Frontend
+- **React.js** (via Vite)
+- **TypeScript**
+- **Tailwind CSS** (for utility-first, responsive styling)
+- **Radix UI** (for accessible UI components)
 
----
+### Backend
+- **Node.js** & **Express**
+- **TypeScript**
+- **Drizzle ORM** (for type-safe database queries)
 
-### 2️⃣ Database Setup
+### Database & Deployment
+- **MySQL** (Relational Database)
+- **Railway** (Configured for easy and seamless full-stack deployment)
 
-#### 🔹 Option A: PostgreSQL (Production)
+## 🚀 Getting Started
 
-```bash
-# Install PostgreSQL
-# Windows: https://www.postgresql.org/download/windows/
-# Mac: brew install postgresql
-# Linux: sudo apt-get install postgresql
+Follow these instructions to set up and run the project locally on your machine.
 
-# Create Database
-psql -U postgres -c "CREATE DATABASE litera_club;"
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- [MySQL](https://www.mysql.com/) database running locally or remotely
 
-# Configure Environment
-cp .env.example .env
-```
+### Installation
 
-Update `.env` file:
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repository-url>
+   cd LIT-ERA-main
+   ```
 
-```env
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/litera_club
-SESSION_SECRET=your-secret-key
-ADMIN_CODE=admin123
-NODE_ENV=development
-```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
----
+3. **Set up Environment Variables:**
+   Create a `.env` file in the root directory and add your required environment variables (especially your MySQL database connection URL). Sample `.env`:
+   ```env
+   DATABASE_URL="mysql://user:password@localhost:3306/litera"
+   PORT=5000
+   ```
 
-#### 🔹 Option B: SQLite (Development)
+### Database Setup
 
-```bash
-npm install better-sqlite3 @types/better-sqlite3
-cp .env.example .env
-```
-
-Update `.env`:
-
-```env
-DATABASE_URL=sqlite:./litera_club.db
-SESSION_SECRET=your-secret-key
-ADMIN_CODE=admin123
-NODE_ENV=development
-```
-
----
-
-### 3️⃣ Run Database Migration
-
+Step 1: Push your Drizzle schema to the MySQL database.
 ```bash
 npm run db:push
 ```
 
----
+### Running the Application
 
-### 4️⃣ Start Development Server
-
+To start the development server (which will simultaneously start your Vite frontend and Express backend):
 ```bash
 npm run dev
 ```
+Your application should now be running on `http://localhost:5000` (or whatever port Vite/Express outputs in the terminal).
 
-Application runs at:
+### Building for Production
 
-- Frontend: http://localhost:3000  
-- Backend API: http://localhost:5000  
-
----
-
-# 📁 Project Structure
-
-```
-litera-club/
-├── client/              # React frontend
-├── server/              # Express backend
-├── shared/              # Shared schemas and types
-├── uploads/             # File storage
-└── drizzle.config.ts
-```
-
----
-
-# 🎯 Features
-
-## 🌍 Public Features
-- Browse literary content (thoughts, poems, riddles, quotes)
-- View events and club zones
-- Submit magazine work
-- Contact form
-- Interactive games (Strands, Spelling Bee)
-- MUN information page
-
----
-
-## 👤 User Features (Login Required)
-- Register for events
-- Join literary zones
-- Register for MUN conferences
-- Submit game scores
-- Track personal registrations
-
----
-
-## 👑 Admin Features
-- Manage submissions
-- Create and edit content
-- Upload daily puzzles
-- Manage users
-- View analytics and game scores
-- Monitor registrations
-
----
-
-# 🛠️ Tech Stack
-
-## Frontend
-- React 18 + TypeScript
-- Vite
-- Tailwind CSS
-- TanStack Query
-- Wouter
-- Framer Motion
-- Shadcn/ui
-
-## Backend
-- Node.js + Express
-- PostgreSQL
-- Drizzle ORM
-- Express Session
-- Bcrypt
-- Zod Validation
-- Multer (File Uploads)
-
----
-
-# 🗄️ Database Tables
-
-- users
-- content
-- events
-- puzzles
-- submissions
-- game_scores
-- contact_submissions
-- event_registrations
-- zone_memberships
-- mun_registrations
-
----
-
-# 🔐 Security Features
-
-- Password hashing using bcrypt
-- Session-based authentication
-- Role-based access control
-- Input validation with Zod
-- SQL Injection prevention (Drizzle ORM)
-- File type & size validation
-- Secure file storage
-
----
-
-# 🔌 API Endpoints
-
-## Authentication
-- POST /api/auth/register
-- POST /api/auth/login
-- POST /api/auth/logout
-- GET /api/auth/me
-
-## Submissions
-- POST /api/submissions
-- GET /api/submissions (Admin)
-- GET /api/submissions/:id/download (Admin)
-
-## Content
-- GET /api/content
-- POST /api/content (Admin)
-
-## Events
-- GET /api/events
-- POST /api/events (Admin)
-- POST /api/events/:id/register
-
-## Games
-- GET /api/puzzles
-- POST /api/game-scores
-
-## Contact
-- POST /api/contact
-- GET /api/contacts (Admin)
-
----
-
-# 📦 Available Scripts
-
-```bash
-npm run dev        # Development server
-npm run build      # Production build
-npm run start      # Start production server
-npm run db:push    # Push schema changes
-npm run db:studio  # Open Drizzle Studio
-npm run check      # Type checking
-```
-
----
-
-# 🚀 Deployment
-
-### Production Environment Variables
-
-```env
-DATABASE_URL=your-production-db-url
-SESSION_SECRET=strong-random-secret
-ADMIN_CODE=secure-admin-code
-NODE_ENV=production
-```
-
-Then run:
-
+To build the project for production deployment:
 ```bash
 npm run build
-npm run db:push
+```
+
+To start the production server:
+```bash
 npm run start
 ```
 
----
+## 🌐 Deployment (Railway)
 
-# 🧪 Testing Checklist
+This repository is optimized for deployment on **Railway**. 
+1. Create a MySQL database instance in your Railway project.
+2. Link your GitHub repository to a new Railway service.
+3. Pass the `DATABASE_URL` and `PORT` to the service environment variables.
+4. The application will automatically build using the `npm run build` script and start using the `npm run start` command.
 
-### Public
-- [ ] Browse content
-- [ ] Submit magazine work
-- [ ] Submit contact form
-- [ ] Play games
+## 🤝 Contributing
 
-### User
-- [ ] Register / Login
-- [ ] Join zones
-- [ ] Register for events
-- [ ] Submit scores
+Contributions are always welcome! Feel free to open a pull request or add an issue if you have suggestions for improvements or find any bugs.
 
-### Admin
-- [ ] Create content
-- [ ] Upload puzzles
-- [ ] View submissions
-- [ ] Manage users
+## 📄 License
 
----
-
-# 📄 License
-
-This project is licensed under the MIT License.
-
----
-
-# 👥 Authors
-
-**LIT'ERA Club Development Team**
-
----
-
-**Version:** 1.0.0  
-**Status:** Production Ready ✅  
-**Last Updated:** February 2026  
+This project is licensed under the [MIT License](LICENSE).
+```
