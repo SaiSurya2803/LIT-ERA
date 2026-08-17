@@ -59,7 +59,8 @@ export function useLogin() {
       const data = await res.json();
       return api.auth.login.responses[200].parse(data);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.setQueryData([api.auth.me.path], data);
       queryClient.invalidateQueries({ queryKey: [api.auth.me.path] });
     },
   });
@@ -101,7 +102,8 @@ export function useRegister() {
       const data = await res.json();
       return api.auth.register.responses[201].parse(data);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.setQueryData([api.auth.me.path], data);
       queryClient.invalidateQueries({ queryKey: [api.auth.me.path] });
     },
   });
@@ -118,6 +120,7 @@ export function useLogout() {
       });
     },
     onSuccess: () => {
+      queryClient.setQueryData([api.auth.me.path], null);
       queryClient.invalidateQueries({ queryKey: [api.auth.me.path] });
     },
   });

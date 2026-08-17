@@ -26,10 +26,10 @@ function createDbPool() {
 
     return mysql.createPool({
       host: parsed.hostname,
-      port: Number(parsed.port) || 3306,
+      port: Number(parsed.port) || (isLocal ? 3306 : 4000),
       user: decodeURIComponent(parsed.username),
       password: decodeURIComponent(parsed.password),
-      database: parsed.pathname.replace(/^\//, "") || "test",
+      database: parsed.pathname.replace(/^\//, "") || "sys",
       waitForConnections: true,
       connectionLimit: 5,
       maxIdle: 5,

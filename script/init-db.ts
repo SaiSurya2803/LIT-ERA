@@ -2,20 +2,32 @@ import "dotenv/config";
 import mysql from "mysql2/promise";
 
 async function init() {
-  console.log("Connecting to TiDB Cloud...");
+  const rawDbUrl = (process.env.DATABASE_URL || "").trim().replace(/^["']|["']$/g, "");
+
+  if (!rawDbUrl) {
+    throw new Error("DATABASE_URL environment variable is missing. Please set it in your .env file or environment.");
+  }
+
+  console.log("Connecting to database using DATABASE_URL...");
+  
+  const parsed = new URL(rawDbUrl);
+  const isLocal = parsed.hostname.includes("localhost") || parsed.hostname.includes("127.0.0.1");
+
   const connection = await mysql.createConnection({
-    host: "gateway01.ap-southeast-1.prod.aws.tidbcloud.com",
-    port: 4000,
-    user: "7EghEhEouyQyPKz.root",
-    password: "vGYAtF15WcdMOtQG",
-    database: "test",
-    ssl: {
-      minVersion: "TLSv1.2",
-      rejectUnauthorized: true,
-    },
+    host: parsed.hostname,
+    port: Number(parsed.port) || (isLocal ? 3306 : 4000),
+    user: decodeURIComponent(parsed.username),
+    password: decodeURIComponent(parsed.password),
+    database: parsed.pathname.replace(/^\//, "") || "sys",
+    ssl: isLocal
+      ? undefined
+      : {
+          minVersion: "TLSv1.2",
+          rejectUnauthorized: true,
+        },
   });
 
-  console.log("Connected! Creating database tables...");
+  console.log(`Connected to database '${parsed.pathname.replace(/^\//, "") || "sys"}' on ${parsed.hostname}! Creating tables...`);
 
   const queries = [
     `CREATE TABLE IF NOT EXISTS users (
@@ -140,7 +152,7 @@ async function init() {
     await connection.query(q);
   }
 
-  console.log("✓ All 10 tables created successfully in TiDB Cloud!");
+  console.log("✓ All 10 tables verified / created successfully!");
   await connection.end();
 }
 

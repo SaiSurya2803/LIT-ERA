@@ -72,7 +72,7 @@ export async function registerRoutes(
   });
 
   // Auth - me
-  app.get(api.auth.me.path, async (req, res, next) => {
+  app.get(["/api/me", "/me", api.auth.me.path], async (req, res, next) => {
     try {
       const user = (req as any).user || null;
       if (!user) {
@@ -96,7 +96,7 @@ export async function registerRoutes(
     adminCode: z.string().optional(),
   });
 
-  app.post("/api/auth/register", async (req, res, next) => {
+  app.post(["/api/auth/register", "/auth/register"], async (req, res, next) => {
     try {
       const data = registerSchema.parse(req.body);
       const existing = await storage.getUserByEmail(data.email);
@@ -135,11 +135,12 @@ export async function registerRoutes(
       }
       console.error("Register error:", err);
       const message = err?.message || "Something went wrong while registering.";
-      return res.status(500).json({ message });
+      const status = message === "Email already in use" ? 400 : 500;
+      return res.status(status).json({ message });
     }
   });
 
-  app.post("/api/auth/login", async (req, res, next) => {
+  app.post(["/api/auth/login", "/auth/login"], async (req, res, next) => {
     try {
       const data = loginSchema.parse(req.body);
       const user = await storage.getUserByEmail(data.email);
@@ -173,7 +174,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/auth/logout", (req, res, next) => {
+  app.post(["/api/auth/logout", "/auth/logout"], (req, res, next) => {
     try {
       if (req.session) {
         req.session.destroy((err) => {
