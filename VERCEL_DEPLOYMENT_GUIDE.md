@@ -31,10 +31,13 @@ Vercel is a serverless platform that requires an external cloud database. You ca
 - **[Railway](https://railway.app)** / **[Render](https://render.com)**
 
 ### Get Connection URL:
-Copy your connection string format:
+Copy your connection string in this format (TiDB Cloud uses port `4000` and the `sys` database):
 ```
-mysql://username:password@host:port/database_name?ssl={"rejectUnauthorized":true}
+mysql://<username>:<password>@<host>.tidbcloud.com:4000/sys
 ```
+TLS 1.2+ with certificate verification is applied automatically for any non-local host,
+so no `?ssl=...` query string is needed. Percent-encode special characters in the password
+(`@` becomes `%40`).
 
 ---
 
@@ -57,9 +60,9 @@ Under **Environment Variables**, add the following:
 
 | Variable Name | Value / Description | Example |
 | :--- | :--- | :--- |
-| `DATABASE_URL` | Your Cloud MySQL connection URI | `mysql://user:pass@host:3306/litera_club` |
-| `SESSION_SECRET` | A secure random 32+ character string | `litera-club-secret-key-2026-secure-session` |
-| `ADMIN_CODE` | Secret code for registering admin accounts | `litera_admin_secret_2026` |
+| `DATABASE_URL` | Your Cloud MySQL connection URI | `mysql://<user>:<password>@<host>.tidbcloud.com:4000/sys` |
+| `SESSION_SECRET` | Required. Random 32+ char string signing the login cookie | output of `openssl rand -hex 32` |
+| `ADMIN_CODE` | Optional code for registering admin accounts | `<your-admin-code>` |
 | `NODE_ENV` | Environment mode | `production` |
 
 ---

@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
-import session from "express-session";
 import cors from "cors";
 import path from "path";
 import { createServer } from "http";
@@ -36,19 +35,6 @@ app.use(express.urlencoded({ extended: false }));
 
 // Serve uploads directory for static assets
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "litera-secret-key-2026-production",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false,
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    },
-  })
-);
 
 // Register routes synchronously at module load time
 const httpServer = createServer(app);
