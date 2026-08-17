@@ -40,16 +40,21 @@ export function useLogin() {
         body: JSON.stringify(input),
       });
       if (!res.ok) {
-        let errorMsg = `Login failed (${res.status})`;
+        let errorMsg = "";
         try {
           const body = await res.json();
           if (body && body.message) {
             errorMsg = body.message;
           }
         } catch {
-          // ignore json parse error
+          try {
+            const raw = await res.text();
+            if (raw && !raw.startsWith("<!DOCTYPE")) {
+              errorMsg = raw.slice(0, 150);
+            }
+          } catch {}
         }
-        throw new Error(errorMsg);
+        throw new Error(errorMsg || `Login failed (${res.status})`);
       }
       const data = await res.json();
       return api.auth.login.responses[200].parse(data);
@@ -77,16 +82,21 @@ export function useRegister() {
         body: JSON.stringify(input),
       });
       if (!res.ok) {
-        let errorMsg = `Registration failed (${res.status})`;
+        let errorMsg = "";
         try {
           const body = await res.json();
           if (body && body.message) {
             errorMsg = body.message;
           }
         } catch {
-          // ignore json parse error
+          try {
+            const raw = await res.text();
+            if (raw && !raw.startsWith("<!DOCTYPE")) {
+              errorMsg = raw.slice(0, 150);
+            }
+          } catch {}
         }
-        throw new Error(errorMsg);
+        throw new Error(errorMsg || `Registration failed (${res.status})`);
       }
       const data = await res.json();
       return api.auth.register.responses[201].parse(data);

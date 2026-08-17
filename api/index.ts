@@ -38,14 +38,11 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(
   session({
-    store: new MemoryStoreSession({
-      checkPeriod: 86400000, // prune expired entries every 24h
-    }),
-    secret: process.env.SESSION_SECRET || "litera-secret-key-2026",
+    secret: process.env.SESSION_SECRET || "litera-secret-key-2026-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "lax",
       maxAge: 24 * 60 * 60 * 1000,
     },

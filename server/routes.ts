@@ -57,11 +57,15 @@ export async function registerRoutes(
 ): Promise<Server> {
   // Attach user from session if present
   app.use(async (req, _res, next) => {
-    const userId = req.session.userId;
+    const userId = req.session?.userId;
     if (userId) {
-      const user = await storage.getUser(userId);
-      if (user) {
-        (req as any).user = user;
+      try {
+        const user = await storage.getUser(userId);
+        if (user) {
+          (req as any).user = user;
+        }
+      } catch (error) {
+        console.error("Error fetching user from session:", error);
       }
     }
     next();
@@ -171,14 +175,18 @@ export async function registerRoutes(
 
   app.post("/api/auth/logout", (req, res, next) => {
     try {
-      req.session.destroy((err) => {
-        if (err) {
-          console.error("Logout error:", err);
-          return res.status(500).json({ message: "Failed to logout" });
-        }
-        res.clearCookie('connect.sid');
-        res.status(204).end();
-      });
+      if (req.session) {
+        req.session.destroy((err) => {
+          if (err) {
+            console.error("Logout error:", err);
+            return res.status(500).json({ message: "Failed to logout" });
+          }
+          res.clearCookie('connect.sid');
+          return res.status(204).end();
+        });
+      } else {
+        return res.status(204).end();
+      }
     } catch (error) {
       next(error);
     }
