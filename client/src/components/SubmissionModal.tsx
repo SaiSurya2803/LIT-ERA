@@ -123,8 +123,7 @@ export default function SubmissionModal({ isOpen, onClose }: SubmissionModalProp
           onClose();
         }, 3000);
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Submission failed:', errorData);
+        console.error('Submission failed:', responseData);
         setSubmitStatus('error');
       }
     } catch (error) {

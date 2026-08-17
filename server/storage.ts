@@ -91,9 +91,9 @@ export class DatabaseStorage implements IStorage {
     try {
       const [user] = await db.select().from(users).where(eq(users.id, id));
       return user;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching user:", error);
-      throw new Error("Failed to fetch user");
+      throw new Error(error?.message || "Failed to fetch user");
     }
   }
 
@@ -101,9 +101,9 @@ export class DatabaseStorage implements IStorage {
     try {
       const [user] = await db.select().from(users).where(eq(users.email, email));
       return user;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching user by email:", error);
-      throw new Error("Failed to fetch user");
+      throw new Error(error?.message || "Failed to fetch user");
     }
   }
 
@@ -115,19 +115,23 @@ export class DatabaseStorage implements IStorage {
       return user;
     } catch (error: any) {
       console.error("Error creating user:", error);
-      if (error.code === '23505') { // Unique constraint violation
+      if (error.code === '23505' || error.code === 'ER_DUP_ENTRY') { // MySQL & Postgres Unique constraint violation
         throw new Error("Email already in use");
       }
-      throw new Error("Failed to create user");
+      if (error.code === 'ER_NO_SUCH_TABLE') {
+        throw new Error("Database tables not found. Please run 'npm run db:push' to initialize the database tables.");
+      }
+      throw new Error(error?.message || "Failed to create user");
     }
   }
 
   async getAllUsers(): Promise<User[]> {
     try {
       return await db.select().from(users).orderBy(desc(users.joinDate));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching all users:", error);
-      throw new Error("Failed to fetch users");
+      // Return empty array if table doesn't exist yet or connection fails during initial admin check
+      return [];
     }
   }
 

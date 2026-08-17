@@ -41,7 +41,12 @@ export function useLogin() {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.message || "Login failed");
+        const fallbackMsg = res.status === 404 
+          ? "API route not found. Ensure server is running and configured." 
+          : res.status === 500 
+          ? "Server/Database error. Please verify DATABASE_URL and run 'npm run db:push'." 
+          : `Login failed (${res.status})`;
+        throw new Error(body.message || fallbackMsg);
       }
       const data = await res.json();
       return api.auth.login.responses[200].parse(data);
@@ -70,7 +75,12 @@ export function useRegister() {
       });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
-        throw new Error(body.message || "Registration failed");
+        const fallbackMsg = res.status === 404 
+          ? "API route not found. Ensure serverless functions are configured." 
+          : res.status === 500 
+          ? "Database error. Please check DATABASE_URL in Vercel and run 'npm run db:push'." 
+          : `Registration failed (${res.status})`;
+        throw new Error(body.message || fallbackMsg);
       }
       const data = await res.json();
       return api.auth.register.responses[201].parse(data);

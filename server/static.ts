@@ -15,8 +15,8 @@ export function serveStatic(app: Express) {
 
   // SPA fallback for client-side routing - serves index.html for all non-API routes
   app.use((req, res, next) => {
-    // Only handle GET requests
-    if (req.method !== "GET") {
+    // Only handle GET and HEAD requests
+    if (req.method !== "GET" && req.method !== "HEAD") {
       return next();
     }
 

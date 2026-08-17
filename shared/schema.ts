@@ -17,13 +17,13 @@ export const users = mysqlTable("users", {
   name: text("name").notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  club: text("club").default("LIT'ERA"),
+  club: varchar("club", { length: 100 }).default("LIT'ERA"),
   isAdmin: boolean("is_admin").default(false),
   joinDate: timestamp("join_date").defaultNow(),
 });
 
 export const contactSubmissions = mysqlTable("contact_submissions", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   country: text("country"),
@@ -33,7 +33,7 @@ export const contactSubmissions = mysqlTable("contact_submissions", {
 });
 
 export const events = mysqlTable("events", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
   eventDate: text("event_date"),
@@ -41,7 +41,7 @@ export const events = mysqlTable("events", {
 });
 
 export const gameScores = mysqlTable("game_scores", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
   gameType: varchar("game_type", { length: 50 }).notNull(), // 'strands' or 'spellbee'
   score: integer("score"),
@@ -53,7 +53,7 @@ export const gameScores = mysqlTable("game_scores", {
 }));
 
 export const puzzles = mysqlTable("puzzles", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   type: varchar("type", { length: 50 }).notNull(), // 'strands' or 'spellbee'
   data: text("data").notNull(), // JSON stringified puzzle data
   publishDate: varchar("publish_date", { length: 20 }).notNull(),
@@ -64,7 +64,7 @@ export const puzzles = mysqlTable("puzzles", {
 }));
 
 export const content = mysqlTable("content", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   type: text("type").notNull(), // 'thought', 'riddle', 'quote', 'fact', 'poem'
   title: text("title").notNull(),
   content: text("content").notNull(),
@@ -76,7 +76,7 @@ export const content = mysqlTable("content", {
 });
 
 export const submissions = mysqlTable("submissions", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   title: text("title").notNull(),
@@ -86,12 +86,12 @@ export const submissions = mysqlTable("submissions", {
   fileSize: integer("file_size"),
   originalFileName: text("original_file_name"),
   filePath: text("file_path"),
-  status: text("status").default("pending"), // 'pending', 'approved', 'rejected'
+  status: varchar("status", { length: 50 }).default("pending"), // 'pending', 'approved', 'rejected'
   submittedAt: timestamp("submitted_at").defaultNow(),
 });
 
 export const publications = mysqlTable("publications", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   title: text("title").notNull(),
   category: text("category").notNull(), // 'newspaper', 'magazine', 'journal', 'anthology'
   author: text("author").notNull(),
@@ -110,7 +110,7 @@ export const publications = mysqlTable("publications", {
 });
 
 export const eventRegistrations = mysqlTable("event_registrations", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
   eventId: integer("event_id").notNull(),
   eventTitle: text("event_title").notNull(),
@@ -118,7 +118,7 @@ export const eventRegistrations = mysqlTable("event_registrations", {
 });
 
 export const munRegistrations = mysqlTable("mun_registrations", {
-  id: serial("id").primaryKey(),
+  id: integer("id").autoincrement().primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   email: text("email").notNull(),

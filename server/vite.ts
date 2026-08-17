@@ -34,8 +34,8 @@ export async function setupVite(server: Server, app: Express) {
   // SPA fallback for client-side routing - must be last in this file
   // This catches all remaining GET requests and serves the index.html
   app.use(async (req, res, next) => {
-    // Only handle GET requests
-    if (req.method !== "GET") {
+    // Only handle GET and HEAD requests
+    if (req.method !== "GET" && req.method !== "HEAD") {
       return next();
     }
 

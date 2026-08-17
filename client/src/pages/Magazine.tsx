@@ -24,11 +24,6 @@ export default function Magazine() {
     return () => window.removeEventListener('openSubmissionModal', handleOpenSubmission);
   }, []);
 
-  // Sync local publications state with database data
-  useEffect(() => {
-    setLocalPublications(publicationsFromDB.length > 0 ? publicationsFromDB : fallbackPublications);
-  }, [publicationsFromDB]);
-
   // Fallback publications for display (will be replaced by database data)
   const fallbackPublications = [
     {
@@ -190,7 +185,7 @@ export default function Magazine() {
       views: 445,
       likes: 78,
       featured: false,
-      pdfFile: "uploads/publications/A Fresh Start- Pranavi.pdf",
+      pdfFile: "/uploads/publications/A Fresh Start- Pranavi.pdf",
       pdfFileName: "A Fresh Start- Pranavi.pdf"
     },
     {
@@ -206,7 +201,7 @@ export default function Magazine() {
       views: 234,
       likes: 34,
       featured: false,
-      pdfFile: "uploads/publications/Am I really an Engineer - Rohith Mangamuri.pdf",
+      pdfFile: "/uploads/publications/Am I really an Engineer - Rohith Mangamuri.pdf",
       pdfFileName: "Am-I-really-an-Engineer-Rohith-Mangamuri.pdf"
     },
     {
@@ -222,7 +217,7 @@ export default function Magazine() {
       views: 123,
       likes: 28,
       featured: false,
-      pdfFile: "uploads/publications/Are You Niche or Performative - Ikshita.pdf",
+      pdfFile: "/uploads/publications/Are You Niche or Performative - Ikshita.pdf",
       pdfFileName: "Are You Niche or Performative - Ikshita.pdf"
     },
     {
@@ -238,7 +233,7 @@ export default function Magazine() {
       views: 189,
       likes: 41,
       featured: false,
-      pdfFile: "uploads/publications/Before the next bomb falls - Tasneem Firdous.pdf",
+      pdfFile: "/uploads/publications/Before the next bomb falls - Tasneem Firdous.pdf",
       pdfFileName: "Before the next bomb falls - Tasneem Firdous.pdf"
     },
     {
@@ -254,7 +249,7 @@ export default function Magazine() {
       views: 567,
       likes: 89,
       featured: false,
-      pdfFile: "uploads/publications/Being vs Doing- sheripally Rakesh Goud.pdf",
+      pdfFile: "/uploads/publications/Being vs Doing- sheripally Rakesh Goud.pdf",
       pdfFileName: "Being vs Doing- sheripally Rakesh Goud.pdf"
     },
     {
@@ -264,13 +259,13 @@ export default function Magazine() {
       author: "Dhruu",
       date: "December 17, 2025",
       image: "https://picsum.photos/seed/research-symposium/400/300.jpg",
-      type: " Poem ",
+      type: "Poem",
       pages: 1,
       downloads: 78,
       views: 234,
       likes: 56,
       featured: false,
-      pdfFile: "uploads/publications/Celestial Serenade - Dhruu.pdf",
+      pdfFile: "/uploads/publications/Celestial Serenade - Dhruu.pdf",
       pdfFileName: "Celestial-Serenade - Dhruu.pdf"
     },
     {
@@ -280,13 +275,13 @@ export default function Magazine() {
       author: "Asiya Beig",
       date: "December 17, 2025",
       image: "https://picsum.photos/seed/student-spotlight/400/300.jpg",
-      type: " Article ",
+      type: "Article",
       pages: 2,
       downloads: 145,
       views: 389,
       likes: 67,
       featured: false,
-      pdfFile: "uploads/publications/Document from Asiyabeig - Asiya Beig.pdf",
+      pdfFile: "/uploads/publications/Document from Asiyabeig - Asiya Beig.pdf",
       pdfFileName: "Document from Asiyabeig - Asiya Beig.pdf"
     },
     {
@@ -302,7 +297,7 @@ export default function Magazine() {
       views: 345,
       likes: 78,
       featured: false,
-      pdfFile: "uploads/publications/Finding yourself - Sasamrutha Moganti.pdf",
+      pdfFile: "/uploads/publications/Finding yourself - Sasamrutha Moganti.pdf",
       pdfFileName: "Finding yourself - Sasamrutha Moganti.pdf"
     },
     {
@@ -318,7 +313,7 @@ export default function Magazine() {
       views: 345,
       likes: 78,
       featured: false,
-      pdfFile: "uploads/publications/Part - Chikkam Radhakrishna.pdf",
+      pdfFile: "/uploads/publications/Part - Chikkam Radhakrishna.pdf",
       pdfFileName: "Part - Chikkam Radhakrishna.pdf"
     }
   ];
@@ -330,9 +325,6 @@ export default function Magazine() {
     { id: "Poem", name: "Poems", icon: <FileText className="w-4 h-4" /> },
     { id: "Article", name: "Articles", icon: <FileText className="w-4 h-4" /> }
   ];
-
-  // Use database publications if available, otherwise use fallback
-  const publications = publicationsFromDB.length > 0 ? publicationsFromDB : fallbackPublications;
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -346,25 +338,29 @@ export default function Magazine() {
     return colors[category?.toLowerCase()] || '4A5568';
   };
 
-  // Map database fields to display format
-  const publicationsDisplay = publications.map((pub: any) => ({
+  const mapPublication = (pub: any) => ({
     id: pub.id,
     title: pub.title,
     category: pub.category,
     author: pub.author,
-    date: pub.publishDate || pub.date,
+    date: pub.publishDate || pub.date || "2026",
     description: pub.description,
-    // Use cover image if available, otherwise use a placeholder with category-based color
-    image: pub.coverImage || pub.image || `https://placehold.co/400x300/${getCategoryColor(pub.category)}/white?text=${encodeURIComponent(pub.title)}`,
-    type: pub.category ? pub.category.charAt(0).toUpperCase() + pub.category.slice(1) : pub.type,
-    pages: pub.pages,
-    downloads: pub.downloads,
-    views: pub.views,
-    likes: pub.likes,
-    featured: pub.featured,
+    image: pub.coverImage || pub.image || `https://placehold.co/400x300/${getCategoryColor(pub.category)}/white?text=${encodeURIComponent(pub.title || "Publication")}`,
+    type: pub.type || (pub.category ? pub.category.charAt(0).toUpperCase() + pub.category.slice(1) : "Publication"),
+    pages: pub.pages || 1,
+    downloads: pub.downloads || 0,
+    views: pub.views || 0,
+    likes: pub.likes || 0,
+    featured: !!pub.featured,
     pdfFile: pub.pdfFile || null,
     pdfFileName: pub.pdfFileName || null
-  }));
+  });
+
+  // Sync local publications state with database data
+  useEffect(() => {
+    const rawList = publicationsFromDB.length > 0 ? publicationsFromDB : fallbackPublications;
+    setLocalPublications(rawList.map(mapPublication));
+  }, [publicationsFromDB]);
 
   const filteredPublications = selectedCategory === "all"
     ? localPublications.filter((pub: any) =>

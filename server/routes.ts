@@ -114,21 +114,23 @@ export async function registerRoutes(
         club: "LIT'ERA",
       });
 
-      req.session.userId = user.id;
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
+      if (req.session) {
+        req.session.userId = user.id;
+        await new Promise<void>((resolve) => {
+          req.session.save((err) => {
+            if (err) console.error("Session save warning:", err);
+            resolve();
+          });
         });
-      });
+      }
       
       return res.status(201).json(user);
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
       }
       console.error("Register error:", err);
-      const message = (err as any)?.message || "Something went wrong while registering.";
+      const message = err?.message || "Something went wrong while registering.";
       return res.status(500).json({ message });
     }
   });
@@ -146,21 +148,23 @@ export async function registerRoutes(
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      req.session.userId = user.id;
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
+      if (req.session) {
+        req.session.userId = user.id;
+        await new Promise<void>((resolve) => {
+          req.session.save((err) => {
+            if (err) console.error("Session save warning:", err);
+            resolve();
+          });
         });
-      });
+      }
       
       return res.json(user);
-    } catch (err) {
+    } catch (err: any) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
       }
       console.error("Login error:", err);
-      const message = (err as any)?.message || "Something went wrong while logging in.";
+      const message = err?.message || "Something went wrong while logging in.";
       return res.status(500).json({ message });
     }
   });
@@ -989,44 +993,71 @@ export async function registerRoutes(
     }
   });
 
-  // Like endpoint for publications
-  app.post("/api/publications/:id/like", async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      
-      // Increment likes
-      await storage.incrementPublicationLikes(parseInt(id));
-      
-      return res.status(200).json({ 
-        success: true,
-        message: "Publication liked successfully"
-      });
-    } catch (error) {
-      console.error("Like error:", error);
-      return res.status(500).json({ 
-        success: false,
-        message: "Failed to like publication"
-      });
-    }
-  });
-
   // Like a publication
   app.post("/api/publications/:id/like", async (req, res, next) => {
     try {
       const { id } = req.params;
-      const publication = await storage.getPublicationById(parseInt(id));
-      
-      if (!publication) {
-        return res.status(404).json({ message: "Publication not found" });
+      const pubId = parseInt(id);
+      if (isNaN(pubId)) {
+        return res.status(400).json({ success: false, message: "Invalid publication ID" });
       }
       
-      await storage.incrementPublicationLikes(parseInt(id as string));
+      const publication = await storage.getPublicationById(pubId);
+      if (!publication) {
+        return res.status(404).json({ success: false, message: "Publication not found" });
+      }
       
+      await storage.incrementPublicationLikes(pubId);
       return res.json({ success: true, likes: (publication.likes || 0) + 1 });
     } catch (error) {
       console.error("Like error:", error);
       const message = (error as any)?.message || "Failed to like publication";
-      return res.status(500).json({ message });
+      return res.status(500).json({ success: false, message });
+    }
+  });
+
+  // Track publication view
+  app.post("/api/publications/:id/view", async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const pubId = parseInt(id);
+      if (!isNaN(pubId)) {
+        await storage.incrementPublicationViews(pubId);
+      }
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("View tracking error:", error);
+      return res.json({ success: false });
+    }
+  });
+
+  // Track publication download
+  app.post("/api/publications/:id/download", async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const pubId = parseInt(id);
+      if (!isNaN(pubId)) {
+        await storage.incrementPublicationDownloads(pubId);
+      }
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("Download tracking error:", error);
+      return res.json({ success: false });
+    }
+  });
+
+  // Track publication view fallback for POST /api/publications/:id
+  app.post("/api/publications/:id", async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const pubId = parseInt(id);
+      if (!isNaN(pubId)) {
+        await storage.incrementPublicationViews(pubId);
+      }
+      return res.json({ success: true });
+    } catch (error) {
+      console.error("View tracking error:", error);
+      return res.json({ success: false });
     }
   });
 

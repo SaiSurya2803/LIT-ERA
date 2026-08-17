@@ -3,24 +3,38 @@ import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import * as schema from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required. Please check your .env file.");
+const databaseUrl = process.env.DATABASE_URL || "";
+
+if (!databaseUrl) {
+  console.warn("⚠️ [DATABASE] DATABASE_URL environment variable is not set. Database queries will fail until configured.");
 }
 
-// Create connection pool
-const pool = mysql.createPool({
-  uri: process.env.DATABASE_URL,
+// Enable SSL if connecting to a remote cloud host (TiDB, Aiven, PlanetScale, Render, etc.)
+const isLocalhost = databaseUrl.includes("localhost") || databaseUrl.includes("127.0.0.1") || !databaseUrl;
+const poolConfig: mysql.PoolOptions = {
+  uri: databaseUrl || "mysql://root:@localhost:3306/litera_club",
   waitForConnections: true,
-  connectionLimit: 20,
-  maxIdle: 20, // max idle connections, the default value is the same as `connectionLimit`
-  idleTimeout: 30000, // idle connections timeout, in milliseconds, the default value 60000
+  connectionLimit: 10,
+  maxIdle: 10,
+  idleTimeout: 30000,
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
-});
+};
+
+if (!isLocalhost) {
+  poolConfig.ssl = {
+    rejectUnauthorized: false,
+  };
+}
+
+// Create connection pool
+const pool = mysql.createPool(poolConfig);
 
 export const db = drizzle(pool, { schema, mode: "default" });
 export { pool };
 
-console.log("✓ Connected to MySQL database");
+if (databaseUrl) {
+  console.log("✓ Initialized MySQL database pool");
+}
 

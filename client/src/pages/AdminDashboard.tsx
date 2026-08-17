@@ -209,119 +209,112 @@ export default function AdminDashboard() {
                       <TableHead className="font-accent text-ink/50 uppercase tracking-widest text-xs">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
-                  {(() => {
-    console.log('Submissions count:', submissions?.length || 0);
-    
-    if (submissionsLoading) {
-      return <div className="flex justify-center py-8"><Skeleton className="w-64 h-12 bg-ink/10" /></div>;
-    }
-    
-    if (!submissions || submissions.length === 0) {
-      return <div className="text-center py-8"><p className="font-body text-ink/60">No submissions found.</p></div>;
-    }
-    
-    return (
-      <TableBody>
-        {submissions.map((submission: any) => {
-          console.log('Submission ID:', submission.id, 'FileName:', submission.fileName, 'FileSize:', submission.fileSize);
-          return (
-            <TableRow key={submission.id} className="border-ink/5">
-              <TableCell className="font-body">{new Date(submission.submittedAt).toLocaleDateString()}</TableCell>
-              <TableCell className="font-body font-bold">{submission.name}</TableCell>
-              <TableCell className="font-body text-ink/70">{submission.email}</TableCell>
-              <TableCell className="font-body">{submission.title}</TableCell>
-              <TableCell className="font-body capitalize">{submission.category}</TableCell>
-              <TableCell className="font-body">
-                {submission.fileName ? (
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-gold" />
-                    <div>
-                      <div className="text-xs font-medium">{submission.originalFileName || submission.fileName}</div>
-                      <div className="text-xs text-ink/60">
-                        {submission.fileSize ? `${(submission.fileSize / 1024 / 1024).toFixed(2)} MB` : 'Unknown size'}
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <span className="text-ink/40 text-xs italic">No file</span>
-                )}
-              </TableCell>
-              <TableCell className="font-body">
-                <span className={`px-2 py-1 text-xs font-accent uppercase rounded ${
-                  submission.status === 'approved' ? 'bg-green-100 text-green-800' :
-                  submission.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {submission.status}
-                </span>
-              </TableCell>
-              <TableCell className="font-body">
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-ink text-ink font-accent text-xs hover:bg-ink hover:text-cream"
-                    onClick={() => {
-                      // View submission details
-                      alert(`Submission Details:\n\nTitle: ${submission.title}\nCategory: ${submission.category}\nDescription: ${submission.description}\n\nEmail: ${submission.email}\nStatus: ${submission.status}\n${submission.fileName ? `\nFile: ${submission.fileName} (${(submission.fileSize / 1024 / 1024).toFixed(2)} MB)` : '\nNo file attached'}`);
-                    }}
-                  >
-                    <Eye className="w-3 h-3" />
-                  </Button>
-                  {submission.fileName && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-gold text-gold font-accent text-xs hover:bg-gold hover:text-ink"
-                      onClick={async () => {
-                        try {
-                          console.log('Downloading file for submission:', submission.id);
-                          
-                          const response = await fetch(`/api/submissions/${submission.id}/download`, {
-                            credentials: "include"
-                          });
-                          
-                          if (response.ok) {
-                            // Create blob from the file response
-                            const blob = await response.blob();
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = submission.originalFileName || submission.fileName;
-                            document.body.appendChild(a);
-                            a.click();
-                            window.URL.revokeObjectURL(url);
-                            document.body.removeChild(a);
-                            
-                            toast({
-                              title: "File Downloaded",
-                              description: `Downloaded ${submission.originalFileName || submission.fileName}`,
-                            });
-                          } else {
-                            const errorData = await response.json();
-                            throw new Error(errorData.message || "Failed to download file");
-                          }
-                        } catch (error) {
-                          console.error('Download error:', error);
-                          toast({
-                            title: "Download Failed",
-                            description: "Could not download file. Please try again.",
-                            variant: "destructive",
-                          });
-                        }
-                      }}
-                    >
-                      <Download className="w-3 h-3" />
-                    </Button>
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    );
-  })()}
+                  <TableBody>
+                    {submissionsLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8">
+                          <Skeleton className="w-64 h-12 bg-ink/10 mx-auto" />
+                        </TableCell>
+                      </TableRow>
+                    ) : !submissions || submissions.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center py-8">
+                          <p className="font-body text-ink/60">No submissions found.</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      submissions.map((submission: any) => (
+                        <TableRow key={submission.id} className="border-ink/5">
+                          <TableCell className="font-body">{new Date(submission.submittedAt).toLocaleDateString()}</TableCell>
+                          <TableCell className="font-body font-bold">{submission.name}</TableCell>
+                          <TableCell className="font-body text-ink/70">{submission.email}</TableCell>
+                          <TableCell className="font-body">{submission.title}</TableCell>
+                          <TableCell className="font-body capitalize">{submission.category}</TableCell>
+                          <TableCell className="font-body">
+                            {submission.fileName ? (
+                              <div className="flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-gold" />
+                                <div>
+                                  <div className="text-xs font-medium">{submission.originalFileName || submission.fileName}</div>
+                                  <div className="text-xs text-ink/60">
+                                    {submission.fileSize ? `${(submission.fileSize / 1024 / 1024).toFixed(2)} MB` : 'Unknown size'}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-ink/40 text-xs italic">No file</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="font-body">
+                            <span className={`px-2 py-1 text-xs font-accent uppercase rounded ${
+                              submission.status === 'approved' ? 'bg-green-100 text-green-800' :
+                              submission.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {submission.status}
+                            </span>
+                          </TableCell>
+                          <TableCell className="font-body">
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-ink text-ink font-accent text-xs hover:bg-ink hover:text-cream"
+                                onClick={() => {
+                                  alert(`Submission Details:\n\nTitle: ${submission.title}\nCategory: ${submission.category}\nDescription: ${submission.description}\n\nEmail: ${submission.email}\nStatus: ${submission.status}\n${submission.fileName ? `\nFile: ${submission.fileName} (${(submission.fileSize / 1024 / 1024).toFixed(2)} MB)` : '\nNo file attached'}`);
+                                }}
+                              >
+                                <Eye className="w-3 h-3" />
+                              </Button>
+                              {submission.fileName && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-gold text-gold font-accent text-xs hover:bg-gold hover:text-ink"
+                                  onClick={async () => {
+                                    try {
+                                      const response = await fetch(`/api/submissions/${submission.id}/download`, {
+                                        credentials: "include"
+                                      });
+                                      
+                                      if (response.ok) {
+                                        const blob = await response.blob();
+                                        const url = window.URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = submission.originalFileName || submission.fileName;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        window.URL.revokeObjectURL(url);
+                                        document.body.removeChild(a);
+                                        
+                                        toast({
+                                          title: "File Downloaded",
+                                          description: `Downloaded ${submission.originalFileName || submission.fileName}`,
+                                        });
+                                      } else {
+                                        const errorData = await response.json();
+                                        throw new Error(errorData.message || "Failed to download file");
+                                      }
+                                    } catch (error) {
+                                      console.error('Download error:', error);
+                                      toast({
+                                        title: "Download Failed",
+                                        description: "Could not download file. Please try again.",
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }}
+                                >
+                                  <Download className="w-3 h-3" />
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
                 </Table>
               </div>
             </div>
