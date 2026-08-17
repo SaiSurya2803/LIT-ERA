@@ -111,7 +111,10 @@ export class DatabaseStorage implements IStorage {
     try {
       const id = crypto.randomUUID();
       await db.insert(users).values({ ...insertUser, id });
-      const [user] = await db.select().from(users).where(eq(users.email, insertUser.email));
+      const [user] = await db.select().from(users).where(eq(users.id, id));
+      if (!user) {
+        throw new Error("User row could not be read back after insert");
+      }
       return user;
     } catch (error: any) {
       console.error("Error creating user:", error);

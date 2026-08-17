@@ -3,12 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
-import session from "express-session";
-import MemoryStore from "memorystore";
 import path from "path";
-
-// Use memory store for PostgreSQL sessions
-const MemoryStoreSession = MemoryStore(session);
 
 // Global error handlers
 process.on("uncaughtException", (error) => {
@@ -45,23 +40,6 @@ app.use(express.urlencoded({ extended: false }));
 
 // Serve uploads folder for static files (images, PDFs, etc.)
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-
-// Use memory store for PostgreSQL sessions
-app.use(
-  session({
-    store: new MemoryStoreSession({
-      checkPeriod: 86400000 // prune expired entries every 24h
-    }),
-    secret: process.env.SESSION_SECRET || "change-me-in-production",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    },
-  }),
-);
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {

@@ -7,6 +7,10 @@ import { storage } from "./storage";
 import { api } from "../shared/routes";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { clearSessionCookie, getSessionUserId, setSessionCookie } from "./auth";
+import { ensureSchema } from "./ensure-schema";
+import { describeDbError } from "./db-errors";
+import { toPublicUser } from "../shared/schema";
 
 // Configure multer for file uploads
 const storageMulter = multer.diskStorage({
@@ -45,11 +49,6 @@ const upload = multer({
   }
 });
 
-declare module "express-session" {
-  interface SessionData {
-    userId?: string;
-  }
-}
 
 export async function registerRoutes(
   httpServer: Server,
@@ -57,7 +56,7 @@ export async function registerRoutes(
 ): Promise<Server> {
   // Attach user from session if present
   app.use(async (req, _res, next) => {
-    const userId = req.session?.userId;
+    const userId = getSessionUserId(req);
     if (userId) {
       try {
         const user = await storage.getUser(userId);
@@ -78,7 +77,7 @@ export async function registerRoutes(
       if (!user) {
         return res.status(401).json({ message: "Not authenticated" });
       }
-      return res.json(user);
+      return res.json(toPublicUser(user));
     } catch (error) {
       next(error);
     }
@@ -99,6 +98,7 @@ export async function registerRoutes(
   app.post(["/api/auth/register", "/auth/register"], async (req, res, next) => {
     try {
       const data = registerSchema.parse(req.body);
+      await ensureSchema();
       const existing = await storage.getUserByEmail(data.email);
       if (existing) {
         return res.status(400).json({ message: "Email already in use" });
@@ -118,31 +118,26 @@ export async function registerRoutes(
         club: "LIT'ERA",
       });
 
-      if (req.session) {
-        req.session.userId = user.id;
-        await new Promise<void>((resolve) => {
-          req.session.save((err) => {
-            if (err) console.error("Session save warning:", err);
-            resolve();
-          });
-        });
-      }
-      
-      return res.status(201).json(user);
+      setSessionCookie(res, user.id);
+
+      return res.status(201).json(toPublicUser(user));
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
       }
-      console.error("Register error:", err);
-      const message = err?.message || "Something went wrong while registering.";
-      const status = message === "Email already in use" ? 400 : 500;
-      return res.status(status).json({ message });
+      if (err?.message === "Email already in use") {
+        return res.status(400).json({ message: err.message, code: "EMAIL_IN_USE" });
+      }
+      const described = describeDbError(err, "register");
+      console.error("Register error:", described.logMessage, err);
+      return res.status(described.status).json({ message: described.message, code: described.code });
     }
   });
 
   app.post(["/api/auth/login", "/auth/login"], async (req, res, next) => {
     try {
       const data = loginSchema.parse(req.body);
+      await ensureSchema();
       const user = await storage.getUserByEmail(data.email);
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -153,41 +148,23 @@ export async function registerRoutes(
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      if (req.session) {
-        req.session.userId = user.id;
-        await new Promise<void>((resolve) => {
-          req.session.save((err) => {
-            if (err) console.error("Session save warning:", err);
-            resolve();
-          });
-        });
-      }
-      
-      return res.json(user);
+      setSessionCookie(res, user.id);
+
+      return res.json(toPublicUser(user));
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
       }
-      console.error("Login error:", err);
-      const message = err?.message || "Something went wrong while logging in.";
-      return res.status(500).json({ message });
+      const described = describeDbError(err, "login");
+      console.error("Login error:", described.logMessage, err);
+      return res.status(described.status).json({ message: described.message, code: described.code });
     }
   });
 
-  app.post(["/api/auth/logout", "/auth/logout"], (req, res, next) => {
+  app.post(["/api/auth/logout", "/auth/logout"], (_req, res, next) => {
     try {
-      if (req.session) {
-        req.session.destroy((err) => {
-          if (err) {
-            console.error("Logout error:", err);
-            return res.status(500).json({ message: "Failed to logout" });
-          }
-          res.clearCookie('connect.sid');
-          return res.status(204).end();
-        });
-      } else {
-        return res.status(204).end();
-      }
+      clearSessionCookie(res);
+      return res.status(204).end();
     } catch (error) {
       next(error);
     }
@@ -201,7 +178,7 @@ export async function registerRoutes(
         return res.status(403).json({ message: "Forbidden: Admin access required" });
       }
       const usersList = await storage.getAllUsers();
-      return res.json(usersList);
+      return res.json(usersList.map(toPublicUser));
     } catch (error) {
       next(error);
     }

@@ -150,6 +150,14 @@ export const insertMunRegistrationSchema = createInsertSchema(munRegistrations).
 export const insertPublicationSchema = createInsertSchema(publications).omit({ id: true, createdAt: true, views: true, downloads: true, likes: true });
 
 export type User = typeof users.$inferSelect;
+export type PublicUser = Omit<User, "passwordHash">;
+
+/** Strips the password hash before a user is sent to a client. */
+export function toPublicUser(user: User): PublicUser {
+  const { passwordHash: _passwordHash, ...publicUser } = user;
+  return publicUser;
+}
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type InsertContact = z.infer<typeof insertContactSchema>;

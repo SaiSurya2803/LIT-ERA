@@ -51,18 +51,27 @@ Follow these instructions to set up and run the project locally on your machine.
    ```
 
 3. **Set up Environment Variables:**
-   Create a `.env` file in the root directory and add your required environment variables (especially your MySQL database connection URL). Sample `.env`:
-   ```env
-   DATABASE_URL="mysql://user:password@localhost:3306/litera"
-   PORT=5000
+   Copy `.env.example` to `.env` and fill in the values. Credentials live only in
+   environment variables — never in source or config files.
+   ```bash
+   cp .env.example .env
    ```
+   `DATABASE_URL` is required. For TiDB Cloud use port `4000`, database `sys` and a
+   TLS-enabled host, e.g. `mysql://<user>:<password>@<host>.tidbcloud.com:4000/sys`.
+   `SESSION_SECRET` is required when `NODE_ENV=production` (it signs the login cookie).
 
 ### Database Setup
 
-Step 1: Push your Drizzle schema to the MySQL database.
+Create the tables in the configured database:
+```bash
+npm run db:init   # idempotent CREATE TABLE IF NOT EXISTS for every table
+```
+Or apply the Drizzle schema diff:
 ```bash
 npm run db:push
 ```
+The server also verifies the schema lazily on the first auth request, so a fresh
+TiDB Cloud cluster works without a manual step.
 
 ### Running the Application
 
