@@ -1,13 +1,10 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
-import MemoryStore from "memorystore";
 import cors from "cors";
 import path from "path";
 import { createServer } from "http";
 import { registerRoutes } from "../server/routes";
-
-const MemoryStoreSession = MemoryStore(session);
 
 const app = express();
 app.set("trust proxy", 1);
@@ -49,45 +46,18 @@ app.use(
   })
 );
 
-// Register routes with HTTP server instance
+// Register routes synchronously at module load time
 const httpServer = createServer(app);
-let routesInitPromise: Promise<any> | null = null;
+registerRoutes(httpServer, app);
 
-function ensureRoutesInitialized() {
-  if (!routesInitPromise) {
-    routesInitPromise = registerRoutes(httpServer, app)
-      .then(() => {
-        // Attach error handler after routes are mounted
-        app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-          const status = err.status || err.statusCode || 500;
-          const message = err.message || "Internal Server Error";
-          console.error("Serverless API Error:", err);
-          if (!res.headersSent) {
-            res.status(status).json({ success: false, message });
-          }
-        });
-      })
-      .catch((err) => {
-        console.error("Failed to register serverless routes:", err);
-        routesInitPromise = null;
-        throw err;
-      });
+// Global error handler
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  console.error("Serverless API Error:", err);
+  if (!res.headersSent) {
+    res.status(status).json({ success: false, message });
   }
-  return routesInitPromise;
-}
+});
 
-// Vercel Serverless Function entrypoint handler
-export default async function handler(req: Request, res: Response) {
-  try {
-    await ensureRoutesInitialized();
-    return app(req, res);
-  } catch (error: any) {
-    console.error("Handler error:", error);
-    if (!res.headersSent) {
-      return res.status(500).json({
-        success: false,
-        message: error?.message || "Internal Server Error",
-      });
-    }
-  }
-}
+export default app;
