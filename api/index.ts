@@ -12,11 +12,15 @@ app.use(cors({ origin: true, credentials: true }));
 
 // Normalize request URLs so both /api/... and /... work seamlessly on Vercel
 app.use((req, _res, next) => {
-  if (req.query && req.query.__path) {
-    const sub = String(req.query.__path);
-    req.url = "/api/" + sub.replace(/^\//, "");
+  const matchedPath = req.headers["x-matched-path"];
+  if (typeof matchedPath === "string" && matchedPath.startsWith("/api")) {
+    req.url = matchedPath;
+  } else if (req.query && req.query.__path) {
+    req.url = "/api/" + String(req.query.__path).replace(/^\//, "");
+  } else if (typeof req.originalUrl === "string" && req.originalUrl.startsWith("/api")) {
+    req.url = req.originalUrl;
   } else if (!req.url.startsWith("/api") && !req.url.startsWith("/uploads")) {
-    req.url = "/api" + req.url;
+    req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
   }
   next();
 });
