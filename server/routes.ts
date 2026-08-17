@@ -4,7 +4,7 @@ import multer from "multer";
 import path from "path";
 import { existsSync, mkdirSync } from "fs";
 import { storage } from "./storage";
-import { api } from "@shared/routes";
+import { api } from "../shared/routes";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 

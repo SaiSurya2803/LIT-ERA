@@ -31,7 +31,7 @@ import {
   type InsertMunRegistration,
   type Publication,
   type InsertPublication,
-} from "@shared/schema";
+} from "../shared/schema";
 import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
