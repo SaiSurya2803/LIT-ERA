@@ -24,24 +24,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ message: "Not authenticated" });
     }
     
-    const isAdmin = Boolean(
-      user.isAdmin === true || 
-      user.isAdmin === "true" || 
-      user.isAdmin === 1 || 
-      (user as any).is_admin === true || 
-      (user as any).is_admin === "true" || 
-      (user as any).is_admin === 1
-    );
-
-    if (!isAdmin) {
+    if (!user.isAdmin) {
       return res.status(403).json({ message: "Admin access required" });
     }
 
-    const users = await sql`
-      SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate"
-      FROM users
-      ORDER BY join_date DESC NULLS LAST
-    `;
+    const rows = await sql`SELECT * FROM users`;
+    
+    const users = (rows || []).map((u: any) => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      club: u.club || "LIT'ERA",
+      isAdmin: Boolean(
+        u.is_admin === true || 
+        u.is_admin === "true" || 
+        u.is_admin === 1 || 
+        u.isAdmin === true || 
+        u.isAdmin === "true" || 
+        u.isAdmin === 1
+      ),
+      joinDate: u.join_date ?? u.joinDate ?? u.created_at ?? new Date().toISOString()
+    })).sort((a: any, b: any) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime());
+
     return res.status(200).json(users);
   } catch (err: any) {
     console.error("Admin users error:", err);

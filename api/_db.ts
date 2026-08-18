@@ -42,12 +42,24 @@ export async function getAuthenticatedUser(cookieHeader: string | undefined, sql
   if (!uid) return null;
 
   try {
-    await ensureCoreTables(sql);
-    const users = await sql`
-      SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate"
-      FROM users WHERE id = ${uid} LIMIT 1
-    `;
-    return users[0] || null;
+    const rows = await sql`SELECT * FROM users WHERE id = ${uid} LIMIT 1`;
+    if (!rows || rows.length === 0) return null;
+    const u = rows[0];
+    return {
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      club: u.club || "LIT'ERA",
+      isAdmin: Boolean(
+        u.is_admin === true || 
+        u.is_admin === "true" || 
+        u.is_admin === 1 || 
+        u.isAdmin === true || 
+        u.isAdmin === "true" || 
+        u.isAdmin === 1
+      ),
+      joinDate: u.join_date ?? u.joinDate ?? new Date().toISOString()
+    };
   } catch (err) {
     console.error("getAuthenticatedUser error:", err);
     return null;
@@ -62,7 +74,7 @@ export async function ensureCoreTables(sql: NeonQueryFunction<false, false>) {
         name TEXT NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
         password_hash TEXT NOT NULL,
-        club TEXT DEFAULT 'LIT''ERA',
+        club TEXT DEFAULT 'LITERA',
         is_admin BOOLEAN DEFAULT FALSE,
         join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
