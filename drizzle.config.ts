@@ -13,7 +13,7 @@ function findDatabaseUrl(): string {
 
   for (const k of standardKeys) {
     const val = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
-    if (val && (val.startsWith("mysql://") || val.startsWith("mysql://"))) {
+    if (val && (val.startsWith("postgres://") || val.startsWith("postgresql://"))) {
       return val;
     }
   }
@@ -21,7 +21,7 @@ function findDatabaseUrl(): string {
   for (const [key, value] of Object.entries(process.env)) {
     if (value && typeof value === "string") {
       const clean = value.trim().replace(/^["']|["']$/g, "");
-      if (clean.startsWith("mysql://") || clean.startsWith("mysql://")) {
+      if (clean.startsWith("postgres://") || clean.startsWith("postgresql://")) {
         return clean;
       }
     }
@@ -35,8 +35,8 @@ const dbUrl = findDatabaseUrl();
 export default defineConfig({
   out: "./migrations",
   schema: "./shared/schema.ts",
-  dialect: "mysql",
+  dialect: "postgresql",
   dbCredentials: {
-    url: dbUrl || "mysql://localhost:5432/postgres",
+    url: dbUrl || "postgres://localhost:5432/postgres",
   },
 });

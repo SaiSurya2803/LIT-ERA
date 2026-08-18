@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { db, ensureTables } from "./db";
+import { db } from "./db";
 import {
   users,
   contactSubmissions,
@@ -88,30 +88,17 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    try {
-      await ensureTables();
-      const [user] = await db.select().from(users).where(eq(users.id, id));
-      return user;
-    } catch (error: any) {
-      console.error("Error fetching user:", error);
-      throw new Error(error?.message || "Failed to fetch user");
-    }
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    try {
-      await ensureTables();
-      const [user] = await db.select().from(users).where(eq(users.email, email));
-      return user;
-    } catch (error: any) {
-      console.error("Error fetching user by email:", error);
-      throw new Error(error?.message || "Failed to fetch user");
-    }
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
     try {
-      await ensureTables();
       const id = crypto.randomUUID();
       const [user] = await db.insert(users).values({ ...insertUser, id }).returning();
       return user;
@@ -120,350 +107,187 @@ export class DatabaseStorage implements IStorage {
       if (error.code === '23505' || error.code === 'ER_DUP_ENTRY') {
         throw new Error("Email already in use");
       }
-      throw new Error(error?.message || "Failed to create user");
+      throw error;
     }
   }
 
   async getAllUsers(): Promise<User[]> {
-    try {
-      await ensureTables();
-      return await db.select().from(users).orderBy(desc(users.joinDate));
-    } catch (error: any) {
-      console.error("Error fetching all users:", error);
-      return [];
-    }
+    return await db.select().from(users).orderBy(desc(users.joinDate));
   }
 
   async createContact(contact: InsertContact): Promise<ContactSubmission> {
-    try {
-      const [submission] = await db.insert(contactSubmissions).values(contact).returning();
-      return submission;
-    } catch (error) {
-      console.error("Error creating contact:", error);
-      throw new Error("Failed to submit contact form");
-    }
+    const [submission] = await db.insert(contactSubmissions).values(contact).returning();
+    return submission;
   }
 
   async getContacts(): Promise<ContactSubmission[]> {
-    try {
-      return await db.select().from(contactSubmissions).orderBy(desc(contactSubmissions.submissionDate));
-    } catch (error) {
-      console.error("Error fetching contacts:", error);
-      throw new Error("Failed to fetch contacts");
-    }
+    return await db.select().from(contactSubmissions).orderBy(desc(contactSubmissions.submissionDate));
   }
 
   async createEvent(event: InsertEvent): Promise<Event> {
-    try {
-      const [ev] = await db.insert(events).values(event).returning();
-      return ev;
-    } catch (error) {
-      console.error("Error creating event:", error);
-      throw new Error("Failed to create event");
-    }
+    const [ev] = await db.insert(events).values(event).returning();
+    return ev;
   }
 
   async getEvents(): Promise<Event[]> {
-    try {
-      return await db.select().from(events).where(eq(events.isActive, true));
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      throw new Error("Failed to fetch events");
-    }
+    return await db.select().from(events).where(eq(events.isActive, true));
   }
 
   async createGameScore(score: InsertGameScore): Promise<GameScore> {
-    try {
-      const [gameScore] = await db.insert(gameScores).values(score).returning();
-      return gameScore;
-    } catch (error) {
-      console.error("Error creating game score:", error);
-      throw new Error("Failed to submit game score");
-    }
+    const [gameScore] = await db.insert(gameScores).values(score).returning();
+    return gameScore;
   }
 
   async getGameScores(): Promise<GameScore[]> {
-    try {
-      return await db.select().from(gameScores).orderBy(desc(gameScores.completedDate));
-    } catch (error) {
-      console.error("Error fetching game scores:", error);
-      throw new Error("Failed to fetch game scores");
-    }
+    return await db.select().from(gameScores).orderBy(desc(gameScores.completedDate));
   }
 
   async createPuzzle(insertPuzzle: InsertPuzzle): Promise<Puzzle> {
-    try {
-      const [puzzle] = await db.insert(puzzles).values(insertPuzzle).returning();
-      return puzzle;
-    } catch (error) {
-      console.error("Error creating puzzle:", error);
-      throw new Error("Failed to create puzzle");
-    }
+    const [puzzle] = await db.insert(puzzles).values(insertPuzzle).returning();
+    return puzzle;
   }
 
   async getPuzzles(): Promise<Puzzle[]> {
-    try {
-      return await db.select().from(puzzles).orderBy(desc(puzzles.publishDate));
-    } catch (error) {
-      console.error("Error fetching puzzles:", error);
-      throw new Error("Failed to fetch puzzles");
-    }
+    return await db.select().from(puzzles).orderBy(desc(puzzles.publishDate));
   }
 
   async getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined> {
-    try {
-      const [puzzle] = await db.select().from(puzzles).where(
-        and(
-          eq(puzzles.type, type),
-          eq(puzzles.publishDate, date)
-        )
-      );
-      return puzzle;
-    } catch (error) {
-      console.error("[Storage] Error fetching daily puzzle:", error);
-      throw new Error("Failed to fetch daily puzzle");
-    }
+    const [puzzle] = await db.select().from(puzzles).where(
+      and(
+        eq(puzzles.type, type),
+        eq(puzzles.publishDate, date)
+      )
+    );
+    return puzzle;
   }
 
   async deletePuzzlesByType(type: string): Promise<number> {
-    try {
-      const result = await db.delete(puzzles).where(eq(puzzles.type, type)).returning();
-      return result.length;
-    } catch (error) {
-      console.error(`[Storage] Error deleting puzzles of type ${type}:`, error);
-      throw new Error(`Failed to delete puzzles of type ${type}`);
-    }
+    const result = await db.delete(puzzles).where(eq(puzzles.type, type)).returning();
+    return result.length;
   }
 
   async deleteGameScoresByType(gameType: string): Promise<number> {
-    try {
-      const result = await db.delete(gameScores).where(eq(gameScores.gameType, gameType)).returning();
-      return result.length;
-    } catch (error) {
-      console.error(`[Storage] Error deleting game scores of type ${gameType}:`, error);
-      throw new Error(`Failed to delete game scores of type ${gameType}`);
-    }
+    const result = await db.delete(gameScores).where(eq(gameScores.gameType, gameType)).returning();
+    return result.length;
   }
 
   async createContent(contentItem: InsertContent): Promise<Content> {
-    try {
-      const [newContent] = await db.insert(content).values(contentItem).returning();
-      return newContent;
-    } catch (error) {
-      console.error("Error creating content:", error);
-      throw new Error("Failed to create content");
-    }
+    const [newContent] = await db.insert(content).values(contentItem).returning();
+    return newContent;
   }
 
   async getContent(): Promise<Content[]> {
-    try {
-      return await db.select().from(content).where(eq(content.isActive, true)).orderBy(desc(content.date));
-    } catch (error) {
-      console.error("Error fetching content:", error);
-      throw new Error("Failed to fetch content");
-    }
+    return await db.select().from(content).where(eq(content.isActive, true)).orderBy(desc(content.date));
   }
 
   async updateContent(id: number, updates: Partial<InsertContent>): Promise<Content | undefined> {
-    try {
-      const [updatedContent] = await db.update(content).set(updates).where(eq(content.id, id)).returning();
-      return updatedContent;
-    } catch (error) {
-      console.error("Error updating content:", error);
-      throw new Error("Failed to update content");
-    }
+    const [updatedContent] = await db.update(content).set(updates).where(eq(content.id, id)).returning();
+    return updatedContent;
   }
 
   async deleteContent(id: number): Promise<boolean> {
-    try {
-      const result = await db.delete(content).where(eq(content.id, id)).returning();
-      return result.length > 0;
-    } catch (error) {
-      console.error("Error deleting content:", error);
-      throw new Error("Failed to delete content");
-    }
+    const result = await db.delete(content).where(eq(content.id, id)).returning();
+    return result.length > 0;
   }
 
   async createSubmission(insertSubmission: InsertSubmission): Promise<Submission> {
-    try {
-      const [submission] = await db.insert(submissions).values(insertSubmission).returning();
-      return submission;
-    } catch (error) {
-      console.error("Error creating submission:", error);
-      throw new Error("Failed to create submission");
-    }
+    const [submission] = await db.insert(submissions).values(insertSubmission).returning();
+    return submission;
   }
 
   async getSubmissions(): Promise<Submission[]> {
-    try {
-      return await db.select().from(submissions).orderBy(desc(submissions.submittedAt));
-    } catch (error) {
-      console.error("Error fetching submissions:", error);
-      throw new Error("Failed to fetch submissions");
-    }
+    return await db.select().from(submissions).orderBy(desc(submissions.submittedAt));
   }
 
   async getSubmissionById(id: number): Promise<Submission | undefined> {
-    try {
-      const [submission] = await db.select().from(submissions).where(eq(submissions.id, id));
-      return submission;
-    } catch (error) {
-      console.error("Error fetching submission:", error);
-      throw new Error("Failed to fetch submission");
-    }
+    const [submission] = await db.select().from(submissions).where(eq(submissions.id, id));
+    return submission;
   }
 
   async createEventRegistration(registration: InsertEventRegistration): Promise<EventRegistration> {
-    try {
-      const [eventReg] = await db.insert(eventRegistrations).values(registration).returning();
-      return eventReg;
-    } catch (error) {
-      console.error("Error creating event registration:", error);
-      throw new Error("Failed to register for event");
-    }
+    const [eventReg] = await db.insert(eventRegistrations).values(registration).returning();
+    return eventReg;
   }
 
   async getEventRegistrations(userId: string): Promise<EventRegistration[]> {
-    try {
-      return await db.select().from(eventRegistrations).where(eq(eventRegistrations.userId, userId)).orderBy(desc(eventRegistrations.registeredAt));
-    } catch (error) {
-      console.error("Error fetching event registrations:", error);
-      throw new Error("Failed to fetch event registrations");
-    }
+    return await db.select().from(eventRegistrations).where(eq(eventRegistrations.userId, userId)).orderBy(desc(eventRegistrations.registeredAt));
   }
 
   async checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined> {
-    try {
-      const [registration] = await db.select().from(eventRegistrations).where(
-        and(
-          eq(eventRegistrations.userId, userId),
-          eq(eventRegistrations.eventId, eventId)
-        )
-      );
-      return registration;
-    } catch (error) {
-      console.error("Error checking event registration:", error);
-      throw new Error("Failed to check event registration");
-    }
+    const [registration] = await db.select().from(eventRegistrations).where(
+      and(
+        eq(eventRegistrations.userId, userId),
+        eq(eventRegistrations.eventId, eventId)
+      )
+    );
+    return registration;
   }
 
   async createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration> {
-    try {
-      const [munReg] = await db.insert(munRegistrations).values(registration).returning();
-      return munReg;
-    } catch (error) {
-      console.error("Error creating MUN registration:", error);
-      throw new Error("Failed to register for MUN");
-    }
+    const [munReg] = await db.insert(munRegistrations).values(registration).returning();
+    return munReg;
   }
 
   async getMunRegistrations(): Promise<MunRegistration[]> {
-    try {
-      return await db.select().from(munRegistrations).orderBy(desc(munRegistrations.registeredAt));
-    } catch (error) {
-      console.error("Error fetching MUN registrations:", error);
-      throw new Error("Failed to fetch MUN registrations");
-    }
+    return await db.select().from(munRegistrations).orderBy(desc(munRegistrations.registeredAt));
   }
 
   async checkMunRegistration(userId: string): Promise<MunRegistration | undefined> {
-    try {
-      const [registration] = await db.select().from(munRegistrations).where(eq(munRegistrations.userId, userId));
-      return registration;
-    } catch (error) {
-      console.error("Error checking MUN registration:", error);
-      throw new Error("Failed to check MUN registration");
-    }
+    const [registration] = await db.select().from(munRegistrations).where(eq(munRegistrations.userId, userId));
+    return registration;
   }
 
   async createPublication(insertPublication: InsertPublication): Promise<Publication> {
-    try {
-      const [publication] = await db.insert(publications).values(insertPublication).returning();
-      return publication;
-    } catch (error) {
-      console.error("Error creating publication:", error);
-      throw new Error("Failed to create publication");
-    }
+    const [publication] = await db.insert(publications).values(insertPublication).returning();
+    return publication;
   }
 
   async getPublications(): Promise<Publication[]> {
-    try {
-      return await db.select().from(publications).where(eq(publications.isActive, true)).orderBy(desc(publications.publishDate));
-    } catch (error) {
-      console.error("Error fetching publications:", error);
-      throw new Error("Failed to fetch publications");
-    }
+    return await db.select().from(publications).where(eq(publications.isActive, true)).orderBy(desc(publications.publishDate));
   }
 
   async getPublicationById(id: number): Promise<Publication | undefined> {
-    try {
-      const [publication] = await db.select().from(publications).where(eq(publications.id, id));
-      return publication;
-    } catch (error) {
-      console.error("Error fetching publication:", error);
-      throw new Error("Failed to fetch publication");
-    }
+    const [publication] = await db.select().from(publications).where(eq(publications.id, id));
+    return publication;
   }
 
   async updatePublication(id: number, updates: Partial<InsertPublication>): Promise<Publication | undefined> {
-    try {
-      const [updatedPublication] = await db.update(publications).set(updates).where(eq(publications.id, id)).returning();
-      return updatedPublication;
-    } catch (error) {
-      console.error("Error updating publication:", error);
-      throw new Error("Failed to update publication");
-    }
+    const [updatedPublication] = await db.update(publications).set(updates).where(eq(publications.id, id)).returning();
+    return updatedPublication;
   }
 
   async deletePublication(id: number): Promise<boolean> {
-    try {
-      const result = await db.delete(publications).where(eq(publications.id, id)).returning();
-      return result.length > 0;
-    } catch (error) {
-      console.error("Error deleting publication:", error);
-      throw new Error("Failed to delete publication");
-    }
+    const result = await db.delete(publications).where(eq(publications.id, id)).returning();
+    return result.length > 0;
   }
 
   async incrementPublicationViews(id: number): Promise<void> {
-    try {
-      const publication = await this.getPublicationById(id);
-      if (publication) {
-        await db
-          .update(publications)
-          .set({ views: (publication.views || 0) + 1 })
-          .where(eq(publications.id, id));
-      }
-    } catch (error) {
-      console.error("Error incrementing publication views:", error);
+    const publication = await this.getPublicationById(id);
+    if (publication) {
+      await db
+        .update(publications)
+        .set({ views: (publication.views || 0) + 1 })
+        .where(eq(publications.id, id));
     }
   }
 
   async incrementPublicationDownloads(id: number): Promise<void> {
-    try {
-      const publication = await this.getPublicationById(id);
-      if (publication) {
-        await db
-          .update(publications)
-          .set({ downloads: (publication.downloads || 0) + 1 })
-          .where(eq(publications.id, id));
-      }
-    } catch (error) {
-      console.error("Error incrementing publication downloads:", error);
+    const publication = await this.getPublicationById(id);
+    if (publication) {
+      await db
+        .update(publications)
+        .set({ downloads: (publication.downloads || 0) + 1 })
+        .where(eq(publications.id, id));
     }
   }
 
   async incrementPublicationLikes(id: number): Promise<void> {
-    try {
-      const publication = await this.getPublicationById(id);
-      if (publication) {
-        await db
-          .update(publications)
-          .set({ likes: (publication.likes || 0) + 1 })
-          .where(eq(publications.id, id));
-      }
-    } catch (error) {
-      console.error("Error incrementing publication likes:", error);
+    const publication = await this.getPublicationById(id);
+    if (publication) {
+      await db
+        .update(publications)
+        .set({ likes: (publication.likes || 0) + 1 })
+        .where(eq(publications.id, id));
     }
   }
 }

@@ -4,11 +4,11 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import session from "express-session";
-import MemoryStore from "memorystore";
+import connectPgSimple from "connect-pg-simple";
 import path from "path";
+import { findDatabaseUrl } from "./db";
 
-// Use memory store for PostgreSQL sessions
-const MemoryStoreSession = MemoryStore(session);
+const PostgresSessionStore = connectPgSimple(session);
 
 // Global error handlers
 process.on("uncaughtException", (error) => {
@@ -46,11 +46,14 @@ app.use(express.urlencoded({ extended: false }));
 // Serve uploads folder for static files (images, PDFs, etc.)
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// Use memory store for PostgreSQL sessions
+// Use connect-pg-simple for production-ready sessions
 app.use(
   session({
-    store: new MemoryStoreSession({
-      checkPeriod: 86400000 // prune expired entries every 24h
+    store: new PostgresSessionStore({
+      conObject: {
+        connectionString: findDatabaseUrl() || "postgres://localhost:5432/postgres",
+      },
+      createTableIfMissing: true,
     }),
     secret: process.env.SESSION_SECRET || "change-me-in-production",
     resave: false,
