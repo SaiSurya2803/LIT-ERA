@@ -5,6 +5,10 @@ import cors from "cors";
 import path from "path";
 import { createServer } from "http";
 import { registerRoutes } from "../server/routes";
+import connectPgSimple from "connect-pg-simple";
+import { findDatabaseUrl } from "../server/db";
+
+const PostgresSessionStore = connectPgSimple(session);
 
 const app = express();
 app.set("trust proxy", 1);
@@ -21,6 +25,12 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(
   session({
+    store: new PostgresSessionStore({
+      conObject: {
+        connectionString: findDatabaseUrl() || "postgres://localhost:5432/postgres",
+      },
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET || "litera-secret-key-2026-production",
     resave: false,
     saveUninitialized: false,

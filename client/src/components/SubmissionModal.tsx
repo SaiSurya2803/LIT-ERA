@@ -79,20 +79,20 @@ export default function SubmissionModal({ isOpen, onClose }: SubmissionModalProp
     setIsSubmitting(true);
     
     try {
-      // Send to backend API with JSON
+      // Send to backend API with FormData
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('email', formData.email);
+      data.append('title', formData.title);
+      data.append('category', formData.category);
+      data.append('description', formData.description);
+      if (formData.file) {
+        data.append('file', formData.file);
+      }
+
       const response = await fetch('/api/submissions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          title: formData.title,
-          category: formData.category,
-          description: formData.description,
-          fileName: formData.file ? formData.file.name : null,
-          originalFileName: formData.file ? formData.file.name : null,
-          fileSize: formData.file ? formData.file.size : null,
-        }),
+        body: data,
         credentials: 'include'
       });
 
