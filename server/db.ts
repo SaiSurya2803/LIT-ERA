@@ -3,19 +3,44 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import * as schema from "../shared/schema";
 
-const rawUrl = (
-  process.env.POSTGRES_URL || 
-  process.env.POSTGRES_PRISMA_URL ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  process.env.DATABASE_URL || 
-  ""
-).trim().replace(/^["']|["']$/g, "");
+export function findPostgresUrl(): string {
+  // Check common default keys first
+  const standardKeys = [
+    "POSTGRES_URL",
+    "DATABASE_URL",
+    "litera_POSTGRES_URL",
+    "litera_POSTGRES_URL_NON_POOLING",
+    "POSTGRES_URL_NON_POOLING",
+    "POSTGRES_PRISMA_URL",
+  ];
 
-if (!rawUrl) {
-  console.warn("⚠️ [DATABASE] POSTGRES_URL / DATABASE_URL is not set. Please connect a database in Vercel Storage tab.");
+  for (const k of standardKeys) {
+    const val = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
+    if (val && (val.startsWith("postgres://") || val.startsWith("postgresql://"))) {
+      return val;
+    }
+  }
+
+  // Dynamically scan any environment variable (e.g. store-name prefixed like <store>_POSTGRES_URL)
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value && typeof value === "string") {
+      const clean = value.trim().replace(/^["']|["']$/g, "");
+      if (clean.startsWith("postgres://") || clean.startsWith("postgresql://")) {
+        return clean;
+      }
+    }
+  }
+
+  return "";
 }
 
-export const isConfigured = !!rawUrl && !rawUrl.startsWith("mysql://");
+const rawUrl = findPostgresUrl();
+
+if (!rawUrl) {
+  console.warn("⚠️ [DATABASE] PostgreSQL URL not found in environment variables. Checking available keys:", Object.keys(process.env).filter(k => k.toLowerCase().includes("postgres") || k.toLowerCase().includes("db")));
+}
+
+export const isConfigured = !!rawUrl;
 
 const sql = neon(
   isConfigured 
@@ -30,11 +55,9 @@ let tablesInitialized = false;
 
 export async function ensureTables(): Promise<void> {
   if (tablesInitialized) return;
-  if (!rawUrl) {
-    throw new Error("Database not connected. Please go to Vercel Dashboard -> Storage tab and create/connect a Postgres database.");
-  }
-  if (rawUrl.startsWith("mysql://")) {
-    throw new Error("DATABASE_URL is currently set to a MySQL URL. Please connect Vercel Postgres from the Storage tab.");
+  const activeUrl = findPostgresUrl();
+  if (!activeUrl) {
+    throw new Error("Postgres database connection string not found. Please connect your Vercel Postgres store in Vercel Dashboard -> Storage.");
   }
 
   try {
@@ -162,7 +185,6 @@ export async function ensureTables(): Promise<void> {
     console.log("✓ All Vercel Postgres tables verified/initialized successfully");
   } catch (err: any) {
     console.error("Error auto-initializing tables:", err);
-    // Don't mark initialized so next request retries
     throw err;
   }
 }

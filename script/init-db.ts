@@ -1,16 +1,40 @@
 import "dotenv/config";
 import { neon } from "@neondatabase/serverless";
 
+function findPostgresUrl(): string {
+  const standardKeys = [
+    "POSTGRES_URL",
+    "DATABASE_URL",
+    "litera_POSTGRES_URL",
+    "litera_POSTGRES_URL_NON_POOLING",
+    "POSTGRES_URL_NON_POOLING",
+    "POSTGRES_PRISMA_URL",
+  ];
+
+  for (const k of standardKeys) {
+    const val = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
+    if (val && (val.startsWith("postgres://") || val.startsWith("postgresql://"))) {
+      return val;
+    }
+  }
+
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value && typeof value === "string") {
+      const clean = value.trim().replace(/^["']|["']$/g, "");
+      if (clean.startsWith("postgres://") || clean.startsWith("postgresql://")) {
+        return clean;
+      }
+    }
+  }
+
+  return "";
+}
+
 async function init() {
-  const rawDbUrl = (
-    process.env.POSTGRES_URL || 
-    process.env.DATABASE_URL || 
-    process.env.POSTGRES_URL_NON_POOLING || 
-    ""
-  ).trim().replace(/^["']|["']$/g, "");
+  const rawDbUrl = findPostgresUrl();
 
   if (!rawDbUrl) {
-    throw new Error("POSTGRES_URL / DATABASE_URL is missing. Please set it in your .env file or environment.");
+    throw new Error("PostgreSQL connection string not found. Please set POSTGRES_URL or litera_POSTGRES_URL.");
   }
 
   console.log("Connecting to Vercel Postgres / Neon database...");
