@@ -79,26 +79,20 @@ export default function SubmissionModal({ isOpen, onClose }: SubmissionModalProp
     setIsSubmitting(true);
     
     try {
-      // Create FormData for file upload
-      const submitData = new FormData();
-      submitData.append('name', formData.name);
-      submitData.append('email', formData.email);
-      submitData.append('title', formData.title);
-      submitData.append('category', formData.category);
-      submitData.append('description', formData.description);
-      
-      if (formData.file) {
-        submitData.append('file', formData.file);
-        console.log('File added to FormData:', formData.file.name);
-      }
-      
-      console.log('=== SENDING DATA ===');
-      console.log('FormData entries:', Array.from(submitData.entries()));
-      
-      // Send to backend API with FormData
+      // Send to backend API with JSON
       const response = await fetch('/api/submissions', {
         method: 'POST',
-        body: submitData, // Don't set Content-Type header for FormData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          title: formData.title,
+          category: formData.category,
+          description: formData.description,
+          fileName: formData.file ? formData.file.name : null,
+          originalFileName: formData.file ? formData.file.name : null,
+          fileSize: formData.file ? formData.file.size : null,
+        }),
         credentials: 'include'
       });
 

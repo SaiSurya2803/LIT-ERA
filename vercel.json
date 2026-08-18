@@ -6,13 +6,22 @@
     "api/auth/register.ts": { "maxDuration": 30 },
     "api/auth/login.ts": { "maxDuration": 30 },
     "api/auth/logout.ts": { "maxDuration": 10 },
-    "api/me.ts": { "maxDuration": 10 }
+    "api/me.ts": { "maxDuration": 10 },
+    "api/admin/users.ts": { "maxDuration": 15 },
+    "api/contacts.ts": { "maxDuration": 15 },
+    "api/submissions.ts": { "maxDuration": 15 },
+    "api/content.ts": { "maxDuration": 15 }
   },
   "routes": [
     { "src": "/api/auth/register", "dest": "/api/auth/register.ts" },
     { "src": "/api/auth/login", "dest": "/api/auth/login.ts" },
     { "src": "/api/auth/logout", "dest": "/api/auth/logout.ts" },
     { "src": "/api/me", "dest": "/api/me.ts" },
+    { "src": "/api/admin/users", "dest": "/api/admin/users.ts" },
+    { "src": "/api/contacts", "dest": "/api/contacts.ts" },
+    { "src": "/api/submissions", "dest": "/api/submissions.ts" },
+    { "src": "/api/content/([0-9]+)", "dest": "/api/content.ts?id=$1" },
+    { "src": "/api/content", "dest": "/api/content.ts" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
