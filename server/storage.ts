@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { db } from "./db";
+import { db, ensureTables } from "./db";
 import {
   users,
   contactSubmissions,
@@ -89,6 +89,7 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     try {
+      await ensureTables();
       const [user] = await db.select().from(users).where(eq(users.id, id));
       return user;
     } catch (error: any) {
@@ -99,6 +100,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     try {
+      await ensureTables();
       const [user] = await db.select().from(users).where(eq(users.email, email));
       return user;
     } catch (error: any) {
@@ -109,6 +111,7 @@ export class DatabaseStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     try {
+      await ensureTables();
       const id = crypto.randomUUID();
       const [user] = await db.insert(users).values({ ...insertUser, id }).returning();
       return user;
@@ -123,6 +126,7 @@ export class DatabaseStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     try {
+      await ensureTables();
       return await db.select().from(users).orderBy(desc(users.joinDate));
     } catch (error: any) {
       console.error("Error fetching all users:", error);
