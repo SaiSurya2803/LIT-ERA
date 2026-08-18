@@ -22,7 +22,8 @@ function findPostgresUrl(): string {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  const origin = req.headers.origin || "*";
+  res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -43,16 +44,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    const users = await sql`SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate", password_hash FROM users WHERE email = ${email} LIMIT 1`;
+    const users = await sql`
+      SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate", password_hash
+      FROM users WHERE email = ${String(email)} LIMIT 1
+    `;
     if (!users.length) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const user = users[0];
-    const ok = await bcrypt.compare(password, user.password_hash);
+    const ok = await bcrypt.compare(String(password), user.password_hash);
     if (!ok) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    // Set persistent auth cookie
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = [
+      `lit_era_uid=${user.id}`,
+      "Path=/",
+      "HttpOnly",
+      "SameSite=Lax",
+      `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
+      ...(isProduction ? ["Secure"] : []),
+    ].join("; ");
+    res.setHeader("Set-Cookie", cookieOptions);
 
     const { password_hash, ...safeUser } = user;
     return res.status(200).json(safeUser);

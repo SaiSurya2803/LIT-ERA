@@ -5,27 +5,15 @@
   "functions": {
     "api/auth/register.ts": { "maxDuration": 30 },
     "api/auth/login.ts": { "maxDuration": 30 },
+    "api/auth/logout.ts": { "maxDuration": 10 },
     "api/me.ts": { "maxDuration": 10 }
   },
   "routes": [
-    {
-      "src": "/api/auth/register",
-      "dest": "/api/auth/register.ts"
-    },
-    {
-      "src": "/api/auth/login",
-      "dest": "/api/auth/login.ts"
-    },
-    {
-      "src": "/api/me",
-      "dest": "/api/me.ts"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    { "src": "/api/auth/register", "dest": "/api/auth/register.ts" },
+    { "src": "/api/auth/login", "dest": "/api/auth/login.ts" },
+    { "src": "/api/auth/logout", "dest": "/api/auth/logout.ts" },
+    { "src": "/api/me", "dest": "/api/me.ts" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

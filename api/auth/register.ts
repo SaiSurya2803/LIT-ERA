@@ -6,12 +6,8 @@ import { neon } from "@neondatabase/serverless";
 
 function findPostgresUrl(): string {
   const keys = [
-    "POSTGRES_URL",
-    "DATABASE_URL",
-    "litera_POSTGRES_URL",
-    "litera_POSTGRES_URL_NON_POOLING",
-    "POSTGRES_URL_NON_POOLING",
-    "POSTGRES_PRISMA_URL",
+    "POSTGRES_URL", "DATABASE_URL", "litera_POSTGRES_URL",
+    "litera_POSTGRES_URL_NON_POOLING", "POSTGRES_URL_NON_POOLING", "POSTGRES_PRISMA_URL",
   ];
   for (const k of keys) {
     const v = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
@@ -27,7 +23,8 @@ function findPostgresUrl(): string {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader("Access-Control-Allow-Origin", req.headers.origin || "*");
+  const origin = req.headers.origin || "*";
+  res.setHeader("Access-Control-Allow-Origin", origin);
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -64,7 +61,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (typeof password !== "string" || password.length < 6) {
       return res.status(400).json({ message: "Password must be at least 6 characters" });
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email address" });
@@ -86,14 +82,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const [user] = await sql`
       INSERT INTO users (id, name, email, password_hash, club, is_admin)
-      VALUES (${id}, ${name}, ${email}, ${passwordHash}, ${"LIT'ERA"}, ${isAdmin})
+      VALUES (${id}, ${String(name)}, ${String(email)}, ${passwordHash}, ${"LIT'ERA"}, ${isAdmin})
       RETURNING id, name, email, club, is_admin as "isAdmin", join_date as "joinDate"
     `;
+
+    // Set a persistent auth cookie with the user ID
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieOptions = [
+      `lit_era_uid=${user.id}`,
+      "Path=/",
+      "HttpOnly",
+      "SameSite=Lax",
+      `Max-Age=${60 * 60 * 24 * 7}`, // 7 days
+      ...(isProduction ? ["Secure"] : []),
+    ].join("; ");
+    res.setHeader("Set-Cookie", cookieOptions);
 
     return res.status(201).json(user);
   } catch (err: any) {
     console.error("Register error:", err);
-    if (err.code === "23505" || (err.message || "").includes("unique")) {
+    if (err.code === "23505" || (err.message || "").toLowerCase().includes("unique")) {
       return res.status(400).json({ message: "Email already in use" });
     }
     return res.status(500).json({ message: err.message || "Registration failed" });
