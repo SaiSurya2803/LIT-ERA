@@ -18,7 +18,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // POST: Submit a contact form (public)
   if (req.method === "POST") {
-    const { name, email, subject, message } = req.body || {};
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {}
+    }
+    const { name, email, subject, message } = body || {};
     if (!name || !email || !message) {
       return res.status(400).json({ message: "Name, email and message are required" });
     }
@@ -49,7 +55,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
     const user = await getAuthenticatedUser(req.headers.cookie as string | undefined, sql);
     if (!user) return res.status(401).json({ message: "Not authenticated" });
-    if (!user.isAdmin) return res.status(403).json({ message: "Admin access required" });
+
+    const isAdmin = Boolean(
+      user.isAdmin === true || 
+      user.isAdmin === "true" || 
+      user.isAdmin === 1 || 
+      (user as any).is_admin === true || 
+      (user as any).is_admin === "true" || 
+      (user as any).is_admin === 1
+    );
+
+    if (!isAdmin) return res.status(403).json({ message: "Admin access required" });
 
     try {
       await sql`

@@ -14,13 +14,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const dbUrl = findPostgresUrl();
   if (!dbUrl) return res.status(500).json({ message: "Database not configured." });
 
-  const sql = neon(dbUrl);
-  const user = await getAuthenticatedUser(req.headers.cookie as string | undefined, sql);
-
-  if (!user) return res.status(401).json({ message: "Not authenticated" });
-  if (!user.isAdmin) return res.status(403).json({ message: "Admin access required" });
-
   try {
+    const sql = neon(dbUrl);
+    const user = await getAuthenticatedUser(req.headers.cookie as string | undefined, sql);
+
+    if (!user) return res.status(401).json({ message: "Not authenticated" });
+    
+    const isAdmin = Boolean(
+      user.isAdmin === true || 
+      user.isAdmin === "true" || 
+      user.isAdmin === 1 || 
+      (user as any).is_admin === true || 
+      (user as any).is_admin === "true" || 
+      (user as any).is_admin === 1
+    );
+
+    if (!isAdmin) return res.status(403).json({ message: "Admin access required" });
+
     const users = await sql`
       SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate"
       FROM users

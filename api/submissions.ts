@@ -73,7 +73,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "GET") {
     const user = await getAuthenticatedUser(req.headers.cookie as string | undefined, sql);
     if (!user) return res.status(401).json({ message: "Not authenticated" });
-    if (!user.isAdmin) return res.status(403).json({ message: "Admin access required" });
+
+    const isAdmin = Boolean(
+      user.isAdmin === true || 
+      user.isAdmin === "true" || 
+      user.isAdmin === 1 || 
+      (user as any).is_admin === true || 
+      (user as any).is_admin === "true" || 
+      (user as any).is_admin === 1
+    );
+
+    if (!isAdmin) return res.status(403).json({ message: "Admin access required" });
 
     try {
       const submissions = await sql`
