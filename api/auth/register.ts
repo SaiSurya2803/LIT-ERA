@@ -72,10 +72,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ message: "Email already in use" });
     }
 
-    // Check if first user (auto-admin)
-    const countResult = await sql`SELECT COUNT(*) as count FROM users`;
-    const isFirstUser = Number(countResult[0].count) === 0;
-    const isAdmin = isFirstUser || (!!process.env.ADMIN_CODE && adminCode === process.env.ADMIN_CODE);
+    // Only grant admin if NO admin exists yet (first-ever user)
+    const existingAdmins = await sql`SELECT id FROM users WHERE is_admin = TRUE LIMIT 1`;
+    const noAdminYet = existingAdmins.length === 0;
+    const isAdmin = noAdminYet || (!!process.env.ADMIN_CODE && adminCode === process.env.ADMIN_CODE);
 
     const passwordHash = await bcrypt.hash(password, 10);
     const id = crypto.randomUUID();
