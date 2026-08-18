@@ -8,49 +8,15 @@ import { registerRoutes } from "../server/routes";
 
 const app = express();
 app.set("trust proxy", 1);
-app.use(cors({ origin: true, credentials: true }));
 
-// Normalize request URLs so both /api/... and /... work seamlessly on Vercel
-app.use((req, _res, next) => {
-  try {
-    const matchedPath = req.headers["x-matched-path"];
-    if (typeof matchedPath === "string" && matchedPath.startsWith("/api")) {
-      req.url = matchedPath;
-      return next();
-    }
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
 
-    const rawUrl = req.url || "";
-    const parsed = new URL(rawUrl, "http://localhost");
-    const queryPath = parsed.searchParams.get("__path") || (req.query && req.query.__path as string);
-    if (queryPath) {
-      req.url = "/api/" + String(queryPath).replace(/^\/+/, "");
-      return next();
-    }
-
-    if (typeof req.originalUrl === "string" && req.originalUrl.startsWith("/api")) {
-      req.url = req.originalUrl;
-      return next();
-    }
-
-    if (!req.url.startsWith("/api") && !req.url.startsWith("/uploads")) {
-      req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
-    }
-  } catch (err) {
-    console.error("URL Normalizer error:", err);
-  }
-  next();
-});
-
-app.use(
-  express.json({
-    verify: (req: any, _res, buf) => {
-      req.rawBody = buf;
-    },
-  })
-);
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve uploads directory for static assets
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(
@@ -59,24 +25,22 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
 
-// Register routes synchronously at module load time
 const httpServer = createServer(app);
 registerRoutes(httpServer, app);
 
-// Global error handler
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = err.status || err.statusCode || 500;
   const message = err.message || "Internal Server Error";
-  console.error("Serverless API Error:", err);
+  console.error("API Error:", err);
   if (!res.headersSent) {
-    res.status(status).json({ success: false, message });
+    res.status(status).json({ message });
   }
 });
 
