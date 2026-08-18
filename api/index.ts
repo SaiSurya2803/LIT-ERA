@@ -12,15 +12,31 @@ app.use(cors({ origin: true, credentials: true }));
 
 // Normalize request URLs so both /api/... and /... work seamlessly on Vercel
 app.use((req, _res, next) => {
-  const matchedPath = req.headers["x-matched-path"];
-  if (typeof matchedPath === "string" && matchedPath.startsWith("/api")) {
-    req.url = matchedPath;
-  } else if (req.query && req.query.__path) {
-    req.url = "/api/" + String(req.query.__path).replace(/^\//, "");
-  } else if (typeof req.originalUrl === "string" && req.originalUrl.startsWith("/api")) {
-    req.url = req.originalUrl;
-  } else if (!req.url.startsWith("/api") && !req.url.startsWith("/uploads")) {
-    req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
+  try {
+    const matchedPath = req.headers["x-matched-path"];
+    if (typeof matchedPath === "string" && matchedPath.startsWith("/api")) {
+      req.url = matchedPath;
+      return next();
+    }
+
+    const rawUrl = req.url || "";
+    const parsed = new URL(rawUrl, "http://localhost");
+    const queryPath = parsed.searchParams.get("__path") || (req.query && req.query.__path as string);
+    if (queryPath) {
+      req.url = "/api/" + String(queryPath).replace(/^\/+/, "");
+      return next();
+    }
+
+    if (typeof req.originalUrl === "string" && req.originalUrl.startsWith("/api")) {
+      req.url = req.originalUrl;
+      return next();
+    }
+
+    if (!req.url.startsWith("/api") && !req.url.startsWith("/uploads")) {
+      req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
+    }
+  } catch (err) {
+    console.error("URL Normalizer error:", err);
   }
   next();
 });
