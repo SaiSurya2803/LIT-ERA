@@ -1,7 +1,7 @@
 import "dotenv/config";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { neon } from "@neondatabase/serverless";
-import { findPostgresUrl, getAuthenticatedUser, ensureCoreTables } from "../_db";
+import { findPostgresUrl, getAuthenticatedUser, ensureCoreTables } from "./_db";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const origin = req.headers.origin || "*";
@@ -44,7 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `;
     return res.status(200).json(users);
   } catch (err: any) {
-    console.error("Admin users error:", err);
+    console.error("Users list error:", err);
     return res.status(500).json({ message: err.message || "Failed to fetch users" });
   }
 }

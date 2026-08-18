@@ -24,7 +24,14 @@ export function parseCookies(cookieHeader: string | undefined): Record<string, s
   if (!cookieHeader) return cookies;
   for (const part of cookieHeader.split(";")) {
     const [k, ...v] = part.trim().split("=");
-    if (k) cookies[k.trim()] = decodeURIComponent(v.join("=").trim());
+    if (k) {
+      const rawVal = v.join("=").trim();
+      try {
+        cookies[k.trim()] = decodeURIComponent(rawVal);
+      } catch {
+        cookies[k.trim()] = rawVal;
+      }
+    }
   }
   return cookies;
 }
@@ -34,64 +41,72 @@ export async function getAuthenticatedUser(cookieHeader: string | undefined, sql
   const uid = cookies["lit_era_uid"];
   if (!uid) return null;
 
-  await ensureCoreTables(sql);
-
-  const users = await sql`
-    SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate"
-    FROM users WHERE id = ${uid} LIMIT 1
-  `;
-  return users[0] || null;
+  try {
+    await ensureCoreTables(sql);
+    const users = await sql`
+      SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate"
+      FROM users WHERE id = ${uid} LIMIT 1
+    `;
+    return users[0] || null;
+  } catch (err) {
+    console.error("getAuthenticatedUser error:", err);
+    return null;
+  }
 }
 
 export async function ensureCoreTables(sql: NeonQueryFunction<false, false>) {
-  await sql`
-    CREATE TABLE IF NOT EXISTS users (
-      id VARCHAR(36) PRIMARY KEY,
-      name TEXT NOT NULL,
-      email VARCHAR(255) NOT NULL UNIQUE,
-      password_hash TEXT NOT NULL,
-      club TEXT DEFAULT 'LIT''ERA',
-      is_admin BOOLEAN DEFAULT FALSE,
-      join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS contact_submissions (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      subject TEXT,
-      message TEXT NOT NULL,
-      submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS submissions (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      email VARCHAR(255) NOT NULL,
-      title TEXT NOT NULL,
-      category TEXT NOT NULL,
-      description TEXT,
-      file_name TEXT,
-      original_file_name TEXT,
-      file_size INTEGER,
-      file_path TEXT,
-      status TEXT DEFAULT 'pending',
-      submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS content (
-      id SERIAL PRIMARY KEY,
-      type TEXT NOT NULL,
-      title TEXT NOT NULL,
-      content TEXT NOT NULL,
-      answer TEXT,
-      author TEXT NOT NULL,
-      date TEXT NOT NULL,
-      is_active BOOLEAN DEFAULT TRUE,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `;
+  try {
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id VARCHAR(36) PRIMARY KEY,
+        name TEXT NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        club TEXT DEFAULT 'LIT''ERA',
+        is_admin BOOLEAN DEFAULT FALSE,
+        join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS contact_submissions (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        subject TEXT,
+        message TEXT NOT NULL,
+        submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS submissions (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        title TEXT NOT NULL,
+        category TEXT NOT NULL,
+        description TEXT,
+        file_name TEXT,
+        original_file_name TEXT,
+        file_size INTEGER,
+        file_path TEXT,
+        status TEXT DEFAULT 'pending',
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS content (
+        id SERIAL PRIMARY KEY,
+        type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        answer TEXT,
+        author TEXT NOT NULL,
+        date TEXT NOT NULL,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `;
+  } catch (e) {
+    console.warn("Table auto-init warning:", e);
+  }
 }

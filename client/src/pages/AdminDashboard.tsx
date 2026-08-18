@@ -53,18 +53,25 @@ export default function AdminDashboard() {
   const { 
     data: usersList = [], 
     isLoading: usersLoading, 
+    error: usersError,
     refetch: refetchUsers 
   } = useQuery<any[]>({
     queryKey: ["/api/admin/users"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/users", { credentials: "include" });
+      let res = await fetch("/api/admin/users", { credentials: "include" });
+      if (!res.ok) {
+        res = await fetch("/api/users", { credentials: "include" });
+      }
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || "Failed to fetch users");
+        throw new Error(err.message || `Failed to fetch users (${res.status})`);
       }
-      return res.json();
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!isAdmin,
+    refetchOnWindowFocus: true,
+    refetchInterval: 10000, // auto-refresh every 10s
   });
 
   // 4. Content Query
@@ -214,6 +221,12 @@ export default function AdminDashboard() {
                       <TableRow>
                         <TableCell colSpan={5} className="text-center py-8">
                           <Skeleton className="w-64 h-8 bg-ink/10 mx-auto" />
+                        </TableCell>
+                      </TableRow>
+                    ) : usersError ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8">
+                          <p className="font-body text-red-600 font-medium text-sm">{(usersError as any)?.message || "Failed to load registered members"}</p>
                         </TableCell>
                       </TableRow>
                     ) : usersList.length === 0 ? (
