@@ -2,9 +2,9 @@ import "dotenv/config";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { neon } from "@neondatabase/serverless";
+import { getConnection } from "./_db";
 
-function findPostgresUrl(): string {
+function findDatabaseUrl(): string {
   const keys = [
     "POSTGRES_URL", "DATABASE_URL", "litera_POSTGRES_URL",
     "litera_POSTGRES_URL_NON_POOLING", "POSTGRES_URL_NON_POOLING", "POSTGRES_PRISMA_URL",
@@ -32,17 +32,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
 
-  const dbUrl = findPostgresUrl();
+  const dbUrl = findDatabaseUrl();
   if (!dbUrl) {
     return res.status(500).json({ message: "Database not configured. Please connect Vercel Postgres in Storage tab." });
   }
 
-  const sql = neon(dbUrl);
+  const sql = await getConnection(dbUrl);
 
   try {
     // Auto-create users table if it doesn't exist
-    await sql`
-      CREATE TABLE IF NOT EXISTS users (
+    await sql.execute(`CREATE TABLE IF NOT EXISTS users (
         id VARCHAR(36) PRIMARY KEY,
         name TEXT NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
@@ -51,7 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         is_admin BOOLEAN DEFAULT FALSE,
         join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
+    `);
 
     const { name, email, password, adminCode } = req.body || {};
 
@@ -67,24 +66,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Check if email already exists
-    const existing = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+    const [existing] = await sql.execute<any[]>(`SELECT id FROM users WHERE email = ? LIMIT 1`, [email]);
     if (existing.length > 0) {
       return res.status(400).json({ message: "Email already in use" });
     }
 
     // Only grant admin if NO admin exists yet (first-ever user)
-    const existingAdmins = await sql`SELECT id FROM users WHERE is_admin = TRUE LIMIT 1`;
+    const [existingAdmins] = await sql.execute<any[]>(`SELECT id FROM users WHERE is_admin = TRUE LIMIT 1`);
     const noAdminYet = existingAdmins.length === 0;
     const isAdmin = noAdminYet || (!!process.env.ADMIN_CODE && adminCode === process.env.ADMIN_CODE);
 
     const passwordHash = await bcrypt.hash(password, 10);
     const id = crypto.randomUUID();
 
-    const [user] = await sql`
-      INSERT INTO users (id, name, email, password_hash, club, is_admin)
-      VALUES (${id}, ${String(name)}, ${String(email)}, ${passwordHash}, ${"LIT'ERA"}, ${isAdmin})
-      RETURNING id, name, email, club, is_admin as "isAdmin", join_date as "joinDate"
-    `;
+    await sql.execute(
+      `INSERT INTO users (id, name, email, password_hash, club, is_admin) VALUES (?, ?, ?, ?, ?, ?)`,
+      [id, String(name), String(email), passwordHash, "LIT'ERA", isAdmin]
+    );
+    const [rows] = await sql.execute<any[]>(`SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate" FROM users WHERE id = ?`, [id]);
+    const user = rows[0];
 
     // Set a persistent auth cookie with the user ID
     const isProduction = process.env.NODE_ENV === "production";

@@ -1,7 +1,7 @@
 import "dotenv/config";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { neon } from "@neondatabase/serverless";
-import { findPostgresUrl, getAuthenticatedUser, ensureCoreTables } from "../_db";
+import { getConnection } from "../_db";
+import { findDatabaseUrl, getAuthenticatedUser, ensureCoreTables } from "../_db";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const origin = req.headers.origin || "*";
@@ -11,11 +11,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const dbUrl = findPostgresUrl();
+  const dbUrl = findDatabaseUrl();
   if (!dbUrl) return res.status(500).json({ message: "Database not configured." });
 
   try {
-    const sql = neon(dbUrl);
+    const sql = await getConnection(dbUrl);
     await ensureCoreTables(sql);
 
     const user = await getAuthenticatedUser(req.headers.cookie as string | undefined, sql);
@@ -28,7 +28,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(403).json({ message: "Admin access required" });
     }
 
-    const rows = await sql`SELECT * FROM users`;
+    const [rows] = await sql.execute<any[]>("SELECT * FROM users");
     
     const users = (rows || []).map((u: any) => ({
       id: u.id,

@@ -1,9 +1,9 @@
 import "dotenv/config";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import bcrypt from "bcryptjs";
-import { neon } from "@neondatabase/serverless";
+import { getConnection } from "../_db";
 
-function findPostgresUrl(): string {
+function findDatabaseUrl(): string {
   const keys = [
     "POSTGRES_URL", "DATABASE_URL", "litera_POSTGRES_URL",
     "litera_POSTGRES_URL_NON_POOLING", "POSTGRES_URL_NON_POOLING", "POSTGRES_PRISMA_URL",
@@ -31,11 +31,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ message: "Method not allowed" });
 
-  const dbUrl = findPostgresUrl();
+  const dbUrl = findDatabaseUrl();
   if (!dbUrl) {
     return res.status(500).json({ message: "Database not configured." });
   }
-  const sql = neon(dbUrl);
+  const sql = await getConnection(dbUrl);
 
   try {
     const { email, password } = req.body || {};
@@ -44,10 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ message: "Email and password are required" });
     }
 
-    const users = await sql`
-      SELECT id, name, email, club, is_admin as "isAdmin", join_date as "joinDate", password_hash
-      FROM users WHERE email = ${String(email)} LIMIT 1
-    `;
+    const [users] = await sql.execute<any[]>("SELECT id, name, email, club, is_admin as \"isAdmin\", join_date as \"joinDate\", password_hash FROM users WHERE email = ? LIMIT 1", [String(email)]);
     if (!users.length) {
       return res.status(401).json({ message: "Invalid credentials" });
     }

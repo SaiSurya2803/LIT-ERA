@@ -1,17 +1,18 @@
 import {
-  pgTable,
+  mysqlTable,
   text,
-  integer,
+  int,
   boolean,
   timestamp,
   index,
-  serial,
+  
   varchar,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
+import { mysqlTable } from "drizzle-orm/mysql-core";
+export const users = mysqlTable("users", {
   id: varchar("id", { length: 36 }).primaryKey(),
   name: text("name").notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
@@ -21,8 +22,8 @@ export const users = pgTable("users", {
   joinDate: timestamp("join_date").defaultNow(),
 });
 
-export const contactSubmissions = pgTable("contact_submissions", {
-  id: serial("id").primaryKey(),
+export const contactSubmissions = mysqlTable("contact_submissions", {
+  id: int("id").autoincrement().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   country: text("country"),
@@ -31,28 +32,28 @@ export const contactSubmissions = pgTable("contact_submissions", {
   submissionDate: timestamp("submission_date").defaultNow(),
 });
 
-export const events = pgTable("events", {
-  id: serial("id").primaryKey(),
+export const events = mysqlTable("events", {
+  id: int("id").autoincrement().primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
   eventDate: text("event_date"),
   isActive: boolean("is_active").default(true),
 });
 
-export const gameScores = pgTable("game_scores", {
-  id: serial("id").primaryKey(),
+export const gameScores = mysqlTable("game_scores", {
+  id: int("id").autoincrement().primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
   gameType: varchar("game_type", { length: 50 }).notNull(), // 'strands' or 'spellbee'
-  score: integer("score"),
-  completionTime: integer("completion_time"),
+  score: int("score"),
+  completionTime: int("completion_time"),
   completedDate: timestamp("completed_date").defaultNow(),
 }, (table) => ({
   gameTypeIdx: index("game_scores_game_type_idx").on(table.gameType),
   userIdIdx: index("game_scores_user_id_idx").on(table.userId),
 }));
 
-export const puzzles = pgTable("puzzles", {
-  id: serial("id").primaryKey(),
+export const puzzles = mysqlTable("puzzles", {
+  id: int("id").autoincrement().primaryKey(),
   type: varchar("type", { length: 50 }).notNull(), // 'strands' or 'spellbee'
   data: text("data").notNull(), // JSON stringified puzzle data
   publishDate: varchar("publish_date", { length: 20 }).notNull(),
@@ -62,8 +63,8 @@ export const puzzles = pgTable("puzzles", {
   publishDateIdx: index("puzzles_publish_date_idx").on(table.publishDate),
 }));
 
-export const content = pgTable("content", {
-  id: serial("id").primaryKey(),
+export const content = mysqlTable("content", {
+  id: int("id").autoincrement().primaryKey(),
   type: text("type").notNull(), // 'thought', 'riddle', 'quote', 'fact', 'poem'
   title: text("title").notNull(),
   content: text("content").notNull(),
@@ -74,23 +75,23 @@ export const content = pgTable("content", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const submissions = pgTable("submissions", {
-  id: serial("id").primaryKey(),
+export const submissions = mysqlTable("submissions", {
+  id: int("id").autoincrement().primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull(),
   title: text("title").notNull(),
   category: text("category").notNull(),
   description: text("description").notNull(),
   fileName: text("file_name"),
-  fileSize: integer("file_size"),
+  fileSize: int("file_size"),
   originalFileName: text("original_file_name"),
   filePath: text("file_path"),
   status: text("status").default("pending"), // 'pending', 'approved', 'rejected'
   submittedAt: timestamp("submitted_at").defaultNow(),
 });
 
-export const publications = pgTable("publications", {
-  id: serial("id").primaryKey(),
+export const publications = mysqlTable("publications", {
+  id: int("id").autoincrement().primaryKey(),
   title: text("title").notNull(),
   category: text("category").notNull(), // 'newspaper', 'magazine', 'journal', 'anthology'
   author: text("author").notNull(),
@@ -98,26 +99,26 @@ export const publications = pgTable("publications", {
   coverImage: text("cover_image"), // path to cover image
   pdfFile: text("pdf_file"), // path to PDF file
   pdfFileName: text("pdf_file_name"),
-  pages: integer("pages"),
+  pages: int("pages"),
   publishDate: text("publish_date").notNull(),
   featured: boolean("featured").default(false),
-  views: integer("views").default(0),
-  downloads: integer("downloads").default(0),
-  likes: integer("likes").default(0),
+  views: int("views").default(0),
+  downloads: int("downloads").default(0),
+  likes: int("likes").default(0),
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const eventRegistrations = pgTable("event_registrations", {
-  id: serial("id").primaryKey(),
+export const eventRegistrations = mysqlTable("event_registrations", {
+  id: int("id").autoincrement().primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
-  eventId: integer("event_id").notNull(),
+  eventId: int("event_id").notNull(),
   eventTitle: text("event_title").notNull(),
   registeredAt: timestamp("registered_at").defaultNow(),
 });
 
-export const munRegistrations = pgTable("mun_registrations", {
-  id: serial("id").primaryKey(),
+export const munRegistrations = mysqlTable("mun_registrations", {
+  id: int("id").autoincrement().primaryKey(),
   userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   email: text("email").notNull(),

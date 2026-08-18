@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { defineConfig } from "drizzle-kit";
 
-function findPostgresUrl(): string {
+function findDatabaseUrl(): string {
   const standardKeys = [
     "POSTGRES_URL",
     "DATABASE_URL",
@@ -13,7 +13,7 @@ function findPostgresUrl(): string {
 
   for (const k of standardKeys) {
     const val = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
-    if (val && (val.startsWith("postgres://") || val.startsWith("postgresql://"))) {
+    if (val && (val.startsWith("mysql://") || val.startsWith("mysql://"))) {
       return val;
     }
   }
@@ -21,7 +21,7 @@ function findPostgresUrl(): string {
   for (const [key, value] of Object.entries(process.env)) {
     if (value && typeof value === "string") {
       const clean = value.trim().replace(/^["']|["']$/g, "");
-      if (clean.startsWith("postgres://") || clean.startsWith("postgresql://")) {
+      if (clean.startsWith("mysql://") || clean.startsWith("mysql://")) {
         return clean;
       }
     }
@@ -30,13 +30,13 @@ function findPostgresUrl(): string {
   return "";
 }
 
-const dbUrl = findPostgresUrl();
+const dbUrl = findDatabaseUrl();
 
 export default defineConfig({
   out: "./migrations",
   schema: "./shared/schema.ts",
-  dialect: "postgresql",
+  dialect: "mysql",
   dbCredentials: {
-    url: dbUrl || "postgres://localhost:5432/postgres",
+    url: dbUrl || "mysql://localhost:5432/postgres",
   },
 });

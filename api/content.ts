@@ -1,7 +1,7 @@
 import "dotenv/config";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { neon } from "@neondatabase/serverless";
-import { findPostgresUrl, getAuthenticatedUser, ensureCoreTables } from "./_db";
+import { getConnection } from "./_db";
+import { findDatabaseUrl, getAuthenticatedUser, ensureCoreTables } from "./_db";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const origin = req.headers.origin || "*";
@@ -11,10 +11,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const dbUrl = findPostgresUrl();
+  const dbUrl = findDatabaseUrl();
   if (!dbUrl) return res.status(500).json({ message: "Database not configured." });
 
-  const sql = neon(dbUrl);
+  const sql = await getConnection(dbUrl);
   await ensureCoreTables(sql);
 
   // Extract ID if present in query or URL
@@ -24,12 +24,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // GET: Public list of content
   if (req.method === "GET") {
     try {
-      const items = await sql`
+      const [items] = await sql.execute<any[]>(`
         SELECT id, type, title, content, answer, author, date, is_active as "isActive", created_at as "createdAt"
         FROM content
         WHERE is_active = TRUE
         ORDER BY id DESC
-      `;
+      `);
       return res.status(200).json(items);
     } catch (err: any) {
       console.error("Content GET error:", err);
@@ -50,15 +50,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     try {
       const formattedDate = date || new Date().toISOString().split("T")[0];
-      const [item] = await sql`
-        INSERT INTO content (type, title, content, answer, author, date, is_active)
-        VALUES (
-          ${String(type)}, ${String(title)}, ${String(content)},
-          ${answer ? String(answer) : null}, ${String(author)},
-          ${formattedDate}, ${isActive ?? true}
-        )
-        RETURNING id, type, title, content, answer, author, date, is_active as "isActive", created_at as "createdAt"
-      `;
+      const [result] = await sql.execute<any>(
+        `INSERT INTO content (type, title, content, answer, author, date, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [String(type), String(title), String(content), answer ? String(answer) : null, String(author), formattedDate, isActive ?? true]
+      );
+      const [rows] = await sql.execute<any[]>(`SELECT id, type, title, content, answer, author, date, is_active as "isActive", created_at as "createdAt" FROM content WHERE id = ?`, [result.insertId]);
+      const item = rows[0];
       return res.status(201).json(item);
     } catch (err: any) {
       console.error("Content creation error:", err);
@@ -71,19 +69,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!id) return res.status(400).json({ message: "Content ID is required" });
     const { type, title, content, answer, author, date, isActive } = req.body || {};
     try {
-      const [item] = await sql`
-        UPDATE content
+      await sql.execute(
+        `UPDATE content
         SET 
-          type = COALESCE(${type ? String(type) : null}, type),
-          title = COALESCE(${title ? String(title) : null}, title),
-          content = COALESCE(${content ? String(content) : null}, content),
-          answer = ${answer !== undefined ? (answer ? String(answer) : null) : null},
-          author = COALESCE(${author ? String(author) : null}, author),
-          date = COALESCE(${date ? String(date) : null}, date),
-          is_active = COALESCE(${isActive !== undefined ? Boolean(isActive) : null}, is_active)
-        WHERE id = ${id}
-        RETURNING id, type, title, content, answer, author, date, is_active as "isActive", created_at as "createdAt"
-      `;
+          type = COALESCE(?, type),
+          title = COALESCE(?, title),
+          content = COALESCE(?, content),
+          answer = COALESCE(?, answer),
+          author = COALESCE(?, author),
+          date = COALESCE(?, date),
+          is_active = COALESCE(?, is_active)
+        WHERE id = ?`,
+        [type ? String(type) : null, title ? String(title) : null, content ? String(content) : null, answer !== undefined ? (answer ? String(answer) : null) : null, author ? String(author) : null, date ? String(date) : null, isActive !== undefined ? Boolean(isActive) : null, id]
+      );
+      // Fallback for logic in typescript
+      const [rows] = await sql.execute<any[]>(`SELECT id, type, title, content, answer, author, date, is_active as "isActive", created_at as "createdAt" FROM content WHERE id = ?`, [id]);
+      const item = rows[0];
       if (!item) return res.status(404).json({ message: "Content not found" });
       return res.status(200).json(item);
     } catch (err: any) {
@@ -96,7 +97,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === "DELETE") {
     if (!id) return res.status(400).json({ message: "Content ID is required" });
     try {
-      await sql`DELETE FROM content WHERE id = ${id}`;
+      await sql.execute(`DELETE FROM content WHERE id = ?`, [id]);
       return res.status(204).end();
     } catch (err: any) {
       console.error("Content delete error:", err);

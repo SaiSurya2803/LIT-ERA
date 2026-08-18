@@ -1,7 +1,7 @@
 import "dotenv/config";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { neon } from "@neondatabase/serverless";
-import { findPostgresUrl, getAuthenticatedUser } from "./_db";
+import { getConnection } from "./_db";
+import { findDatabaseUrl, getAuthenticatedUser } from "./_db";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const origin = req.headers.origin || "*";
@@ -11,15 +11,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const dbUrl = findPostgresUrl();
+  const dbUrl = findDatabaseUrl();
   if (!dbUrl) return res.status(500).json({ message: "Database not configured." });
 
-  const sql = neon(dbUrl);
+  const sql = await getConnection(dbUrl);
 
   // Create table if needed
-  await sql`
-    CREATE TABLE IF NOT EXISTS submissions (
-      id SERIAL PRIMARY KEY,
+  await sql.execute(`CREATE TABLE IF NOT EXISTS submissions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
       name TEXT NOT NULL,
       email VARCHAR(255) NOT NULL,
       title TEXT NOT NULL,
@@ -31,7 +30,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       status TEXT DEFAULT 'pending',
       submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
-  `;
+  `);
 
   // POST: Submit work
   if (req.method === "POST") {
@@ -47,21 +46,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ message: "Name, email, title and category are required" });
     }
     try {
-      const [submission] = await sql`
-        INSERT INTO submissions (name, email, title, category, description, file_name, original_file_name, file_size, status)
-        VALUES (
-          ${String(name)}, ${String(email)}, ${String(title)},
-          ${String(category)}, ${description ? String(description) : null},
-          ${fileName ? String(fileName) : null},
-          ${originalFileName ? String(originalFileName) : null},
-          ${fileSize ? Number(fileSize) : null},
-          'pending'
-        )
-        RETURNING id, name, email, title, category, description,
-                  file_name as "fileName", original_file_name as "originalFileName",
-                  file_size as "fileSize", status,
-                  submitted_at as "submittedAt"
-      `;
+      const [result] = await sql.execute<any>(
+        `INSERT INTO submissions (name, email, title, category, description, file_name, original_file_name, file_size, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+        [String(name), String(email), String(title), String(category), description ? String(description) : null, fileName ? String(fileName) : null, originalFileName ? String(originalFileName) : null, fileSize ? Number(fileSize) : null]
+      );
+      const [rows] = await sql.execute<any[]>(`SELECT id, name, email, title, category, description, file_name as "fileName", original_file_name as "originalFileName", file_size as "fileSize", status, submitted_at as "submittedAt" FROM submissions WHERE id = ?`, [result.insertId]);
+      const submission = rows[0];
       return res.status(201).json(submission);
     } catch (err: any) {
       console.error("Submission error:", err);
@@ -77,14 +68,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!user.isAdmin) return res.status(403).json({ message: "Admin access required" });
 
     try {
-      const submissions = await sql`
+      const [submissions] = await sql.execute<any[]>(`
         SELECT id, name, email, title, category, description,
                file_name as "fileName", original_file_name as "originalFileName",
                file_size as "fileSize", status,
                submitted_at as "submittedAt"
         FROM submissions
         ORDER BY submitted_at DESC
-      `;
+      `);
       return res.status(200).json(submissions);
     } catch (err: any) {
       console.error("Submissions GET error:", err);

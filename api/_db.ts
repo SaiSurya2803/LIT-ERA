@@ -1,19 +1,24 @@
 // Shared DB helper for Vercel serverless functions
-import { neon, type NeonQueryFunction } from "@neondatabase/serverless";
+import mysql from "mysql2/promise";
+import type { Connection } from "mysql2/promise";
 
-export function findPostgresUrl(): string {
+export async function getConnection(dbUrl: string) {
+  return await mysql.createConnection(dbUrl);
+}
+
+export function findDatabaseUrl(): string {
   const keys = [
     "POSTGRES_URL", "DATABASE_URL", "litera_POSTGRES_URL",
     "litera_POSTGRES_URL_NON_POOLING", "POSTGRES_URL_NON_POOLING", "POSTGRES_PRISMA_URL",
   ];
   for (const k of keys) {
     const v = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
-    if (v && (v.startsWith("postgres://") || v.startsWith("postgresql://"))) return v;
+    if (v && (v.startsWith("mysql://") || v.startsWith("mysql://"))) return v;
   }
   for (const v of Object.values(process.env)) {
     if (v) {
       const c = v.trim().replace(/^["']|["']$/g, "");
-      if (c.startsWith("postgres://") || c.startsWith("postgresql://")) return c;
+      if (c.startsWith("mysql://") || c.startsWith("mysql://")) return c;
     }
   }
   return "";
@@ -36,13 +41,13 @@ export function parseCookies(cookieHeader: string | undefined): Record<string, s
   return cookies;
 }
 
-export async function getAuthenticatedUser(cookieHeader: string | undefined, sql: NeonQueryFunction<false, false>) {
+export async function getAuthenticatedUser(cookieHeader: string | undefined, sql: Connection) {
   const cookies = parseCookies(cookieHeader);
   const uid = cookies["lit_era_uid"];
   if (!uid) return null;
 
   try {
-    const rows = await sql`SELECT * FROM users WHERE id = ${uid} LIMIT 1`;
+    const rows = await sql.execute(`SELECT * FROM users WHERE id = ${uid} LIMIT 1`);
     if (!rows || rows.length === 0) return null;
     const u = rows[0];
     return {
@@ -66,9 +71,9 @@ export async function getAuthenticatedUser(cookieHeader: string | undefined, sql
   }
 }
 
-export async function ensureCoreTables(sql: NeonQueryFunction<false, false>) {
+export async function ensureCoreTables(sql: Connection) {
   try {
-    await sql`
+    await sql.execute(`
       CREATE TABLE IF NOT EXISTS users (
         id VARCHAR(36) PRIMARY KEY,
         name TEXT NOT NULL,
@@ -78,20 +83,20 @@ export async function ensureCoreTables(sql: NeonQueryFunction<false, false>) {
         is_admin BOOLEAN DEFAULT FALSE,
         join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
-    await sql`
+    `);
+    await sql.execute(`
       CREATE TABLE IF NOT EXISTS contact_submissions (
-        id SERIAL PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         name TEXT NOT NULL,
         email VARCHAR(255) NOT NULL,
         subject TEXT,
         message TEXT NOT NULL,
         submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
-    await sql`
+    `);
+    await sql.execute(`
       CREATE TABLE IF NOT EXISTS submissions (
-        id SERIAL PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         name TEXT NOT NULL,
         email VARCHAR(255) NOT NULL,
         title TEXT NOT NULL,
@@ -104,10 +109,10 @@ export async function ensureCoreTables(sql: NeonQueryFunction<false, false>) {
         status TEXT DEFAULT 'pending',
         submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
-    await sql`
+    `);
+    await sql.execute(`
       CREATE TABLE IF NOT EXISTS content (
-        id SERIAL PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         type TEXT NOT NULL,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
@@ -117,7 +122,7 @@ export async function ensureCoreTables(sql: NeonQueryFunction<false, false>) {
         is_active BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
-    `;
+    `);
   } catch (e) {
     console.warn("Table auto-init warning:", e);
   }
