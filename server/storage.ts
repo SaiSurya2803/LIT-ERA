@@ -52,8 +52,8 @@ export interface IStorage {
   createPuzzle(puzzle: InsertPuzzle): Promise<Puzzle>;
   getPuzzles(): Promise<Puzzle[]>;
   getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined>;
-  deletePuzzlesByType(type: string): Promise<number>; // Returns count of deleted puzzles
-  deleteGameScoresByType(gameType: string): Promise<number>; // Returns count of deleted scores
+  deletePuzzlesByType(type: string): Promise<number>;
+  deleteGameScoresByType(gameType: string): Promise<number>;
 
   createContent(contentItem: InsertContent): Promise<Content>;
   getContent(): Promise<Content[]>;
@@ -110,16 +110,12 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     try {
       const id = crypto.randomUUID();
-      await db.insert(users).values({ ...insertUser, id });
-      const [user] = await db.select().from(users).where(eq(users.email, insertUser.email));
+      const [user] = await db.insert(users).values({ ...insertUser, id }).returning();
       return user;
     } catch (error: any) {
       console.error("Error creating user:", error);
-      if (error.code === '23505' || error.code === 'ER_DUP_ENTRY') { // MySQL & Postgres Unique constraint violation
+      if (error.code === '23505' || error.code === 'ER_DUP_ENTRY') {
         throw new Error("Email already in use");
-      }
-      if (error.code === 'ER_NO_SUCH_TABLE') {
-        throw new Error("Database tables not found. Please run 'npm run db:push' to initialize the database tables.");
       }
       throw new Error(error?.message || "Failed to create user");
     }
@@ -130,15 +126,13 @@ export class DatabaseStorage implements IStorage {
       return await db.select().from(users).orderBy(desc(users.joinDate));
     } catch (error: any) {
       console.error("Error fetching all users:", error);
-      // Return empty array if table doesn't exist yet or connection fails during initial admin check
       return [];
     }
   }
 
   async createContact(contact: InsertContact): Promise<ContactSubmission> {
     try {
-      const [result] = await db.insert(contactSubmissions).values(contact);
-      const [submission] = await db.select().from(contactSubmissions).where(eq(contactSubmissions.id, result.insertId));
+      const [submission] = await db.insert(contactSubmissions).values(contact).returning();
       return submission;
     } catch (error) {
       console.error("Error creating contact:", error);
@@ -157,8 +151,7 @@ export class DatabaseStorage implements IStorage {
 
   async createEvent(event: InsertEvent): Promise<Event> {
     try {
-      const [result] = await db.insert(events).values(event);
-      const [ev] = await db.select().from(events).where(eq(events.id, result.insertId));
+      const [ev] = await db.insert(events).values(event).returning();
       return ev;
     } catch (error) {
       console.error("Error creating event:", error);
@@ -177,8 +170,7 @@ export class DatabaseStorage implements IStorage {
 
   async createGameScore(score: InsertGameScore): Promise<GameScore> {
     try {
-      const [result] = await db.insert(gameScores).values(score);
-      const [gameScore] = await db.select().from(gameScores).where(eq(gameScores.id, result.insertId));
+      const [gameScore] = await db.insert(gameScores).values(score).returning();
       return gameScore;
     } catch (error) {
       console.error("Error creating game score:", error);
@@ -197,8 +189,7 @@ export class DatabaseStorage implements IStorage {
 
   async createPuzzle(insertPuzzle: InsertPuzzle): Promise<Puzzle> {
     try {
-      const [result] = await db.insert(puzzles).values(insertPuzzle);
-      const [puzzle] = await db.select().from(puzzles).where(eq(puzzles.id, result.insertId));
+      const [puzzle] = await db.insert(puzzles).values(insertPuzzle).returning();
       return puzzle;
     } catch (error) {
       console.error("Error creating puzzle:", error);
@@ -217,36 +208,12 @@ export class DatabaseStorage implements IStorage {
 
   async getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined> {
     try {
-      console.log(`[Storage] Querying puzzle: type=${type}, date=${date}`);
-      
       const [puzzle] = await db.select().from(puzzles).where(
         and(
           eq(puzzles.type, type),
           eq(puzzles.publishDate, date)
         )
       );
-      
-      if (puzzle) {
-        console.log(`[Storage] Puzzle found:`, {
-          id: puzzle.id,
-          type: puzzle.type,
-          publishDate: puzzle.publishDate,
-          hasData: !!puzzle.data
-        });
-      } else {
-        console.log(`[Storage] No puzzle found matching criteria`);
-        
-        // Debug: Show all puzzles
-        const allPuzzles = await db.select().from(puzzles);
-        console.log(`[Storage] Total puzzles in database: ${allPuzzles.length}`);
-        if (allPuzzles.length > 0) {
-          console.log(`[Storage] Available puzzles:`, allPuzzles.map(p => ({
-            type: p.type,
-            date: p.publishDate
-          })));
-        }
-      }
-      
       return puzzle;
     } catch (error) {
       console.error("[Storage] Error fetching daily puzzle:", error);
@@ -256,11 +223,8 @@ export class DatabaseStorage implements IStorage {
 
   async deletePuzzlesByType(type: string): Promise<number> {
     try {
-      console.log(`[Storage] Deleting puzzles of type: ${type}`);
-      const [result] = await db.delete(puzzles).where(eq(puzzles.type, type));
-      const count = result.affectedRows || 0;
-      console.log(`[Storage] Deleted ${count} puzzles of type ${type}`);
-      return count;
+      const result = await db.delete(puzzles).where(eq(puzzles.type, type)).returning();
+      return result.length;
     } catch (error) {
       console.error(`[Storage] Error deleting puzzles of type ${type}:`, error);
       throw new Error(`Failed to delete puzzles of type ${type}`);
@@ -269,22 +233,17 @@ export class DatabaseStorage implements IStorage {
 
   async deleteGameScoresByType(gameType: string): Promise<number> {
     try {
-      console.log(`[Storage] Deleting game scores of type: ${gameType}`);
-      const [result] = await db.delete(gameScores).where(eq(gameScores.gameType, gameType));
-      const count = result.affectedRows || 0;
-      console.log(`[Storage] Deleted ${count} game scores of type ${gameType}`);
-      return count;
+      const result = await db.delete(gameScores).where(eq(gameScores.gameType, gameType)).returning();
+      return result.length;
     } catch (error) {
       console.error(`[Storage] Error deleting game scores of type ${gameType}:`, error);
       throw new Error(`Failed to delete game scores of type ${gameType}`);
     }
   }
 
-  // Content management implementations
   async createContent(contentItem: InsertContent): Promise<Content> {
     try {
-      const [result] = await db.insert(content).values(contentItem);
-      const [newContent] = await db.select().from(content).where(eq(content.id, result.insertId));
+      const [newContent] = await db.insert(content).values(contentItem).returning();
       return newContent;
     } catch (error) {
       console.error("Error creating content:", error);
@@ -303,8 +262,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateContent(id: number, updates: Partial<InsertContent>): Promise<Content | undefined> {
     try {
-      await db.update(content).set(updates).where(eq(content.id, id));
-      const [updatedContent] = await db.select().from(content).where(eq(content.id, id));
+      const [updatedContent] = await db.update(content).set(updates).where(eq(content.id, id)).returning();
       return updatedContent;
     } catch (error) {
       console.error("Error updating content:", error);
@@ -314,19 +272,17 @@ export class DatabaseStorage implements IStorage {
 
   async deleteContent(id: number): Promise<boolean> {
     try {
-      const [result] = await db.delete(content).where(eq(content.id, id));
-      return (result.affectedRows ?? 0) > 0;
+      const result = await db.delete(content).where(eq(content.id, id)).returning();
+      return result.length > 0;
     } catch (error) {
       console.error("Error deleting content:", error);
       throw new Error("Failed to delete content");
     }
   }
 
-  // Submissions
   async createSubmission(insertSubmission: InsertSubmission): Promise<Submission> {
     try {
-      const [result] = await db.insert(submissions).values(insertSubmission);
-      const [submission] = await db.select().from(submissions).where(eq(submissions.id, result.insertId));
+      const [submission] = await db.insert(submissions).values(insertSubmission).returning();
       return submission;
     } catch (error) {
       console.error("Error creating submission:", error);
@@ -353,11 +309,9 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Event Registrations
   async createEventRegistration(registration: InsertEventRegistration): Promise<EventRegistration> {
     try {
-      const [result] = await db.insert(eventRegistrations).values(registration);
-      const [eventReg] = await db.select().from(eventRegistrations).where(eq(eventRegistrations.id, result.insertId));
+      const [eventReg] = await db.insert(eventRegistrations).values(registration).returning();
       return eventReg;
     } catch (error) {
       console.error("Error creating event registration:", error);
@@ -389,11 +343,9 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // MUN Registrations
   async createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration> {
     try {
-      const [result] = await db.insert(munRegistrations).values(registration);
-      const [munReg] = await db.select().from(munRegistrations).where(eq(munRegistrations.id, result.insertId));
+      const [munReg] = await db.insert(munRegistrations).values(registration).returning();
       return munReg;
     } catch (error) {
       console.error("Error creating MUN registration:", error);
@@ -420,11 +372,9 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  // Publications
   async createPublication(insertPublication: InsertPublication): Promise<Publication> {
     try {
-      const [result] = await db.insert(publications).values(insertPublication);
-      const [publication] = await db.select().from(publications).where(eq(publications.id, result.insertId));
+      const [publication] = await db.insert(publications).values(insertPublication).returning();
       return publication;
     } catch (error) {
       console.error("Error creating publication:", error);
@@ -453,8 +403,7 @@ export class DatabaseStorage implements IStorage {
 
   async updatePublication(id: number, updates: Partial<InsertPublication>): Promise<Publication | undefined> {
     try {
-      await db.update(publications).set(updates).where(eq(publications.id, id));
-      const [updatedPublication] = await db.select().from(publications).where(eq(publications.id, id));
+      const [updatedPublication] = await db.update(publications).set(updates).where(eq(publications.id, id)).returning();
       return updatedPublication;
     } catch (error) {
       console.error("Error updating publication:", error);
@@ -464,8 +413,8 @@ export class DatabaseStorage implements IStorage {
 
   async deletePublication(id: number): Promise<boolean> {
     try {
-      const [result] = await db.delete(publications).where(eq(publications.id, id));
-      return (result.affectedRows ?? 0) > 0;
+      const result = await db.delete(publications).where(eq(publications.id, id)).returning();
+      return result.length > 0;
     } catch (error) {
       console.error("Error deleting publication:", error);
       throw new Error("Failed to delete publication");
