@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Link } from "wouter";
 import { Calendar, Camera, Search } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -8,25 +7,6 @@ import EventPhotosModal from "@/components/EventPhotosModal";
 import EventDetailsModal from "@/components/EventDetailsModal";
 
 const allEvents = [
-  {
-    id: 12,
-    title: "Model United Nations Conference 2026",
-    date: "April 21-22, 2026",
-    time: "9:00 AM - 6:00 PM",
-    location: "International Conference Center",
-    attendees: 85,
-    maxAttendees: 200,
-    category: "MUN",
-    description: "Join us for the most prestigious MUN conference of the year. Debate global issues, enhance diplomatic skills, and network with delegates from various institutions.",
-    image: "https://picsum.photos/seed/mun-conference-2026/800/500.jpg",
-    featured: true,
-    registrationOpen: true,
-    status: "upcoming",
-    isMUN: true,
-    overview: "The Model United Nations Conference 2026 brings together aspiring diplomats and global leaders to simulate UN proceedings and debate pressing international issues.",
-    structure: "Three-day conference featuring committee sessions, crisis simulations, keynote speeches, and networking events. Delegates represent different countries and work collaboratively to draft resolutions.",
-    impact: "Participants develop critical thinking, public speaking, and negotiation skills while gaining deeper understanding of global affairs and international relations."
-  },
   {
     id: 13,
     title: "Ignite: The Grand Kickoff",
@@ -96,7 +76,7 @@ const allEvents = [
   },
 ];
 
-const categories = ["All", "Debate", "Poetry", "Reading", "Writing", "Special Event", "Community", "Festival", "MUN", "Social"];
+const categories = ["All", "Debate", "Poetry", "Reading", "Writing", "Special Event", "Community", "Festival", "Social"];
 
 export default function EventsPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -320,17 +300,9 @@ export default function EventsPage() {
                       </div>
                     </div>
 
-                    {event.isMUN ? (
-                      <Link href="/mun">
-                        <Button variant="outline" className="w-full border-gold text-gold hover:bg-gold hover:text-ink">
-                          Details
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Button variant="outline" className="w-full border-gold text-gold hover:bg-gold hover:text-ink">
-                        Details
-                      </Button>
-                    )}
+                    <Button variant="outline" className="w-full border-gold text-gold hover:bg-gold hover:text-ink">
+                      Details
+                    </Button>
                   </div>
                 </motion.div>
               ))}

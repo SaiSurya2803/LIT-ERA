@@ -22,11 +22,11 @@ export function NavBar() {
   const navLinks = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
-    { name: "MUN", path: "/mun" },
     { name: "Events", path: "/events" },
     { name: "Magazine", path: "/magazine" },
     { name: "Contact", path: "/contact" },
   ];
+
 
   return (
     <header 

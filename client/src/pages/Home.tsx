@@ -139,7 +139,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { title: "Literary Events", icon: Book, desc: "Join our exciting literary events and workshops.", link: "/events" },
-            { title: "Model UN", icon: Users, desc: "Develop diplomatic skills through Model United Nations.", link: "/mun" },
+            { title: "Debates", icon: Users, desc: "Sharpen your arguments and speaking skills in our debate competitions.", link: "/events" },
             { title: "Magazine", icon: Feather, desc: "Share your creative writing in our literary magazine.", link: "/magazine" },
             { title: "Community", icon: Sparkles, desc: "Connect with fellow literature enthusiasts.", link: "/contact" },
           ].map((feature, i) => (

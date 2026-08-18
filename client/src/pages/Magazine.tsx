@@ -14,17 +14,15 @@ export default function Magazine() {
   const [magazineLikes, setMagazineLikes] = useState(0);
   const [localPublications, setLocalPublications] = useState<any[]>([]);
 
-  // Fetch publications from database
   const { data: publicationsFromDB = [], isLoading, refetch } = usePublications();
 
-  // Listen for custom event to open submission modal from guidelines
   useEffect(() => {
     const handleOpenSubmission = () => setSubmissionOpen(true);
     window.addEventListener('openSubmissionModal', handleOpenSubmission);
     return () => window.removeEventListener('openSubmissionModal', handleOpenSubmission);
   }, []);
 
-  // Fallback publications for display (will be replaced by database data)
+  // All PDFs served from /publications/ (static, bundled into dist/public via client/public/)
   const fallbackPublications = [
     {
       id: 18,
@@ -40,7 +38,7 @@ export default function Magazine() {
       views: 45,
       likes: 8,
       featured: true,
-      pdfFile: "/uploads/publications/Litera-Club-Newsletter.pdf",
+      pdfFile: "/publications/Litera-Club-Newsletter.pdf",
       pdfFileName: "Litera-Club-Newsletter.pdf"
     },
     {
@@ -49,7 +47,7 @@ export default function Magazine() {
       category: "Book",
       author: "Yashwanth Rishindra",
       date: "January 11, 2026",
-      description: "The 19th year on Earth represents a critical bridge between adolescence and adulthood, often characterized by intense personal growth, self-discovery, and significant life shifts. It is a phase of exploring identity, purpose, and independence, marking the transition away from high school and into higher education, early career, or personal freedom.",
+      description: "The 19th year on Earth represents a critical bridge between adolescence and adulthood, often characterized by intense personal growth, self-discovery, and significant life shifts.",
       image: "https://m.media-amazon.com/images/I/61WYKDK6nSL._UF1000,1000_QL80_.jpg",
       type: "Book",
       pages: 24,
@@ -57,7 +55,7 @@ export default function Magazine() {
       views: 892,
       likes: 67,
       featured: true,
-      pdfFile: "/uploads/publications/19th-Year-on-Earth.pdf",
+      pdfFile: "/publications/19th-Year-on-Earth.pdf",
       pdfFileName: "19th-Year-on-Earth.pdf"
     },
     {
@@ -66,6 +64,7 @@ export default function Magazine() {
       category: "Story",
       author: "Pooja Sirasala",
       date: "December 5, 2025",
+      description: "A heartwarming short story about small acts of kindness.",
       image: "https://picsum.photos/seed/you-made-my-day/400/300.jpg",
       type: "Story",
       pages: 1,
@@ -73,7 +72,7 @@ export default function Magazine() {
       views: 234,
       likes: 43,
       featured: false,
-      pdfFile: "/uploads/publications/You Just Made My Day Short Story- Pooja Sirasala.pdf",
+      pdfFile: "/publications/You Just Made My Day Short Story- Pooja Sirasala.pdf",
       pdfFileName: "You-Just-Made-My-Day.pdf"
     },
     {
@@ -82,6 +81,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Pranathi Chitte",
       date: "December 10, 2025",
+      description: "A poem about finding your unique journey in life.",
       image: "https://picsum.photos/seed/unipath-journey/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -89,23 +89,24 @@ export default function Magazine() {
       views: 156,
       likes: 29,
       featured: false,
-      pdfFile: "/uploads/publications/Unipath - Pranathi Chitte.pdf",
+      pdfFile: "/publications/Unipath - Pranathi Chitte.pdf",
       pdfFileName: "Unipath-Pranathi-Chitte.pdf"
     },
     {
       id: 4,
       title: "Turning Point",
-      category: "Story",
+      category: "Article",
       author: "N SADHRIKA",
       date: "December 2, 2025",
+      description: "An article exploring life's pivotal moments and how they shape us.",
       image: "https://picsum.photos/seed/turning-point/400/300.jpg",
-      type: " Article ",
+      type: "Article",
       pages: 4,
       downloads: 89,
       views: 234,
       likes: 54,
       featured: false,
-      pdfFile: "/uploads/publications/Turning point - N SADHRIKA.pdf",
+      pdfFile: "/publications/Turning point - N SADHRIKA.pdf",
       pdfFileName: "Turning-Point-N-SADHRIKA.pdf"
     },
     {
@@ -114,6 +115,7 @@ export default function Magazine() {
       category: "Story",
       author: "Sri Charan Kota",
       date: "December 4, 2025",
+      description: "A compelling story of ambition, perseverance, and reaching new heights.",
       image: "https://picsum.photos/seed/the-summit/400/300.jpg",
       type: "Story",
       pages: 2,
@@ -121,7 +123,7 @@ export default function Magazine() {
       views: 445,
       likes: 89,
       featured: false,
-      pdfFile: "/uploads/publications/The Summit- sri charan kota.pdf",
+      pdfFile: "/publications/The Summit- sri charan kota.pdf",
       pdfFileName: "The-Summit-Sri-Charan-Kota.pdf"
     },
     {
@@ -130,6 +132,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Vineetha N",
       date: "December 17, 2025",
+      description: "A bold poem celebrating the courage to dream beyond reason.",
       image: "https://picsum.photos/seed/courage-delulu/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -137,7 +140,7 @@ export default function Magazine() {
       views: 189,
       likes: 23,
       featured: false,
-      pdfFile: "/uploads/publications/The Courage to Be Delulu - VINEETHA N.pdf",
+      pdfFile: "/publications/The Courage to Be Delulu - VINEETHA N.pdf",
       pdfFileName: "The-Courage-to-Be-Delulu-VINEETHA-N.pdf"
     },
     {
@@ -146,6 +149,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Shaik Azra",
       date: "December 2, 2025",
+      description: "A reflective poem about the current chapter of life.",
       image: "https://picsum.photos/seed/chapter-im-in/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -153,7 +157,7 @@ export default function Magazine() {
       views: 89,
       likes: 18,
       featured: false,
-      pdfFile: "/uploads/publications/The Chapter I'm in - Shaik Azra.pdf",
+      pdfFile: "/publications/The Chapter I'm in - Shaik Azra.pdf",
       pdfFileName: "The-Chapter-Im-in-Shaik-Azra.pdf"
     },
     {
@@ -162,6 +166,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Yasaswy Potturi",
       date: "December 11, 2025",
+      description: "A fiery poem about passion and determination in every step.",
       image: "https://picsum.photos/seed/poem-collection/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -169,7 +174,7 @@ export default function Magazine() {
       views: 167,
       likes: 45,
       featured: false,
-      pdfFile: "/uploads/publications/Poem - Yasaswy Potturi.pdf",
+      pdfFile: "/publications/Poem - Yasaswy Potturi.pdf",
       pdfFileName: "Poem-Collection-Yasaswy-Potturi.pdf"
     },
     {
@@ -178,6 +183,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Pranavi",
       date: "December 7, 2025",
+      description: "A poem about new beginnings and the hope they bring.",
       image: "https://picsum.photos/seed/literary-voices/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -185,7 +191,7 @@ export default function Magazine() {
       views: 445,
       likes: 78,
       featured: false,
-      pdfFile: "/uploads/publications/A Fresh Start- Pranavi.pdf",
+      pdfFile: "/publications/A Fresh Start- Pranavi.pdf",
       pdfFileName: "A Fresh Start- Pranavi.pdf"
     },
     {
@@ -194,6 +200,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Rohith Mangamuri",
       date: "December 17, 2025",
+      description: "A humorous yet introspective poem about engineering student life.",
       image: "https://picsum.photos/seed/campus-chronicles/400/300.jpg",
       type: "Poem",
       pages: 2,
@@ -201,7 +208,7 @@ export default function Magazine() {
       views: 234,
       likes: 34,
       featured: false,
-      pdfFile: "/uploads/publications/Am I really an Engineer - Rohith Mangamuri.pdf",
+      pdfFile: "/publications/Am I really an Engineer - Rohith Mangamuri.pdf",
       pdfFileName: "Am-I-really-an-Engineer-Rohith-Mangamuri.pdf"
     },
     {
@@ -210,6 +217,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Ikshita",
       date: "December 17, 2025",
+      description: "A thought-provoking poem questioning authenticity in creative expression.",
       image: "https://picsum.photos/seed/digital-poetry-review/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -217,7 +225,7 @@ export default function Magazine() {
       views: 123,
       likes: 28,
       featured: false,
-      pdfFile: "/uploads/publications/Are You Niche or Performative - Ikshita.pdf",
+      pdfFile: "/publications/Are You Niche or Performative - Ikshita.pdf",
       pdfFileName: "Are You Niche or Performative - Ikshita.pdf"
     },
     {
@@ -226,6 +234,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Tasneem Firdous",
       date: "December 7, 2025",
+      description: "A powerful poem about peace, loss, and the fragility of life.",
       image: "https://picsum.photos/seed/creative-writing-workshop/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -233,15 +242,16 @@ export default function Magazine() {
       views: 189,
       likes: 41,
       featured: false,
-      pdfFile: "/uploads/publications/Before the next bomb falls - Tasneem Firdous.pdf",
+      pdfFile: "/publications/Before the next bomb falls - Tasneem Firdous.pdf",
       pdfFileName: "Before the next bomb falls - Tasneem Firdous.pdf"
     },
     {
       id: 13,
       title: "Being vs Doing",
       category: "Poem",
-      author: "sheripally Rakesh Goud",
+      author: "Sheripally Rakesh Goud",
       date: "December 17, 2025",
+      description: "A philosophical poem exploring the tension between existence and action.",
       image: "https://picsum.photos/seed/annual-literary-awards/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -249,7 +259,7 @@ export default function Magazine() {
       views: 567,
       likes: 89,
       featured: false,
-      pdfFile: "/uploads/publications/Being vs Doing- sheripally Rakesh Goud.pdf",
+      pdfFile: "/publications/Being vs Doing- sheripally Rakesh Goud.pdf",
       pdfFileName: "Being vs Doing- sheripally Rakesh Goud.pdf"
     },
     {
@@ -258,6 +268,7 @@ export default function Magazine() {
       category: "Poem",
       author: "Dhruu",
       date: "December 17, 2025",
+      description: "A lyrical poem inspired by the cosmos and the music of the universe.",
       image: "https://picsum.photos/seed/research-symposium/400/300.jpg",
       type: "Poem",
       pages: 1,
@@ -265,7 +276,7 @@ export default function Magazine() {
       views: 234,
       likes: 56,
       featured: false,
-      pdfFile: "/uploads/publications/Celestial Serenade - Dhruu.pdf",
+      pdfFile: "/publications/Celestial Serenade - Dhruu.pdf",
       pdfFileName: "Celestial-Serenade - Dhruu.pdf"
     },
     {
@@ -274,6 +285,7 @@ export default function Magazine() {
       category: "Article",
       author: "Asiya Beig",
       date: "December 17, 2025",
+      description: "An evocative article about travel, departure, and the emotions of leaving home.",
       image: "https://picsum.photos/seed/student-spotlight/400/300.jpg",
       type: "Article",
       pages: 2,
@@ -281,15 +293,16 @@ export default function Magazine() {
       views: 389,
       likes: 67,
       featured: false,
-      pdfFile: "/uploads/publications/Document from Asiyabeig - Asiya Beig.pdf",
+      pdfFile: "/publications/Document from Asiyabeig - Asiya Beig.pdf",
       pdfFileName: "Document from Asiyabeig - Asiya Beig.pdf"
     },
     {
       id: 16,
       title: "Finding yourself",
       category: "Article",
-      author: "sasamrutha Moganti",
+      author: "Sasamrutha Moganti",
       date: "December 8, 2025",
+      description: "An introspective article on the journey of self-discovery.",
       image: "https://picsum.photos/seed/poetry-slam-results/400/300.jpg",
       type: "Article",
       pages: 1,
@@ -297,7 +310,7 @@ export default function Magazine() {
       views: 345,
       likes: 78,
       featured: false,
-      pdfFile: "/uploads/publications/Finding yourself - Sasamrutha Moganti.pdf",
+      pdfFile: "/publications/Finding yourself - Sasamrutha Moganti.pdf",
       pdfFileName: "Finding yourself - Sasamrutha Moganti.pdf"
     },
     {
@@ -306,14 +319,15 @@ export default function Magazine() {
       category: "Story",
       author: "Chikkam Radhakrishna",
       date: "December 2, 2025",
-      image: "https://picsum.photos/seed/poetry-slam-results/400/300.jpg",
+      description: "A short story about the parts we play in each other's lives.",
+      image: "https://picsum.photos/seed/poetry-slam-results2/400/300.jpg",
       type: "Story",
       pages: 2,
       downloads: 89,
       views: 345,
       likes: 78,
       featured: false,
-      pdfFile: "/uploads/publications/Part - Chikkam Radhakrishna.pdf",
+      pdfFile: "/publications/Part - Chikkam Radhakrishna.pdf",
       pdfFileName: "Part - Chikkam Radhakrishna.pdf"
     }
   ];
@@ -323,20 +337,9 @@ export default function Magazine() {
     { id: "Book", name: "Books", icon: <BookOpen className="w-4 h-4" /> },
     { id: "Story", name: "Stories", icon: <FileText className="w-4 h-4" /> },
     { id: "Poem", name: "Poems", icon: <FileText className="w-4 h-4" /> },
-    { id: "Article", name: "Articles", icon: <FileText className="w-4 h-4" /> }
+    { id: "Article", name: "Articles", icon: <FileText className="w-4 h-4" /> },
+    { id: "Magazine", name: "Magazine", icon: <Newspaper className="w-4 h-4" /> },
   ];
-
-  const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      book: 'D4AF37',      // Gold
-      magazine: '4A5568',  // Gray
-      newspaper: '2D3748', // Dark gray
-      journal: '1A202C',   // Almost black
-      anthology: 'B8860B', // Dark gold
-      article: '6B7280'    // Medium gray
-    };
-    return colors[category?.toLowerCase()] || '4A5568';
-  };
 
   const mapPublication = (pub: any) => ({
     id: pub.id,
@@ -345,8 +348,8 @@ export default function Magazine() {
     author: pub.author,
     date: pub.publishDate || pub.date || "2026",
     description: pub.description,
-    image: pub.coverImage || pub.image || `https://placehold.co/400x300/${getCategoryColor(pub.category)}/white?text=${encodeURIComponent(pub.title || "Publication")}`,
-    type: pub.type || (pub.category ? pub.category.charAt(0).toUpperCase() + pub.category.slice(1) : "Publication"),
+    image: pub.coverImage || pub.image || `https://picsum.photos/seed/${pub.id}/400/300.jpg`,
+    type: pub.type || pub.category || "Publication",
     pages: pub.pages || 1,
     downloads: pub.downloads || 0,
     views: pub.views || 0,
@@ -356,170 +359,55 @@ export default function Magazine() {
     pdfFileName: pub.pdfFileName || null
   });
 
-  // Sync local publications state with database data
   useEffect(() => {
     const rawList = publicationsFromDB.length > 0 ? publicationsFromDB : fallbackPublications;
     setLocalPublications(rawList.map(mapPublication));
   }, [publicationsFromDB]);
 
-  const filteredPublications = selectedCategory === "all"
-    ? localPublications.filter((pub: any) =>
-      pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      pub.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    : localPublications.filter((pub: any) =>
-      (pub.category === selectedCategory) &&
-      (pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        pub.description?.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+  const filteredPublications = localPublications.filter((pub: any) => {
+    const matchesCategory = selectedCategory === "all" || pub.category === selectedCategory;
+    const q = searchTerm.toLowerCase();
+    const matchesSearch = !q ||
+      pub.title.toLowerCase().includes(q) ||
+      pub.author.toLowerCase().includes(q) ||
+      (pub.description || "").toLowerCase().includes(q);
+    return matchesCategory && matchesSearch;
+  });
 
-  const handleDownload = async (id: number, pdfFile: string | null, fileName: string | null) => {
+  const handleView = (id: number, pdfFile: string | null) => {
     if (!pdfFile) {
-      alert("PDF file not available");
+      alert("PDF not available for this publication.");
       return;
     }
-
-    // Show immediate feedback
-    const updatedPublications = localPublications.map((pub: any) =>
-      pub.id === id ? { ...pub, downloads: pub.downloads + 1 } : pub
+    // Update local view count
+    setLocalPublications(prev =>
+      prev.map(pub => pub.id === id ? { ...pub, views: pub.views + 1 } : pub)
     );
-    setLocalPublications(updatedPublications);
+    window.open(pdfFile, "_blank", "noopener,noreferrer");
+  };
 
-    // Update database and then refetch
-    try {
-      const response = await fetch(`/api/publications/${id}/download`, { method: 'POST' });
-      console.log('Download response:', response);
-      if (response.ok) {
-        console.log('Download count updated in database');
-        // Refetch after a short delay to ensure database is updated
-        setTimeout(() => refetch(), 1000);
-      }
-    } catch (error) {
-      console.error("Error tracking download:", error);
+  const handleDownload = (id: number, pdfFile: string | null, fileName: string | null) => {
+    if (!pdfFile) {
+      alert("PDF not available for this publication.");
+      return;
     }
-
-    // Download file
+    // Update local download count
+    setLocalPublications(prev =>
+      prev.map(pub => pub.id === id ? { ...pub, downloads: pub.downloads + 1 } : pub)
+    );
     const link = document.createElement("a");
     link.href = pdfFile;
-    link.setAttribute("download", fileName || "publication.pdf");
-    link.target = "_blank";
+    link.download = fileName || "publication.pdf";
     link.rel = "noopener noreferrer";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  // Wrapper function for PublicationCard compatibility
-  const handleDownloadWrapper = (pdfFile: string | null, fileName: string | null) => {
-    handleDownload(0, pdfFile, fileName); // id is not used in new implementation
-  };
-
-  const handleView = async (id: number, pdfFile: string | null) => {
-    if (!pdfFile) {
-      alert("PDF file not available");
-      return;
-    }
-
-    // Show immediate feedback
-    const updatedPublications = localPublications.map((pub: any) =>
-      pub.id === id ? { ...pub, views: pub.views + 1 } : pub
+  const handleLike = (id: number) => {
+    setLocalPublications(prev =>
+      prev.map(pub => pub.id === id ? { ...pub, likes: pub.likes + 1 } : pub)
     );
-    setLocalPublications(updatedPublications);
-
-    // Update database and then refetch
-    try {
-      const response = await fetch(`/api/publications/${id}`, { method: 'POST' });
-      console.log('View response:', response);
-      if (response.ok) {
-        console.log('View count updated in database');
-        // Refetch after a short delay to ensure database is updated
-        setTimeout(() => refetch(), 1000);
-      }
-    } catch (error) {
-      console.error("Error tracking view:", error);
-    }
-
-    // Open PDF in new tab
-    window.open(pdfFile, '_blank');
-  };
-
-  const handleLike = async (id: number) => {
-    // Show immediate feedback
-    const updatedPublications = localPublications.map((pub: any) =>
-      pub.id === id ? { ...pub, likes: pub.likes + 1 } : pub
-    );
-    setLocalPublications(updatedPublications);
-
-    try {
-      console.log('Attempting to like publication:', id);
-      const response = await fetch(`/api/publications/${id}/like`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log('Like response status:', response.status);
-      console.log('Like response ok:', response.ok);
-
-      const responseData = await response.json();
-      console.log('Like response data:', responseData);
-
-      if (response.ok) {
-        console.log('Like count updated in database');
-        // Refetch after a short delay to ensure database is updated
-        setTimeout(() => refetch(), 1000);
-      } else {
-        console.error('Like failed:', responseData);
-        // Revert local change if API failed
-        const revertedPublications = localPublications.map((pub: any) =>
-          pub.id === id ? { ...pub, likes: pub.likes - 1 } : pub
-        );
-        setLocalPublications(revertedPublications);
-      }
-    } catch (error) {
-      console.error("Like error:", error);
-      // Revert local change if API failed
-      const revertedPublications = localPublications.map((pub: any) =>
-        pub.id === id ? { ...pub, likes: pub.likes - 1 } : pub
-      );
-      setLocalPublications(revertedPublications);
-      alert("Failed to like publication");
-    }
-  };
-
-  const handleLikeMagazine = () => {
-    setMagazineLikes(prev => prev + 1);
-    alert("You liked LIT'ERA Magazine! ❤️");
-  };
-
-  const handleShare = async (publication: any) => {
-    const shareData = {
-      title: publication.title,
-      text: `Check out "${publication.title}" by ${publication.author}`,
-      url: window.location.href
-    };
-
-    try {
-      // Check if Web Share API is supported
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        // Fallback: Copy link to clipboard
-        await navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
-      }
-    } catch (error) {
-      console.error("Share error:", error);
-      // Fallback: Copy to clipboard
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
-      } catch (clipboardError) {
-        alert("Unable to share. Please copy the URL manually.");
-      }
-    }
   };
 
   return (
@@ -544,212 +432,204 @@ export default function Magazine() {
               LIT'ERA Magazine
             </h1>
             <p className="font-accent text-xl text-gold tracking-widest uppercase mb-6">
-              Literary Publications & News
+              Literary Publications & Creative Works
             </p>
             <p className="font-body text-ink/70 max-w-2xl mx-auto text-lg leading-relaxed">
-              Explore our collection of newspapers, magazines, research journals, and creative anthologies.
-              Discover the voices of our literary community and stay updated with club news and events.
+              Explore our collection of books, stories, poems, and articles. Discover the voices of our literary community.
             </p>
             <div className="flex items-center justify-center gap-4 mt-6">
               <Button
-                className="!bg-gold !text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-cream hover:!text-ink transition-all"
+                className="!bg-gold !text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-ink hover:!text-cream transition-all"
                 onClick={() => setSubmissionOpen(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Submit Publication
+                Submit Your Work
               </Button>
               <Button
-                className="bg-cream text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:bg-ink hover:text-cream transition-all border border-ink/20"
-                onClick={handleLikeMagazine}
+                className="bg-white text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:bg-ink hover:text-cream transition-all border border-ink/20"
+                onClick={() => setMagazineLikes(p => p + 1)}
               >
                 <Heart className="w-4 h-4 mr-2" />
-                Like Magazine ({magazineLikes})
+                Like Magazine {magazineLikes > 0 && `(${magazineLikes})`}
               </Button>
             </div>
           </motion.div>
         </div>
       </motion.section>
 
-
-      {/* Category Filter */}
-      <section className="py-8 px-6 bg-cream">
+      {/* Filter & Search */}
+      <section className="py-8 px-6 bg-white border-y border-ink/10">
         <div className="flex flex-col lg:flex-row items-center justify-center max-w-7xl mx-auto gap-6 lg:gap-8">
-          {/* Search Bar */}
-          <div className="w-full sm:w-[28rem] lg:w-96 flex-shrink-0">
-            <div className="relative shadow-sm rounded-md overflow-hidden">
+          <div className="w-full sm:w-96 flex-shrink-0">
+            <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink/40" />
               <input
                 type="text"
-                placeholder="Search publications..."
+                placeholder="Search by title, author..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 h-[52px] border border-ink/20 bg-white focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold text-sm shadow-inner transition-all duration-200"
+                className="w-full pl-12 pr-4 py-3 border border-ink/20 bg-cream focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold text-sm transition-all duration-200"
               />
             </div>
           </div>
-
-          {/* Filter Buttons */}
           <div className="flex flex-wrap justify-center gap-3">
-            {categories.map((category: any) => (
+            {categories.map((cat) => (
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-md font-accent text-sm tracking-wide transition-all duration-200 ${selectedCategory === category.id
-                  ? "bg-ink text-white shadow-md border border-ink"
-                  : "bg-white text-gold border border-gold hover:bg-gold hover:text-ink shadow-sm hover:shadow-md"
-                  }`}
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`flex items-center gap-2 px-5 py-2.5 font-accent text-xs tracking-widest uppercase transition-all duration-200 border ${
+                  selectedCategory === cat.id
+                    ? "bg-ink text-cream border-ink shadow-md"
+                    : "bg-cream text-ink border-ink/20 hover:border-gold hover:text-gold"
+                }`}
               >
-                {category.icon}
-                {category.name}
+                {cat.icon}
+                {cat.name}
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* All Publications */}
+      {/* Publications Grid */}
       <section className="py-20 px-6">
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-ink mb-4">
+          <div className="text-center mb-14">
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-ink mb-3">
               All Publications
             </h2>
-            <p className="font-body text-ink/70 max-w-2xl mx-auto">
-              Complete collection of LIT'ERA publications including newspapers, magazines, journals, and creative anthologies.
+            <p className="font-body text-ink/60">
+              {filteredPublications.length} publication{filteredPublications.length !== 1 ? "s" : ""} found
             </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPublications.map((publication: any, index: number) => (
-              <motion.div
-                key={publication.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="relative">
-                  <img
-                    src={publication.image}
-                    alt={publication.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  {publication.featured && (
-                    <div className="absolute top-4 right-4 bg-gold text-ink px-3 py-1 rounded-full text-xs font-accent uppercase tracking-wider">
-                      Featured
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gold font-accent uppercase tracking-wider">
-                      {publication.type}
-                    </span>
-                    <span className="text-sm text-ink/60">
-                      {publication.pages} pages
-                    </span>
-                  </div>
-
-                  <h3 className="font-display text-xl font-bold text-ink mb-2">
-                    {publication.title}
-                  </h3>
-
-                  <p className="font-body text-ink/70 text-sm mb-4 line-clamp-3">
-                    {publication.description}
-                  </p>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-accent text-sm text-ink/60">
-                      {publication.author}
-                    </span>
-                    <span className="font-accent text-sm text-ink/60">
-                      {publication.date}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4 text-sm text-ink/60">
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        {publication.views}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Download className="w-4 h-4" />
-                        {publication.downloads}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Heart className="w-4 h-4" />
-                        {publication.likes}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      className="flex-1 bg-ink text-cream hover:bg-gold hover:text-ink transition-colors"
-                      onClick={() => handleView(publication.id, publication.pdfFile)}
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      View
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1 border-ink text-ink hover:bg-ink hover:text-cream transition-colors"
-                      onClick={() => handleDownload(publication.id, publication.pdfFile, publication.pdfFileName)}
-                    >
-                      <Download className="w-4 h-4 mr-1" />
-                      Download
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-gold text-gold hover:bg-gold hover:text-ink transition-colors"
-                      onClick={() => handleLike(publication.id)}
-                    >
-                      <Heart className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
           </div>
+
+          {isLoading ? (
+            <div className="text-center py-20 text-ink/50 font-body">Loading publications…</div>
+          ) : filteredPublications.length === 0 ? (
+            <div className="text-center py-20 text-ink/50 font-body">No publications found.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredPublications.map((pub: any, index: number) => (
+                <motion.div
+                  key={pub.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.06 }}
+                  className="bg-white rounded-sm shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col"
+                >
+                  <div className="relative">
+                    <img
+                      src={pub.image}
+                      alt={pub.title}
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${pub.id + 100}/400/300`;
+                      }}
+                    />
+                    {pub.featured && (
+                      <div className="absolute top-3 right-3 bg-gold text-ink px-3 py-1 text-xs font-accent uppercase tracking-wider">
+                        Featured
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-6 flex flex-col flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-gold font-accent uppercase tracking-wider">
+                        {pub.type}
+                      </span>
+                      <span className="text-xs text-ink/50 font-body">
+                        {pub.pages} {pub.pages === 1 ? "page" : "pages"}
+                      </span>
+                    </div>
+
+                    <h3 className="font-display text-xl font-bold text-ink mb-2 leading-snug">
+                      {pub.title}
+                    </h3>
+
+                    {pub.description && (
+                      <p className="font-body text-ink/60 text-sm mb-4 line-clamp-3 flex-1">
+                        {pub.description}
+                      </p>
+                    )}
+
+                    <div className="flex items-center justify-between mb-4 text-xs text-ink/50 font-accent">
+                      <span>{pub.author}</span>
+                      <span>{pub.date}</span>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-xs text-ink/50 mb-4">
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3.5 h-3.5" /> {pub.views}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Download className="w-3.5 h-3.5" /> {pub.downloads}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-3.5 h-3.5" /> {pub.likes}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2 mt-auto">
+                      <Button
+                        size="sm"
+                        className="flex-1 bg-ink text-cream hover:bg-gold hover:text-ink transition-colors text-xs"
+                        onClick={() => handleView(pub.id, pub.pdfFile)}
+                      >
+                        <Eye className="w-3.5 h-3.5 mr-1" />
+                        View
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 border-ink text-ink hover:bg-ink hover:text-cream transition-colors text-xs"
+                        onClick={() => handleDownload(pub.id, pub.pdfFile, pub.pdfFileName)}
+                      >
+                        <Download className="w-3.5 h-3.5 mr-1" />
+                        Download
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-gold text-gold hover:bg-gold hover:text-ink transition-colors"
+                        onClick={() => handleLike(pub.id)}
+                      >
+                        <Heart className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* Submit Section */}
-      <section className="py-20 px-6 bg-cream">
+      <section className="py-20 px-6 bg-ink text-cream">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-ink mb-4">
-              Submit Your Work
+            <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
+              Share Your Voice
             </h2>
-            <p className="font-body text-ink/70 mb-8">
-              Share your literary creations with our community. We accept articles, poetry, short stories,
-              research papers, and creative writing for publication in our magazines and journals.
+            <p className="font-body text-cream/70 mb-8 max-w-2xl mx-auto">
+              We welcome poems, stories, articles, and creative writing. Submit your work to be featured in LIT'ERA's publications.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4 mx-auto max-w-lg w-full">
+            <div className="flex flex-wrap items-center justify-center gap-4">
               <Button
-                className="!bg-ink !text-cream font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-gold hover:!text-ink transition-all"
+                className="!bg-gold !text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-cream hover:!text-ink transition-all"
                 onClick={() => setSubmissionOpen(true)}
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Submit Article
+                Submit Your Work
               </Button>
               <Button
                 variant="outline"
-                className="!border-ink !text-ink font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-ink hover:!text-cream transition-all"
+                className="!border-cream !text-cream font-accent text-sm tracking-[0.2em] uppercase px-8 py-4 hover:!bg-cream hover:!text-ink transition-all"
                 onClick={() => setGuidelinesOpen(true)}
               >
                 Submission Guidelines
@@ -759,13 +639,8 @@ export default function Magazine() {
         </div>
       </section>
 
-      {/* Submission Modal */}
       <SubmissionModal isOpen={submissionOpen} onClose={() => setSubmissionOpen(false)} />
-
-      {/* Magazine Guidelines Modal */}
       <MagazineGuidelinesModal isOpen={guidelinesOpen} onClose={() => setGuidelinesOpen(false)} />
     </div>
   );
 }
-
-

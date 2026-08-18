@@ -15,7 +15,6 @@ import Home from "@/pages/Home";
 import About from "@/pages/About";
 import EventsPage from "@/pages/EventsPage";
 import Contact from "@/pages/Contact";
-import MUN from "@/pages/MUN";
 import Magazine from "@/pages/Magazine";
 import AdminDashboard from "@/pages/AdminDashboard";
 import AuthPage from "@/pages/AuthPage";
@@ -79,7 +78,6 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/about" component={About} />
           <Route path="/events" component={EventsPage} />
-          <Route path="/mun" component={MUN} />
           <Route path="/magazine" component={Magazine} />
           <Route path="/contact" component={Contact} />
           <Route path="/admin" component={AdminDashboard} />

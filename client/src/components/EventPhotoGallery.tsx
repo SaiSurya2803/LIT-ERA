@@ -31,15 +31,6 @@ const eventPhotos = [
     image: "/images/debate.jpeg",
     category: "Debate"
   },
-  {
-    id: 5,
-    title: "MUN Conference 2026",
-    date: "February 15-17, 2026",
-    location: "Conference Hall",
-    attendees: 120,
-    image: "/images/mun.jpeg",
-    category: "Conference"
-  },
   
 ];
 

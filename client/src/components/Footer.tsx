@@ -37,7 +37,7 @@ export function Footer() {
         <div>
           <h4 className="font-accent text-gold text-sm tracking-[0.2em] uppercase mb-6">Activities</h4>
           <ul className="space-y-4 font-body text-lg">
-            <li><Link href="/mun" className="text-cream/70 hover:text-gold transition-colors">Model UN</Link></li>
+            <li><Link href="/events" className="text-cream/70 hover:text-gold transition-colors">Literary Events</Link></li>
             <li><Link href="/magazine" className="text-cream/70 hover:text-gold transition-colors">Literary Magazine</Link></li>
             <li><Link href="/events" className="text-cream/70 hover:text-gold transition-colors">Literary Events</Link></li>
           </ul>
