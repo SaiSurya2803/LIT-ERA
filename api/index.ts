@@ -42,6 +42,18 @@ app.use(
 
 const httpServer = createServer(app);
 
+// Diagnostic endpoint to test DB from Vercel
+app.get("/api/_health", async (_req, res) => {
+  try {
+    const { db } = await import("../server/db");
+    const { publications } = await import("../shared/schema");
+    const rows = await db.select({ id: publications.id, title: publications.title }).from(publications);
+    return res.json({ ok: true, publicationCount: rows.length, publications: rows });
+  } catch (err: any) {
+    return res.json({ ok: false, error: err.message, stack: err.stack });
+  }
+});
+
 // registerRoutes is async but route registration (app.get/post/etc) is synchronous
 // so the routes are available immediately even without await
 registerRoutes(httpServer, app).catch((err) => {
