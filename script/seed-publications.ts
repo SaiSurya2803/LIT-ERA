@@ -289,12 +289,11 @@ async function seed() {
     for (const pub of publications) {
       console.log(`Seeding publication: ${pub.title}`);
       
-      const filePath = path.join(process.cwd(), "client", "public", "publications", pub.pdfFileName);
-      let pdfData = null;
+      const filePath = path.join(process.cwd(), "uploads", "publications", pub.pdfFileName);
+      let pdfFile = null;
       
       if (existsSync(filePath)) {
-        const fileBuffer = readFileSync(filePath);
-        pdfData = fileBuffer.toString("base64");
+        pdfFile = `uploads/publications/${pub.pdfFileName}`;
       } else {
         console.warn(`Warning: PDF file not found at ${filePath}`);
       }
@@ -302,7 +301,7 @@ async function seed() {
       const query = `
         INSERT INTO publications (
           title, category, author, description, cover_image, 
-          pdf_file_name, pdf_data, pages, publish_date, 
+          pdf_file, pdf_file_name, pages, publish_date, 
           featured, views, downloads, likes
         ) VALUES (
           $1, $2, $3, $4, $5, 
@@ -313,7 +312,7 @@ async function seed() {
       
       await client.query(query, [
         pub.title, pub.category, pub.author, pub.description, pub.cover_image,
-        pub.pdfFileName, pdfData, pub.pages, pub.publish_date,
+        pdfFile, pub.pdfFileName, pub.pages, pub.publish_date,
         pub.featured, pub.views, pub.downloads, pub.likes
       ]);
     }
