@@ -827,11 +827,18 @@ export async function registerRoutes(
 
   app.get(api.publications.list.path, async (req, res, next) => {
     try {
+      const supabaseUrl = process.env.SUPABASE_URL;
+      const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+      if (!supabaseUrl || !supabaseKey) {
+        console.error("[PUBLICATIONS] Missing env vars - SUPABASE_URL:", !!supabaseUrl, "SUPABASE_SECRET_KEY:", !!supabaseKey);
+        return res.status(500).json({ message: "Server misconfiguration: missing Supabase credentials", env_check: { SUPABASE_URL: !!supabaseUrl, SUPABASE_SECRET_KEY: !!supabaseKey } });
+      }
       const publicationsList = await storage.getPublications();
+      console.log("[PUBLICATIONS] Fetched:", publicationsList.length, "publications");
       return res.json(publicationsList);
     } catch (error) {
-      console.error("Publications fetch error:", error);
-      return res.json([]);
+      console.error("[PUBLICATIONS] Fetch error:", error);
+      return res.status(500).json({ message: "Failed to fetch publications", error: String(error) });
     }
   });
 
