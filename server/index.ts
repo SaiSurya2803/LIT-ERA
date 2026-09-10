@@ -4,8 +4,11 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import session from "express-session";
-import { SupabaseSessionStore } from "./session-store";
+import connectPgSimple from "connect-pg-simple";
+import { pool } from "./db";
 import path from "path";
+
+const PostgresSessionStore = connectPgSimple(session);
 
 // Global error handlers
 process.on("uncaughtException", (error) => {
@@ -44,17 +47,20 @@ app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 // Serve uploads folder for static files (images, PDFs, etc.)
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// Use SupabaseSessionStore for production-ready sessions
+// Session store backed by Postgres
 app.use(
   session({
-    store: new SupabaseSessionStore(),
+    store: new PostgresSessionStore({
+      pool: pool as any,
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET || "change-me-in-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000
     },
   }),
 );

@@ -5,24 +5,25 @@ import cors from "cors";
 import path from "path";
 import { createServer } from "http";
 import { registerRoutes } from "../server/routes";
-import { SupabaseSessionStore } from "../server/session-store";
+import connectPgSimple from "connect-pg-simple";
+import { findDatabaseUrl, pool } from "../server/db";
+
+const PostgresSessionStore = connectPgSimple(session);
 
 const app = express();
 app.set("trust proxy", 1);
 
-app.use(cors({
-  origin: true,
-  credentials: true,
-}));
-
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
-
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(
   session({
-    store: new SupabaseSessionStore(),
+    store: new PostgresSessionStore({
+      pool: pool as any,
+      createTableIfMissing: true,
+    }),
     secret: process.env.SESSION_SECRET || "litera-secret-key-2026-production",
     resave: false,
     saveUninitialized: false,

@@ -1,15 +1,39 @@
 import "dotenv/config";
-import { createClient } from "@supabase/supabase-js";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
+import * as schema from "../shared/schema";
 
-const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || "";
+const { Pool } = pg;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn("⚠️ [DATABASE] Supabase URL or Key not found in environment variables.");
+export function findDatabaseUrl(): string {
+  const keys = [
+    "POSTGRES_URL",
+    "DATABASE_URL",
+    "POSTGRES_PRISMA_URL",
+    "DATABASE_URL_NON_POOLING",
+    "POSTGRES_URL_NON_POOLING",
+  ];
+  for (const k of keys) {
+    const val = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
+    if (val && (val.startsWith("postgres://") || val.startsWith("postgresql://"))) {
+      return val;
+    }
+  }
+  return "";
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false }
+const rawUrl = findDatabaseUrl();
+
+if (!rawUrl) {
+  console.warn("⚠️ [DATABASE] No PostgreSQL URL found in environment.");
+}
+
+export const isConfigured = !!rawUrl;
+
+const pool = new Pool({
+  connectionString: rawUrl || "postgres://localhost:5432/postgres",
+  ssl: rawUrl && !rawUrl.includes("localhost") ? { rejectUnauthorized: false } : undefined,
 });
 
-export const isConfigured = !!supabaseUrl && !!supabaseKey;
+export const db = drizzle(pool, { schema });
+export { pool };
