@@ -3,11 +3,10 @@ import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import cors from "cors";
 import path from "path";
-import fs from "fs";
 import { createServer } from "http";
 import { registerRoutes } from "../server/routes";
 import connectPgSimple from "connect-pg-simple";
-import { pool } from "../server/db";
+import { findDatabaseUrl, pool } from "../server/db";
 
 const PostgresSessionStore = connectPgSimple(session);
 
@@ -17,11 +16,7 @@ app.set("trust proxy", 1);
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
-
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (fs.existsSync(uploadsDir)) {
-  app.use("/uploads", express.static(uploadsDir));
-}
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use(
   session({
@@ -41,24 +36,7 @@ app.use(
 );
 
 const httpServer = createServer(app);
-
-// Diagnostic endpoint to test DB from Vercel
-app.get("/api/_health", async (_req, res) => {
-  try {
-    const { db } = await import("../server/db");
-    const { publications } = await import("../shared/schema");
-    const rows = await db.select({ id: publications.id, title: publications.title }).from(publications);
-    return res.json({ ok: true, publicationCount: rows.length, publications: rows });
-  } catch (err: any) {
-    return res.json({ ok: false, error: err.message, stack: err.stack });
-  }
-});
-
-// registerRoutes is async but route registration (app.get/post/etc) is synchronous
-// so the routes are available immediately even without await
-registerRoutes(httpServer, app).catch((err) => {
-  console.error("Failed to register routes:", err);
-});
+registerRoutes(httpServer, app);
 
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = err.status || err.statusCode || 500;
