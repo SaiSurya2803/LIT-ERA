@@ -194,27 +194,8 @@ export class DatabaseStorage implements IStorage {
     return p;
   }
   async getPublications(): Promise<Publication[]> {
-    // Exclude pdfData from list to avoid huge payloads - only fetch on individual download
-    const rows = await db.select({
-      id: publications.id,
-      title: publications.title,
-      category: publications.category,
-      author: publications.author,
-      description: publications.description,
-      coverImage: publications.coverImage,
-      pdfFile: publications.pdfFile,
-      pdfFileName: publications.pdfFileName,
-      pdfData: publications.pdfData,
-      pages: publications.pages,
-      publishDate: publications.publishDate,
-      featured: publications.featured,
-      views: publications.views,
-      downloads: publications.downloads,
-      likes: publications.likes,
-      isActive: publications.isActive,
-      createdAt: publications.createdAt,
-    }).from(publications).orderBy(desc(publications.id));
-    // Strip pdfData from response to keep payload small
+    // Fetch all then strip pdfData to avoid huge payloads
+    const rows = await db.select().from(publications).orderBy(desc(publications.id));
     return rows.map(r => ({ ...r, pdfData: null }));
   }
   async getPublicationById(id: number): Promise<Publication | undefined> {
