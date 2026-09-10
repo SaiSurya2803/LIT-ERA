@@ -38,7 +38,7 @@ export default function Magazine() {
     author: pub.author,
     date: pub.publishDate || pub.date || "2026",
     description: pub.description,
-    image: pub.coverImage || pub.image || `https://picsum.photos/seed/${pub.id}/400/300.jpg`,
+    image: pub.coverImage || pub.image || `https://picsum.photos/seed/${pub.id}/400/300`,
     type: pub.type || pub.category || "Publication",
     pages: pub.pages || 1,
     downloads: pub.downloads || 0,
@@ -54,11 +54,11 @@ export default function Magazine() {
   }, [publicationsFromDB]);
 
   const filteredPublications = localPublications.filter((pub: any) => {
-    const matchesCategory = selectedCategory === "all" || pub.category === selectedCategory;
+    const matchesCategory = selectedCategory === "all" || pub.category?.toLowerCase() === selectedCategory.toLowerCase();
     const q = searchTerm.toLowerCase();
     const matchesSearch = !q ||
-      pub.title.toLowerCase().includes(q) ||
-      pub.author.toLowerCase().includes(q) ||
+      (pub.title || "").toLowerCase().includes(q) ||
+      (pub.author || "").toLowerCase().includes(q) ||
       (pub.description || "").toLowerCase().includes(q);
     return matchesCategory && matchesSearch;
   });
@@ -201,7 +201,9 @@ export default function Magazine() {
                       alt={pub.title}
                       className="w-full h-48 object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${pub.id + 100}/400/300`;
+                        const target = e.target as HTMLImageElement;
+                        target.onerror = null;
+                        target.src = `https://picsum.photos/seed/${pub.id + 100}/400/300`;
                       }}
                     />
                     {pub.featured && (
