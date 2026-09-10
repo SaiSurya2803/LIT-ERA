@@ -85,6 +85,7 @@ export const submissions = pgTable("submissions", {
   fileSize: integer("file_size"),
   originalFileName: text("original_file_name"),
   filePath: text("file_path"),
+  fileData: text("file_data"), // Base64 encoded file data
   status: text("status").default("pending"), // 'pending', 'approved', 'rejected'
   submittedAt: timestamp("submitted_at").defaultNow(),
 });
@@ -98,6 +99,7 @@ export const publications = pgTable("publications", {
   coverImage: text("cover_image"), // path to cover image
   pdfFile: text("pdf_file"), // path to PDF file
   pdfFileName: text("pdf_file_name"),
+  pdfData: text("pdf_data"), // Base64 encoded PDF data
   pages: integer("pages"),
   publishDate: text("publish_date").notNull(),
   featured: boolean("featured").default(false),

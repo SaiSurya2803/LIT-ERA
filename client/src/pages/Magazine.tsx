@@ -22,315 +22,13 @@ export default function Magazine() {
     return () => window.removeEventListener('openSubmissionModal', handleOpenSubmission);
   }, []);
 
-  // All PDFs served from /publications/ (static, bundled into dist/public via client/public/)
-  const fallbackPublications = [
-    {
-      id: 18,
-      title: "Litera Club Newsletter",
-      category: "Magazine",
-      author: "Litera Club",
-      date: "March 25, 2026",
-      description: "The official newsletter of the Litera Club, featuring literary news, updates, and more.",
-      image: "https://picsum.photos/seed/litera-newsletter/400/300.jpg",
-      type: "Magazine",
-      pages: 1,
-      downloads: 12,
-      views: 45,
-      likes: 8,
-      featured: true,
-      pdfFile: "/publications/Litera-Club-Newsletter.pdf",
-      pdfFileName: "Litera-Club-Newsletter.pdf"
-    },
-    {
-      id: 1,
-      title: "19th Year on Earth",
-      category: "Book",
-      author: "Yashwanth Rishindra",
-      date: "January 11, 2026",
-      description: "The 19th year on Earth represents a critical bridge between adolescence and adulthood, often characterized by intense personal growth, self-discovery, and significant life shifts.",
-      image: "https://m.media-amazon.com/images/I/61WYKDK6nSL._UF1000,1000_QL80_.jpg",
-      type: "Book",
-      pages: 24,
-      downloads: 234,
-      views: 892,
-      likes: 67,
-      featured: true,
-      pdfFile: "/publications/19th-Year-on-Earth.pdf",
-      pdfFileName: "19th-Year-on-Earth.pdf"
-    },
-    {
-      id: 2,
-      title: "You Just Made My Day",
-      category: "Story",
-      author: "Pooja Sirasala",
-      date: "December 5, 2025",
-      description: "A heartwarming short story about small acts of kindness.",
-      image: "https://picsum.photos/seed/you-made-my-day/400/300.jpg",
-      type: "Story",
-      pages: 1,
-      downloads: 67,
-      views: 234,
-      likes: 43,
-      featured: false,
-      pdfFile: "/publications/You Just Made My Day Short Story- Pooja Sirasala.pdf",
-      pdfFileName: "You-Just-Made-My-Day.pdf"
-    },
-    {
-      id: 3,
-      title: "Unipath",
-      category: "Poem",
-      author: "Pranathi Chitte",
-      date: "December 10, 2025",
-      description: "A poem about finding your unique journey in life.",
-      image: "https://picsum.photos/seed/unipath-journey/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 45,
-      views: 156,
-      likes: 29,
-      featured: false,
-      pdfFile: "/publications/Unipath - Pranathi Chitte.pdf",
-      pdfFileName: "Unipath-Pranathi-Chitte.pdf"
-    },
-    {
-      id: 4,
-      title: "Turning Point",
-      category: "Article",
-      author: "N SADHRIKA",
-      date: "December 2, 2025",
-      description: "An article exploring life's pivotal moments and how they shape us.",
-      image: "https://picsum.photos/seed/turning-point/400/300.jpg",
-      type: "Article",
-      pages: 4,
-      downloads: 89,
-      views: 234,
-      likes: 54,
-      featured: false,
-      pdfFile: "/publications/Turning point - N SADHRIKA.pdf",
-      pdfFileName: "Turning-Point-N-SADHRIKA.pdf"
-    },
-    {
-      id: 5,
-      title: "The Summit",
-      category: "Story",
-      author: "Sri Charan Kota",
-      date: "December 4, 2025",
-      description: "A compelling story of ambition, perseverance, and reaching new heights.",
-      image: "https://picsum.photos/seed/the-summit/400/300.jpg",
-      type: "Story",
-      pages: 2,
-      downloads: 178,
-      views: 445,
-      likes: 89,
-      featured: false,
-      pdfFile: "/publications/The Summit- sri charan kota.pdf",
-      pdfFileName: "The-Summit-Sri-Charan-Kota.pdf"
-    },
-    {
-      id: 6,
-      title: "The Courage to Be Delulu",
-      category: "Poem",
-      author: "Vineetha N",
-      date: "December 17, 2025",
-      description: "A bold poem celebrating the courage to dream beyond reason.",
-      image: "https://picsum.photos/seed/courage-delulu/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 34,
-      views: 189,
-      likes: 23,
-      featured: false,
-      pdfFile: "/publications/The Courage to Be Delulu - VINEETHA N.pdf",
-      pdfFileName: "The-Courage-to-Be-Delulu-VINEETHA-N.pdf"
-    },
-    {
-      id: 7,
-      title: "The Chapter I'm in",
-      category: "Poem",
-      author: "Shaik Azra",
-      date: "December 2, 2025",
-      description: "A reflective poem about the current chapter of life.",
-      image: "https://picsum.photos/seed/chapter-im-in/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 28,
-      views: 89,
-      likes: 18,
-      featured: false,
-      pdfFile: "/publications/The Chapter I'm in - Shaik Azra.pdf",
-      pdfFileName: "The-Chapter-Im-in-Shaik-Azra.pdf"
-    },
-    {
-      id: 8,
-      title: "Fire In Every Footstep",
-      category: "Poem",
-      author: "Yasaswy Potturi",
-      date: "December 11, 2025",
-      description: "A fiery poem about passion and determination in every step.",
-      image: "https://picsum.photos/seed/poem-collection/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 92,
-      views: 167,
-      likes: 45,
-      featured: false,
-      pdfFile: "/publications/Poem - Yasaswy Potturi.pdf",
-      pdfFileName: "Poem-Collection-Yasaswy-Potturi.pdf"
-    },
-    {
-      id: 9,
-      title: "A Fresh Start",
-      category: "Poem",
-      author: "Pranavi",
-      date: "December 7, 2025",
-      description: "A poem about new beginnings and the hope they bring.",
-      image: "https://picsum.photos/seed/literary-voices/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 156,
-      views: 445,
-      likes: 78,
-      featured: false,
-      pdfFile: "/publications/A Fresh Start- Pranavi.pdf",
-      pdfFileName: "A Fresh Start- Pranavi.pdf"
-    },
-    {
-      id: 10,
-      title: "Am I really an Engineer",
-      category: "Poem",
-      author: "Rohith Mangamuri",
-      date: "December 17, 2025",
-      description: "A humorous yet introspective poem about engineering student life.",
-      image: "https://picsum.photos/seed/campus-chronicles/400/300.jpg",
-      type: "Poem",
-      pages: 2,
-      downloads: 89,
-      views: 234,
-      likes: 34,
-      featured: false,
-      pdfFile: "/publications/Am I really an Engineer - Rohith Mangamuri.pdf",
-      pdfFileName: "Am-I-really-an-Engineer-Rohith-Mangamuri.pdf"
-    },
-    {
-      id: 11,
-      title: "Are You Niche or Performative",
-      category: "Poem",
-      author: "Ikshita",
-      date: "December 17, 2025",
-      description: "A thought-provoking poem questioning authenticity in creative expression.",
-      image: "https://picsum.photos/seed/digital-poetry-review/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 45,
-      views: 123,
-      likes: 28,
-      featured: false,
-      pdfFile: "/publications/Are You Niche or Performative - Ikshita.pdf",
-      pdfFileName: "Are You Niche or Performative - Ikshita.pdf"
-    },
-    {
-      id: 12,
-      title: "Before the next bomb falls",
-      category: "Poem",
-      author: "Tasneem Firdous",
-      date: "December 7, 2025",
-      description: "A powerful poem about peace, loss, and the fragility of life.",
-      image: "https://picsum.photos/seed/creative-writing-workshop/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 67,
-      views: 189,
-      likes: 41,
-      featured: false,
-      pdfFile: "/publications/Before the next bomb falls - Tasneem Firdous.pdf",
-      pdfFileName: "Before the next bomb falls - Tasneem Firdous.pdf"
-    },
-    {
-      id: 13,
-      title: "Being vs Doing",
-      category: "Poem",
-      author: "Sheripally Rakesh Goud",
-      date: "December 17, 2025",
-      description: "A philosophical poem exploring the tension between existence and action.",
-      image: "https://picsum.photos/seed/annual-literary-awards/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 234,
-      views: 567,
-      likes: 89,
-      featured: false,
-      pdfFile: "/publications/Being vs Doing- sheripally Rakesh Goud.pdf",
-      pdfFileName: "Being vs Doing- sheripally Rakesh Goud.pdf"
-    },
-    {
-      id: 14,
-      title: "Celestial Serenade",
-      category: "Poem",
-      author: "Dhruu",
-      date: "December 17, 2025",
-      description: "A lyrical poem inspired by the cosmos and the music of the universe.",
-      image: "https://picsum.photos/seed/research-symposium/400/300.jpg",
-      type: "Poem",
-      pages: 1,
-      downloads: 78,
-      views: 234,
-      likes: 56,
-      featured: false,
-      pdfFile: "/publications/Celestial Serenade - Dhruu.pdf",
-      pdfFileName: "Celestial-Serenade - Dhruu.pdf"
-    },
-    {
-      id: 15,
-      title: "The Weight of Packed Bags",
-      category: "Article",
-      author: "Asiya Beig",
-      date: "December 17, 2025",
-      description: "An evocative article about travel, departure, and the emotions of leaving home.",
-      image: "https://picsum.photos/seed/student-spotlight/400/300.jpg",
-      type: "Article",
-      pages: 2,
-      downloads: 145,
-      views: 389,
-      likes: 67,
-      featured: false,
-      pdfFile: "/publications/Document from Asiyabeig - Asiya Beig.pdf",
-      pdfFileName: "Document from Asiyabeig - Asiya Beig.pdf"
-    },
-    {
-      id: 16,
-      title: "Finding yourself",
-      category: "Article",
-      author: "Sasamrutha Moganti",
-      date: "December 8, 2025",
-      description: "An introspective article on the journey of self-discovery.",
-      image: "https://picsum.photos/seed/poetry-slam-results/400/300.jpg",
-      type: "Article",
-      pages: 1,
-      downloads: 89,
-      views: 345,
-      likes: 78,
-      featured: false,
-      pdfFile: "/publications/Finding yourself - Sasamrutha Moganti.pdf",
-      pdfFileName: "Finding yourself - Sasamrutha Moganti.pdf"
-    },
-    {
-      id: 17,
-      title: "Part",
-      category: "Story",
-      author: "Chikkam Radhakrishna",
-      date: "December 2, 2025",
-      description: "A short story about the parts we play in each other's lives.",
-      image: "https://picsum.photos/seed/poetry-slam-results2/400/300.jpg",
-      type: "Story",
-      pages: 2,
-      downloads: 89,
-      views: 345,
-      likes: 78,
-      featured: false,
-      pdfFile: "/publications/Part - Chikkam Radhakrishna.pdf",
-      pdfFileName: "Part - Chikkam Radhakrishna.pdf"
+  useEffect(() => {
+    if (publicationsFromDB && publicationsFromDB.length > 0) {
+      setLocalPublications(publicationsFromDB);
+    } else {
+      setLocalPublications([]);
     }
-  ];
+  }, [publicationsFromDB]);
 
   const categories = [
     { id: "all", name: "All Publications", icon: <BookOpen className="w-4 h-4" /> },
@@ -360,8 +58,7 @@ export default function Magazine() {
   });
 
   useEffect(() => {
-    const rawList = publicationsFromDB.length > 0 ? publicationsFromDB : fallbackPublications;
-    setLocalPublications(rawList.map(mapPublication));
+    setLocalPublications((publicationsFromDB || []).map(mapPublication));
   }, [publicationsFromDB]);
 
   const filteredPublications = localPublications.filter((pub: any) => {
@@ -374,34 +71,22 @@ export default function Magazine() {
     return matchesCategory && matchesSearch;
   });
 
-  const handleView = (id: number, pdfFile: string | null) => {
-    if (!pdfFile) {
-      alert("PDF not available for this publication.");
-      return;
-    }
+  const handleView = (id: number) => {
     // Update local view count
     setLocalPublications(prev =>
       prev.map(pub => pub.id === id ? { ...pub, views: pub.views + 1 } : pub)
     );
-    window.open(pdfFile, "_blank", "noopener,noreferrer");
+    fetch(`/api/publications/${id}/view`, { method: 'POST' }).catch(console.error);
+    window.open(`/api/publications/${id}/download?inline=true`, "_blank", "noopener,noreferrer");
   };
 
-  const handleDownload = (id: number, pdfFile: string | null, fileName: string | null) => {
-    if (!pdfFile) {
-      alert("PDF not available for this publication.");
-      return;
-    }
+  const handleDownload = (id: number) => {
     // Update local download count
     setLocalPublications(prev =>
       prev.map(pub => pub.id === id ? { ...pub, downloads: pub.downloads + 1 } : pub)
     );
-    const link = document.createElement("a");
-    link.href = pdfFile;
-    link.download = fileName || "publication.pdf";
-    link.rel = "noopener noreferrer";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    fetch(`/api/publications/${id}/download`, { method: 'POST' }).catch(console.error);
+    window.location.href = `/api/publications/${id}/download`;
   };
 
   const handleLike = (id: number) => {
@@ -574,7 +259,7 @@ export default function Magazine() {
                       <Button
                         size="sm"
                         className="flex-1 bg-ink text-cream hover:bg-gold hover:text-ink transition-colors text-xs"
-                        onClick={() => handleView(pub.id, pub.pdfFile)}
+                        onClick={() => handleView(pub.id)}
                       >
                         <Eye className="w-3.5 h-3.5 mr-1" />
                         View
@@ -583,7 +268,7 @@ export default function Magazine() {
                         size="sm"
                         variant="outline"
                         className="flex-1 border-ink text-ink hover:bg-ink hover:text-cream transition-colors text-xs"
-                        onClick={() => handleDownload(pub.id, pub.pdfFile, pub.pdfFileName)}
+                        onClick={() => handleDownload(pub.id)}
                       >
                         <Download className="w-3.5 h-3.5 mr-1" />
                         Download

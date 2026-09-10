@@ -1,5 +1,7 @@
 import "dotenv/config";
-import { neon } from "@neondatabase/serverless";
+import pg from "pg";
+
+const { Pool } = pg;
 
 function findPostgresUrl(): string {
   const standardKeys = [
@@ -37,8 +39,8 @@ async function init() {
     throw new Error("PostgreSQL connection string not found. Please set POSTGRES_URL or litera_POSTGRES_URL.");
   }
 
-  console.log("Connecting to Vercel Postgres / Neon database...");
-  const sql = neon(rawDbUrl);
+  console.log("Connecting to PostgreSQL database...");
+  const pool = new Pool({ connectionString: rawDbUrl });
 
   const queries = [
     `CREATE TABLE IF NOT EXISTS users (
@@ -109,6 +111,7 @@ async function init() {
       file_size INTEGER,
       original_file_name TEXT,
       file_path TEXT,
+      file_data TEXT,
       status TEXT DEFAULT 'pending',
       submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`,
@@ -122,6 +125,7 @@ async function init() {
       cover_image TEXT,
       pdf_file TEXT,
       pdf_file_name TEXT,
+      pdf_data TEXT,
       pages INTEGER,
       publish_date TEXT NOT NULL,
       featured BOOLEAN DEFAULT FALSE,
@@ -149,14 +153,25 @@ async function init() {
       committee TEXT NOT NULL,
       experience TEXT,
       registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );`,
+
+    `CREATE TABLE IF NOT EXISTS session (
+      sid VARCHAR(255) PRIMARY KEY,
+      sess TEXT NOT NULL,
+      expire TIMESTAMP(6) NOT NULL
     );`
   ];
 
-  for (const q of queries) {
-    await sql(q);
+  const client = await pool.connect();
+  try {
+    for (const q of queries) {
+      await client.query(q);
+    }
+    console.log("✓ All 10 tables initialized successfully in PostgreSQL!");
+  } finally {
+    client.release();
+    await pool.end();
   }
-
-  console.log("✓ All 10 tables initialized successfully in Vercel Postgres / Neon!");
 }
 
 init().catch((err) => {

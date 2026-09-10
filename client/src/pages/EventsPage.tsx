@@ -300,7 +300,11 @@ export default function EventsPage() {
                       </div>
                     </div>
 
-                    <Button variant="outline" className="w-full border-gold text-gold hover:bg-gold hover:text-ink">
+                    <Button 
+                      variant="outline" 
+                      className="w-full border-gold text-gold hover:bg-gold hover:text-ink"
+                      onClick={(e) => handleAboutClick(event, e)}
+                    >
                       Details
                     </Button>
                   </div>

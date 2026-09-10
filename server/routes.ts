@@ -8,21 +8,8 @@ import { api } from "../shared/routes";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 
-// Configure multer for file uploads
-const storageMulter = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), "uploads", "submissions");
-    if (!existsSync(uploadDir)) {
-      mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + "-" + uniqueSuffix + ext);
-  }
-});
+// Configure multer for file uploads in memory
+const storageMulter = multer.memoryStorage();
 
 const upload = multer({
   storage: storageMulter,
@@ -599,10 +586,11 @@ export async function registerRoutes(
         title,
         category,
         description,
-        fileName: req.file ? req.file.filename : null,
+        fileName: req.file ? req.file.originalname : null,
         fileSize: req.file ? req.file.size : null,
         originalFileName: req.file ? req.file.originalname : null,
-        filePath: req.file ? req.file.path : null,
+        filePath: null, // No longer storing on disk
+        fileData: req.file ? req.file.buffer.toString('base64') : null,
         status: "pending"
       };
       
@@ -657,21 +645,22 @@ export async function registerRoutes(
       const submissionId = req.params.id;
       const submission = await storage.getSubmissionById(parseInt(submissionId));
       
-      if (!submission || !submission.fileName) {
+      if (!submission || (!submission.fileData && !submission.filePath)) {
         return res.status(404).json({ message: "File not found" });
-      }
-      
-      const filePath = submission.filePath;
-      if (!filePath || !existsSync(filePath)) {
-        return res.status(404).json({ message: "File not found on server" });
       }
       
       // Set headers for file download
       res.setHeader('Content-Type', 'application/octet-stream');
       res.setHeader('Content-Disposition', `attachment; filename="${submission.originalFileName || submission.fileName}"`);
       
-      // Send the file
-      return res.sendFile(filePath);
+      if (submission.fileData) {
+        const fileBuffer = Buffer.from(submission.fileData, 'base64');
+        return res.send(fileBuffer);
+      } else if (submission.filePath && existsSync(submission.filePath)) {
+        return res.sendFile(submission.filePath);
+      } else {
+        return res.status(404).json({ message: "File data not available" });
+      }
     } catch (error) {
       console.error("File download error:", error);
       const message = (error as any)?.message || "Failed to download file";
@@ -812,20 +801,7 @@ export async function registerRoutes(
 
   // Publications API
   const publicationUpload = multer({
-    storage: multer.diskStorage({
-      destination: (req, file, cb) => {
-        const uploadDir = path.join(process.cwd(), "uploads", "publications");
-        if (!existsSync(uploadDir)) {
-          mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-      },
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, file.fieldname + "-" + uniqueSuffix + ext);
-      }
-    }),
+    storage: multer.memoryStorage(),
     limits: {
       fileSize: 50 * 1024 * 1024, // 50MB limit for publications
     },
@@ -878,8 +854,9 @@ export async function registerRoutes(
         pages: req.body.pages ? parseInt(req.body.pages) : null,
         featured: req.body.featured === 'true' || req.body.featured === true,
         isActive: req.body.isActive === 'true' || req.body.isActive === true,
-        coverImage: coverImage ? `/uploads/publications/${coverImage.filename}` : null,
-        pdfFile: pdfFile ? `/uploads/publications/${pdfFile.filename}` : null,
+        coverImage: coverImage ? `data:${coverImage.mimetype};base64,${coverImage.buffer.toString('base64')}` : null,
+        pdfFile: null, // No longer stored locally
+        pdfData: pdfFile ? pdfFile.buffer.toString('base64') : null,
         pdfFileName: pdfFile ? pdfFile.originalname : null,
       };
 
@@ -917,13 +894,8 @@ export async function registerRoutes(
       const { id } = req.params;
       const publication = await storage.getPublicationById(parseInt(id));
       
-      if (!publication || !publication.pdfFile) {
+      if (!publication || (!publication.pdfData && !publication.pdfFile)) {
         return res.status(404).json({ message: "Publication file not found" });
-      }
-      
-      const filePath = path.join(process.cwd(), publication.pdfFile);
-      if (!existsSync(filePath)) {
-        return res.status(404).json({ message: "File not found on server" });
       }
       
       // Increment downloads
@@ -932,7 +904,16 @@ export async function registerRoutes(
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${publication.pdfFileName || 'publication.pdf'}"`);
       
-      return res.sendFile(filePath);
+      if (publication.pdfData) {
+        const fileBuffer = Buffer.from(publication.pdfData, 'base64');
+        return res.send(fileBuffer);
+      } else if (publication.pdfFile) {
+        const filePath = path.join(process.cwd(), publication.pdfFile);
+        if (existsSync(filePath)) {
+          return res.sendFile(filePath);
+        }
+      }
+      return res.status(404).json({ message: "File not found on server" });
     } catch (error) {
       console.error("Publication download error:", error);
       const message = (error as any)?.message || "Failed to download publication";
@@ -960,9 +941,14 @@ export async function registerRoutes(
       if (req.body.pages) updates.pages = parseInt(req.body.pages);
       if (req.body.featured !== undefined) updates.featured = req.body.featured === 'true' || req.body.featured === true;
       if (req.body.isActive !== undefined) updates.isActive = req.body.isActive === 'true' || req.body.isActive === true;
-      if (coverImage) updates.coverImage = `/uploads/publications/${coverImage.filename}`;
+      
+      if (coverImage) {
+        updates.coverImage = `data:${coverImage.mimetype};base64,${coverImage.buffer.toString('base64')}`;
+      }
+      
       if (pdfFile) {
-        updates.pdfFile = `/uploads/publications/${pdfFile.filename}`;
+        updates.pdfFile = null;
+        updates.pdfData = pdfFile.buffer.toString('base64');
         updates.pdfFileName = pdfFile.originalname;
       }
 

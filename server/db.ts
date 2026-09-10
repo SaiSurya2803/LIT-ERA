@@ -1,7 +1,9 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/neon-http";
-import { neon, neonConfig } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
 import * as schema from "../shared/schema";
+
+const { Pool } = pg;
 
 export function findDatabaseUrl(): string {
   // Check common default keys first
@@ -42,5 +44,8 @@ if (!rawUrl) {
 
 export const isConfigured = !!rawUrl;
 
-const sql = neon(rawUrl || "postgres://localhost:5432/postgres");
-export const db = drizzle(sql, { schema });
+const pool = new Pool({
+  connectionString: rawUrl || "postgres://localhost:5432/postgres",
+});
+
+export const db = drizzle(pool, { schema });
