@@ -4,11 +4,8 @@ import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
+import { SupabaseSessionStore } from "./session-store";
 import path from "path";
-import { findDatabaseUrl } from "./db";
-
-const PostgresSessionStore = connectPgSimple(session);
 
 // Global error handlers
 process.on("uncaughtException", (error) => {
@@ -35,26 +32,22 @@ declare module "http" {
 
 app.use(
   express.json({
+    limit: "50mb",
     verify: (req, _res, buf) => {
       req.rawBody = buf;
     },
   }),
 );
 
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
 // Serve uploads folder for static files (images, PDFs, etc.)
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-// Use connect-pg-simple for production-ready sessions
+// Use SupabaseSessionStore for production-ready sessions
 app.use(
   session({
-    store: new PostgresSessionStore({
-      conObject: {
-        connectionString: findDatabaseUrl() || "postgres://localhost:5432/postgres",
-      },
-      createTableIfMissing: true,
-    }),
+    store: new SupabaseSessionStore(),
     secret: process.env.SESSION_SECRET || "change-me-in-production",
     resave: false,
     saveUninitialized: false,

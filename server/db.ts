@@ -1,52 +1,15 @@
 import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import * as schema from "../shared/schema";
+import { createClient } from "@supabase/supabase-js";
 
-const { Pool } = pg;
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || "";
 
-export function findDatabaseUrl(): string {
-  // Check common default keys first
-  const standardKeys = [
-    "DATABASE_URL",
-    "POSTGRES_URL",
-    "litera_DATABASE_URL",
-    "litera_DATABASE_URL_NON_POOLING",
-    "DATABASE_URL_NON_POOLING",
-    "POSTGRES_PRISMA_URL",
-  ];
-
-  for (const k of standardKeys) {
-    const val = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
-    if (val && (val.startsWith("postgres://") || val.startsWith("postgresql://"))) {
-      return val;
-    }
-  }
-
-  // Dynamically scan any environment variable
-  for (const [key, value] of Object.entries(process.env)) {
-    if (value && typeof value === "string") {
-      const clean = value.trim().replace(/^["']|["']$/g, "");
-      if (clean.startsWith("postgres://") || clean.startsWith("postgresql://")) {
-        return clean;
-      }
-    }
-  }
-
-  return "";
+if (!supabaseUrl || !supabaseKey) {
+  console.warn("⚠️ [DATABASE] Supabase URL or Key not found in environment variables.");
 }
 
-const rawUrl = findDatabaseUrl();
-
-if (!rawUrl) {
-  console.warn("⚠️ [DATABASE] PostgreSQL URL not found in environment variables. Checking available keys:", Object.keys(process.env).filter(k => k.toLowerCase().includes("postgres") || k.toLowerCase().includes("db")));
-}
-
-export const isConfigured = !!rawUrl;
-
-const pool = new Pool({
-  connectionString: rawUrl || "postgres://localhost:5432/postgres",
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false }
 });
 
-export const db = drizzle(pool, { schema });
+export const isConfigured = !!supabaseUrl && !!supabaseKey;
