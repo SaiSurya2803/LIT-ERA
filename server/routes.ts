@@ -768,6 +768,7 @@ export async function registerRoutes(
       const publicationsList = await storage.getPublications();
       return res.json(publicationsList);
     } catch (error) {
+      console.error("Error fetching publications:", error);
       return res.json([]);
     }
   });

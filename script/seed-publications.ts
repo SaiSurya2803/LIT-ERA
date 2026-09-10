@@ -308,6 +308,7 @@ async function seed() {
           $6, $7, $8, $9, 
           $10, $11, $12, $13
         )
+        ON CONFLICT DO NOTHING
       `;
       
       await client.query(query, [
