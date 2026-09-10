@@ -28,6 +28,7 @@ app.use(
     store: new PostgresSessionStore({
       conObject: {
         connectionString: findDatabaseUrl() || "postgres://localhost:5432/postgres",
+        ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
       },
       createTableIfMissing: true,
     }),

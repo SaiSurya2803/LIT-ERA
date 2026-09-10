@@ -46,6 +46,7 @@ export const isConfigured = !!rawUrl;
 
 const pool = new Pool({
   connectionString: rawUrl || "postgres://localhost:5432/postgres",
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : undefined,
 });
 
 export const db = drizzle(pool, { schema });
