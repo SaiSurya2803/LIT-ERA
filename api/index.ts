@@ -3,6 +3,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import cors from "cors";
 import path from "path";
+import fs from "fs";
 import { createServer } from "http";
 import { registerRoutes } from "../server/routes";
 import connectPgSimple from "connect-pg-simple";
@@ -16,7 +17,11 @@ app.set("trust proxy", 1);
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
+const uploadsDir = path.join(process.cwd(), "uploads");
+if (fs.existsSync(uploadsDir)) {
+  app.use("/uploads", express.static(uploadsDir));
+}
 
 app.use(
   session({
@@ -36,7 +41,7 @@ app.use(
 );
 
 const httpServer = createServer(app);
-registerRoutes(httpServer, app);
+await registerRoutes(httpServer, app);
 
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = err.status || err.statusCode || 500;
