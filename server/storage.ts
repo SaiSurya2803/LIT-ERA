@@ -65,73 +65,76 @@ export interface IStorage {
   deletePublication(id: number): Promise<boolean>;
 }
 
+import { mapToCamelCase, mapToSnakeCase } from "./utils";
+
 export class SupabaseStorage implements IStorage {
   // Users
   async getUser(id: string): Promise<User | undefined> {
     const { data } = await supabase.from("users").select("*").eq("id", id).single();
-    return data || undefined;
+    return data ? mapToCamelCase<User>(data) : undefined;
   }
   async getUserByEmail(email: string): Promise<User | undefined> {
     const { data } = await supabase.from("users").select("*").eq("email", email).single();
-    return data || undefined;
+    return data ? mapToCamelCase<User>(data) : undefined;
   }
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = crypto.randomUUID();
-    const { data, error } = await supabase.from("users").insert([{ ...insertUser, id }]).select().single();
+    const snakeData = mapToSnakeCase({ ...insertUser, id });
+    const { data, error } = await supabase.from("users").insert([snakeData]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<User>(data);
   }
   async getAllUsers(): Promise<User[]> {
     const { data } = await supabase.from("users").select("*");
-    return data || [];
+    return data ? mapToCamelCase<User[]>(data) : [];
   }
 
   // Contacts
   async createContact(contact: InsertContact): Promise<ContactSubmission> {
-    const { data, error } = await supabase.from("contact_submissions").insert([contact]).select().single();
+    const { data, error } = await supabase.from("contact_submissions").insert([mapToSnakeCase(contact)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<ContactSubmission>(data);
   }
   async getContacts(): Promise<ContactSubmission[]> {
     const { data } = await supabase.from("contact_submissions").select("*").order("id", { ascending: false });
-    return data || [];
+    return data ? mapToCamelCase<ContactSubmission[]>(data) : [];
   }
 
   // Events
   async createEvent(event: InsertEvent): Promise<Event> {
-    const { data, error } = await supabase.from("events").insert([event]).select().single();
+    const { data, error } = await supabase.from("events").insert([mapToSnakeCase(event)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<Event>(data);
   }
   async getEvents(): Promise<Event[]> {
     const { data } = await supabase.from("events").select("*").order("id", { ascending: false });
-    return data || [];
+    return data ? mapToCamelCase<Event[]>(data) : [];
   }
 
   // Game Scores
   async createGameScore(score: InsertGameScore): Promise<GameScore> {
-    const { data, error } = await supabase.from("game_scores").insert([score]).select().single();
+    const { data, error } = await supabase.from("game_scores").insert([mapToSnakeCase(score)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<GameScore>(data);
   }
   async getGameScores(): Promise<GameScore[]> {
     const { data } = await supabase.from("game_scores").select("*").order("score", { ascending: false });
-    return data || [];
+    return data ? mapToCamelCase<GameScore[]>(data) : [];
   }
 
   // Puzzles
   async createPuzzle(puzzle: InsertPuzzle): Promise<Puzzle> {
-    const { data, error } = await supabase.from("puzzles").insert([puzzle]).select().single();
+    const { data, error } = await supabase.from("puzzles").insert([mapToSnakeCase(puzzle)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<Puzzle>(data);
   }
   async getPuzzles(): Promise<Puzzle[]> {
     const { data } = await supabase.from("puzzles").select("*");
-    return data || [];
+    return data ? mapToCamelCase<Puzzle[]>(data) : [];
   }
   async getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined> {
     const { data } = await supabase.from("puzzles").select("*").eq("type", type).eq("publish_date", date).single();
-    return data || undefined;
+    return data ? mapToCamelCase<Puzzle>(data) : undefined;
   }
   async deletePuzzlesByType(type: string): Promise<number> {
     const { data, error } = await supabase.from("puzzles").delete().eq("type", type).select();
@@ -146,18 +149,18 @@ export class SupabaseStorage implements IStorage {
 
   // Content
   async createContent(contentItem: InsertContent): Promise<Content> {
-    const { data, error } = await supabase.from("content").insert([contentItem]).select().single();
+    const { data, error } = await supabase.from("content").insert([mapToSnakeCase(contentItem)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<Content>(data);
   }
   async getContent(): Promise<Content[]> {
     const { data } = await supabase.from("content").select("*").order("id", { ascending: false });
-    return data || [];
+    return data ? mapToCamelCase<Content[]>(data) : [];
   }
   async updateContent(id: number, updates: Partial<InsertContent>): Promise<Content | undefined> {
-    const { data, error } = await supabase.from("content").update(updates).eq("id", id).select().single();
+    const { data, error } = await supabase.from("content").update(mapToSnakeCase(updates)).eq("id", id).select().single();
     if (error) throw error;
-    return data;
+    return data ? mapToCamelCase<Content>(data) : undefined;
   }
   async deleteContent(id: number): Promise<boolean> {
     const { error } = await supabase.from("content").delete().eq("id", id);
@@ -167,62 +170,63 @@ export class SupabaseStorage implements IStorage {
 
   // Submissions
   async createSubmission(submission: InsertSubmission): Promise<Submission> {
-    const { data, error } = await supabase.from("submissions").insert([submission]).select().single();
+    const { data, error } = await supabase.from("submissions").insert([mapToSnakeCase(submission)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<Submission>(data);
   }
   async getSubmissions(): Promise<Submission[]> {
     const { data } = await supabase.from("submissions").select("*").order("id", { ascending: false });
-    return data || [];
+    return data ? mapToCamelCase<Submission[]>(data) : [];
   }
   async getSubmissionById(id: number): Promise<Submission | undefined> {
     const { data } = await supabase.from("submissions").select("*").eq("id", id).single();
-    return data || undefined;
+    return data ? mapToCamelCase<Submission>(data) : undefined;
   }
 
   // Event Registrations
   async createEventRegistration(registration: InsertEventRegistration): Promise<EventRegistration> {
-    const { data, error } = await supabase.from("event_registrations").insert([registration]).select().single();
+    const { data, error } = await supabase.from("event_registrations").insert([mapToSnakeCase(registration)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<EventRegistration>(data);
   }
   async getEventRegistrations(userId: string): Promise<EventRegistration[]> {
     const { data } = await supabase.from("event_registrations").select("*").eq("user_id", userId);
-    return data || [];
+    return data ? mapToCamelCase<EventRegistration[]>(data) : [];
   }
   async checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined> {
     const { data } = await supabase.from("event_registrations").select("*").eq("user_id", userId).eq("event_id", eventId).single();
-    return data || undefined;
+    return data ? mapToCamelCase<EventRegistration>(data) : undefined;
   }
 
   // MUN Registrations
   async createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration> {
-    const { data, error } = await supabase.from("mun_registrations").insert([registration]).select().single();
+    const { data, error } = await supabase.from("mun_registrations").insert([mapToSnakeCase(registration)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<MunRegistration>(data);
   }
   async getMunRegistrations(): Promise<MunRegistration[]> {
     const { data } = await supabase.from("mun_registrations").select("*").order("id", { ascending: false });
-    return data || [];
+    return data ? mapToCamelCase<MunRegistration[]>(data) : [];
   }
   async checkMunRegistration(userId: string): Promise<MunRegistration | undefined> {
     const { data } = await supabase.from("mun_registrations").select("*").eq("user_id", userId).single();
-    return data || undefined;
+    return data ? mapToCamelCase<MunRegistration>(data) : undefined;
   }
 
   // Publications
   async createPublication(publication: InsertPublication): Promise<Publication> {
-    const { data, error } = await supabase.from("publications").insert([publication]).select().single();
+    const { data, error } = await supabase.from("publications").insert([mapToSnakeCase(publication)]).select().single();
     if (error) throw error;
-    return data;
+    return mapToCamelCase<Publication>(data);
   }
   async getPublications(): Promise<Publication[]> {
-    const { data } = await supabase.from("publications").select("*").order("id", { ascending: false });
-    return data || [];
+    // IMPORTANT: Exclude pdf_data to avoid Vercel 4.5MB payload limit!
+    const { data } = await supabase.from("publications").select("id, title, category, author, description, cover_image, pdf_file, pdf_file_name, pages, publish_date, featured, views, downloads, likes, is_active, created_at").order("id", { ascending: false });
+    return data ? mapToCamelCase<Publication[]>(data) : [];
   }
   async getPublicationById(id: number): Promise<Publication | undefined> {
     const { data } = await supabase.from("publications").select("*").eq("id", id).single();
-    return data || undefined;
+    return data ? mapToCamelCase<Publication>(data) : undefined;
   }
   async incrementPublicationViews(id: number): Promise<void> {
     const pub = await this.getPublicationById(id);
@@ -243,9 +247,9 @@ export class SupabaseStorage implements IStorage {
     }
   }
   async updatePublication(id: number, updates: Partial<InsertPublication>): Promise<Publication | undefined> {
-    const { data, error } = await supabase.from("publications").update(updates).eq("id", id).select().single();
+    const { data, error } = await supabase.from("publications").update(mapToSnakeCase(updates)).eq("id", id).select().single();
     if (error) throw error;
-    return data;
+    return data ? mapToCamelCase<Publication>(data) : undefined;
   }
   async deletePublication(id: number): Promise<boolean> {
     const { error } = await supabase.from("publications").delete().eq("id", id);
