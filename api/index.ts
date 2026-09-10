@@ -7,7 +7,7 @@ import fs from "fs";
 import { createServer } from "http";
 import { registerRoutes } from "../server/routes";
 import connectPgSimple from "connect-pg-simple";
-import { findDatabaseUrl, pool } from "../server/db";
+import { pool } from "../server/db";
 
 const PostgresSessionStore = connectPgSimple(session);
 
@@ -41,7 +41,12 @@ app.use(
 );
 
 const httpServer = createServer(app);
-await registerRoutes(httpServer, app);
+
+// registerRoutes is async but route registration (app.get/post/etc) is synchronous
+// so the routes are available immediately even without await
+registerRoutes(httpServer, app).catch((err) => {
+  console.error("Failed to register routes:", err);
+});
 
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   const status = err.status || err.statusCode || 500;
