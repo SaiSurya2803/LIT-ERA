@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import multer from "multer";
 import path from "path";
-import { existsSync, mkdirSync } from "fs";
+import { existsSync } from "fs";
 import { storage } from "./storage";
 import { api } from "../shared/routes";
 import { z } from "zod";
@@ -211,7 +211,6 @@ export async function registerRoutes(
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
       }
-      console.error("Contact creation error:", err);
       const message = (err as any)?.message || "Failed to submit contact form";
       return res.status(500).json({ message });
     }
@@ -253,7 +252,6 @@ export async function registerRoutes(
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
       }
-      console.error("Event creation error:", err);
       const message = (err as any)?.message || "Failed to create event";
       return res.status(500).json({ message });
     }
@@ -273,7 +271,6 @@ export async function registerRoutes(
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
       }
-      console.error("Game score creation error:", err);
       const message = (err as any)?.message || "Failed to submit game score";
       return res.status(500).json({ message });
     }
@@ -311,7 +308,6 @@ export async function registerRoutes(
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
       }
-      console.error("Puzzle creation error:", err);
       const message = (err as any)?.message || "Failed to create puzzle";
       return res.status(500).json({ message });
     }
@@ -321,24 +317,9 @@ export async function registerRoutes(
     try {
       const { type } = req.params;
       const today = new Date().toISOString().split('T')[0];
-      console.log(`[Puzzle API] Fetching ${type} puzzle for date: ${today}`);
-      
       const puzzle = await storage.getDailyPuzzle(type, today);
-      
-      if (puzzle) {
-        console.log(`[Puzzle API] Found puzzle:`, {
-          id: puzzle.id,
-          type: puzzle.type,
-          publishDate: puzzle.publishDate,
-          dataLength: typeof puzzle.data === 'string' ? puzzle.data.length : 'not a string'
-        });
-      } else {
-        console.log(`[Puzzle API] No puzzle found for ${type} on ${today}`);
-      }
-      
       return res.json(puzzle || null);
     } catch (error) {
-      console.error('[Puzzle API] Error:', error);
       next(error);
     }
   });
@@ -352,8 +333,6 @@ export async function registerRoutes(
       }
 
       const { gameType } = req.params;
-      console.log(`[Admin] Cleaning up ${gameType} data...`);
-
       const puzzlesDeleted = await storage.deletePuzzlesByType(gameType);
       const scoresDeleted = await storage.deleteGameScoresByType(gameType);
 
@@ -364,7 +343,6 @@ export async function registerRoutes(
         scoresDeleted
       });
     } catch (error) {
-      console.error('[Admin] Cleanup error:', error);
       next(error);
     }
   });
@@ -375,7 +353,6 @@ export async function registerRoutes(
       const contentList = await storage.getContent();
       return res.json(contentList);
     } catch (error) {
-      console.error("Content fetch error:", error);
       // Return empty array as fallback to prevent frontend errors
       return res.json([]);
     }
@@ -388,21 +365,14 @@ export async function registerRoutes(
         return res.status(403).json({ message: "Forbidden: Admin access required" });
       }
       
-      console.log("Received content creation request:", JSON.stringify(req.body, null, 2));
-      
       // Validate input
       const input = api.content.create.input.parse(req.body);
-      console.log("Parsed and validated input:", JSON.stringify(input, null, 2));
       
       const contentItem = await storage.createContent(input);
-      console.log("Created content item:", JSON.stringify(contentItem, null, 2));
       
       return res.status(201).json(contentItem);
     } catch (error) {
-      console.error("Content creation error:", error);
-      
       if (error instanceof z.ZodError) {
-        console.error("Validation errors:", JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ 
           message: "Invalid input: " + error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', '),
           errors: error.errors
@@ -436,7 +406,6 @@ export async function registerRoutes(
           message: "Invalid input: " + error.errors[0]?.message 
         });
       }
-      console.error("Content update error:", error);
       const message = (error as any)?.message || "Failed to update content";
       return res.status(500).json({ message });
     }
@@ -458,7 +427,6 @@ export async function registerRoutes(
       
       return res.status(204).end();
     } catch (error) {
-      console.error("Content deletion error:", error);
       const message = (error as any)?.message || "Failed to delete content";
       return res.status(500).json({ message });
     }
@@ -467,31 +435,25 @@ export async function registerRoutes(
   // Seed DB with some initial events and a daily puzzle if none exist
   async function seedDatabase() {
     try {
-      console.log("Starting database seeding...");
-      
       // Seed events
       try {
         const existingEvents = await storage.getEvents();
         if (existingEvents.length === 0) {
-          console.log("Seeding initial event...");
           await storage.createEvent({
             title: "Annual Literary Festival",
             description: "Join us for a celebration of words, poetry, and storytelling.",
             eventDate: "2024-05-15",
             isActive: true
           });
-          console.log("Event seeded successfully");
         }
       } catch (eventError: any) {
-        console.log("Event seeding skipped:", eventError.message);
+        // Event seeding skipped
       }
 
       // Seed content
       try {
         const existingContent = await storage.getContent();
         if (existingContent.length === 0) {
-          console.log("Seeding initial content...");
-          
           await storage.createContent({
             type: "thought",
             title: "The Power of Words",
@@ -519,11 +481,9 @@ export async function registerRoutes(
             date: new Date().toISOString().split('T')[0],
             isActive: true
           });
-          
-          console.log("Content seeded successfully");
         }
       } catch (contentError: any) {
-        console.log("Content seeding skipped:", contentError.message);
+        // Content seeding skipped
       }
       
       // Seed daily puzzle
@@ -531,7 +491,6 @@ export async function registerRoutes(
         const today = new Date().toISOString().split('T')[0];
         const existingPuzzle = await storage.getDailyPuzzle("strands", today);
         if (!existingPuzzle) {
-          console.log("Seeding daily strands puzzle...");
           await storage.createPuzzle({
             type: "strands",
             publishDate: today,
@@ -545,15 +504,11 @@ export async function registerRoutes(
               theme: "Literary Terms"
             })
           });
-          console.log("Strands puzzle seeded successfully");
         }
       } catch (puzzleError: any) {
-        console.log("Puzzle seeding skipped:", puzzleError.message);
+        // Puzzle seeding skipped
       }
-      
-      console.log("Database seeding completed");
     } catch (error) {
-      console.error("Database seeding failed:", error);
       // Don't throw - seeding is non-critical
     }
   }
@@ -569,21 +524,9 @@ export async function registerRoutes(
   // Magazine Submissions with File Upload
   app.post("/api/submissions", upload.single("file"), async (req, res, next) => {
     try {
-      console.log('Received submission request body:', req.body);
-      console.log('Received file:', req.file);
-      
       const { name, email, title, category, description } = req.body;
       
-      console.log('Parsed submission data:', {
-        name,
-        email,
-        title,
-        category,
-        description
-      });
-      
       if (!name || !email || !title || !category || !description) {
-        console.log('Missing required fields');
         return res.status(400).json({ message: "All fields are required" });
       }
       
@@ -601,15 +544,10 @@ export async function registerRoutes(
         status: "pending"
       };
       
-      console.log('Creating submission with data:', submissionData);
-      
       const submission = await storage.createSubmission(submissionData);
-      
-      console.log('Submission created successfully:', submission);
       
       return res.status(201).json(submission);
     } catch (error) {
-      console.error("Submission error:", error);
       const message = (error as any)?.message || "Failed to submit";
       return res.status(500).json({ message });
     }
@@ -643,7 +581,6 @@ export async function registerRoutes(
         return res.status(404).json({ message: "File data not available" });
       }
     } catch (error) {
-      console.error("File download error:", error);
       const message = (error as any)?.message || "Failed to download file";
       return res.status(500).json({ message });
     }
@@ -651,31 +588,14 @@ export async function registerRoutes(
 
   app.get("/api/submissions", async (req, res, next) => {
     try {
-      console.log('Admin requesting submissions...');
       const user = (req as any).user;
       if (!user || !user.isAdmin) {
-        console.log('Access denied - not admin');
         return res.status(403).json({ message: "Forbidden: Admin access required" });
       }
       
       const submissionsList = await storage.getSubmissions();
-      console.log('Fetched submissions from database:', submissionsList);
-      console.log('Number of submissions:', submissionsList.length);
-      
-      // Log each submission's file info
-      submissionsList.forEach((sub, index) => {
-        console.log(`Submission ${index + 1}:`, {
-          id: sub.id,
-          title: sub.title,
-          fileName: sub.fileName,
-          fileSize: sub.fileSize,
-          status: sub.status
-        });
-      });
-      
       return res.json(submissionsList);
     } catch (error) {
-      console.error("Error fetching submissions:", error);
       next(error);
     }
   });
@@ -734,7 +654,6 @@ export async function registerRoutes(
       
       return res.status(201).json(registration);
     } catch (error) {
-      console.error("Event registration error:", error);
       const message = (error as any)?.message || "Failed to register for event";
       return res.status(500).json({ message });
     }
@@ -799,7 +718,6 @@ export async function registerRoutes(
       
       return res.status(201).json(registration);
     } catch (error) {
-      console.error("MUN registration error:", error);
       const message = (error as any)?.message || "Failed to register for MUN";
       return res.status(500).json({ message });
     }
@@ -850,7 +768,6 @@ export async function registerRoutes(
       const publicationsList = await storage.getPublications();
       return res.json(publicationsList);
     } catch (error) {
-      console.error("[PUBLICATIONS] Fetch error:", error);
       return res.json([]);
     }
   });
@@ -883,7 +800,6 @@ export async function registerRoutes(
       const publication = await storage.createPublication(publicationData);
       return res.status(201).json(publication);
     } catch (error) {
-      console.error("Publication creation error:", error);
       const message = (error as any)?.message || "Failed to create publication";
       return res.status(500).json({ message });
     }
@@ -938,7 +854,6 @@ export async function registerRoutes(
       }
       return res.status(404).json({ message: "File not found on server" });
     } catch (error) {
-      console.error("Publication download error:", error);
       const message = (error as any)?.message || "Failed to download publication";
       return res.status(500).json({ message });
     }
@@ -983,7 +898,6 @@ export async function registerRoutes(
       
       return res.json(publication);
     } catch (error) {
-      console.error("Publication update error:", error);
       const message = (error as any)?.message || "Failed to update publication";
       return res.status(500).json({ message });
     }
@@ -1005,7 +919,6 @@ export async function registerRoutes(
       
       return res.status(204).end();
     } catch (error) {
-      console.error("Publication deletion error:", error);
       const message = (error as any)?.message || "Failed to delete publication";
       return res.status(500).json({ message });
     }
@@ -1028,7 +941,6 @@ export async function registerRoutes(
       await storage.incrementPublicationLikes(pubId);
       return res.json({ success: true, likes: (publication.likes || 0) + 1 });
     } catch (error) {
-      console.error("Like error:", error);
       const message = (error as any)?.message || "Failed to like publication";
       return res.status(500).json({ success: false, message });
     }
@@ -1044,7 +956,6 @@ export async function registerRoutes(
       }
       return res.json({ success: true });
     } catch (error) {
-      console.error("View tracking error:", error);
       return res.json({ success: false });
     }
   });
@@ -1059,7 +970,6 @@ export async function registerRoutes(
       }
       return res.json({ success: true });
     } catch (error) {
-      console.error("Download tracking error:", error);
       return res.json({ success: false });
     }
   });
