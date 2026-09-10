@@ -14,21 +14,13 @@ export default function Magazine() {
   const [magazineLikes, setMagazineLikes] = useState(0);
   const [localPublications, setLocalPublications] = useState<any[]>([]);
 
-  const { data: publicationsFromDB = [], isLoading, refetch } = usePublications();
+  const { data: publicationsFromDB = [], isLoading } = usePublications();
 
   useEffect(() => {
     const handleOpenSubmission = () => setSubmissionOpen(true);
     window.addEventListener('openSubmissionModal', handleOpenSubmission);
     return () => window.removeEventListener('openSubmissionModal', handleOpenSubmission);
   }, []);
-
-  useEffect(() => {
-    if (publicationsFromDB && publicationsFromDB.length > 0) {
-      setLocalPublications(publicationsFromDB);
-    } else {
-      setLocalPublications([]);
-    }
-  }, [publicationsFromDB]);
 
   const categories = [
     { id: "all", name: "All Publications", icon: <BookOpen className="w-4 h-4" /> },
@@ -85,7 +77,7 @@ export default function Magazine() {
     setLocalPublications(prev =>
       prev.map(pub => pub.id === id ? { ...pub, downloads: pub.downloads + 1 } : pub)
     );
-    fetch(`/api/publications/${id}/download`, { method: 'POST' }).catch(console.error);
+    fetch(`/api/publications/${id}/track-download`, { method: 'POST' }).catch(console.error);
     window.location.href = `/api/publications/${id}/download`;
   };
 
@@ -93,6 +85,7 @@ export default function Magazine() {
     setLocalPublications(prev =>
       prev.map(pub => pub.id === id ? { ...pub, likes: pub.likes + 1 } : pub)
     );
+    fetch(`/api/publications/${id}/like`, { method: 'POST' }).catch(console.error);
   };
 
   return (

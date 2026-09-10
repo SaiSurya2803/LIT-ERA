@@ -4,20 +4,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { api } from "@shared/routes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
-import { Plus, Edit, Trash2, Brain, Lightbulb, MessageSquare, FileText, Download, Eye, RefreshCw, UserCheck, ShieldCheck } from "lucide-react";
+import { Plus, Edit, Trash2, Brain, Lightbulb, MessageSquare, FileText, Download, RefreshCw, ShieldCheck, Check, X, BookOpen } from "lucide-react";
 
 export default function AdminDashboard() {
   const { user, isAdmin, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const [showContentForm, setShowContentForm] = useState(false);
   const [editingContent, setEditingContent] = useState<any>(null);
+  const [showPublicationForm, setShowPublicationForm] = useState(false);
 
   // 1. Contacts (Missives) Query
   const { 
@@ -58,10 +58,7 @@ export default function AdminDashboard() {
   } = useQuery<any[]>({
     queryKey: ["/api/admin/users"],
     queryFn: async () => {
-      let res = await fetch("/api/admin/users", { credentials: "include" });
-      if (!res.ok) {
-        res = await fetch("/api/users", { credentials: "include" });
-      }
+      const res = await fetch("/api/admin/users", { credentials: "include" });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.message || `Failed to fetch users (${res.status})`);
@@ -74,7 +71,37 @@ export default function AdminDashboard() {
     refetchInterval: 10000, // auto-refresh every 10s
   });
 
-  // 4. Content Query
+  // 4. Publications Query
+  const {
+    data: publicationsList = [],
+    isLoading: publicationsLoading,
+    refetch: refetchPublications,
+  } = useQuery<any[]>({
+    queryKey: ["/api/publications"],
+    queryFn: async () => {
+      const res = await fetch("/api/publications", { credentials: "include" });
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: !!isAdmin,
+  });
+
+  // 5. Event Registrations Query
+  const {
+    data: eventRegistrations = [],
+    isLoading: eventRegistrationsLoading,
+    refetch: refetchEventRegistrations,
+  } = useQuery<any[]>({
+    queryKey: ["/api/admin/event-registrations"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/event-registrations", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch event registrations");
+      return res.json();
+    },
+    enabled: !!isAdmin,
+  });
+
+  // 6. Content Query
   const { 
     data: contentItems = [], 
     isLoading: contentLoading, 
@@ -140,6 +167,73 @@ export default function AdminDashboard() {
     }
   });
 
+  const updateSubmissionStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: string }) => {
+      const res = await fetch(`/api/submissions/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to update submission status");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/submissions"] });
+      toast({ title: "Submission status updated" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Failed to update status", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const createPublicationMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const res = await fetch("/api/publications", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to create publication");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/publications"] });
+      toast({ title: "Publication created successfully" });
+      setShowPublicationForm(false);
+    },
+    onError: (error: Error) => {
+      toast({ title: "Failed to create publication", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deletePublicationMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/publications/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to delete publication");
+      }
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/publications"] });
+      toast({ title: "Publication deleted successfully" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Failed to delete publication", description: error.message, variant: "destructive" });
+    },
+  });
+
   const deleteContentMutation = useMutation({
     mutationFn: async (id: number) => {
       const res = await fetch(`/api/content/${id}`, {
@@ -183,6 +277,8 @@ export default function AdminDashboard() {
             <TabsTrigger value="users" className="font-accent tracking-widest uppercase text-xs px-8 py-3 data-[state=active]:bg-gold data-[state=active]:text-ink rounded-none">Logins (Users)</TabsTrigger>
             <TabsTrigger value="contacts" className="font-accent tracking-widest uppercase text-xs px-8 py-3 data-[state=active]:bg-gold data-[state=active]:text-ink rounded-none">Missives (Contact)</TabsTrigger>
             <TabsTrigger value="submissions" className="font-accent tracking-widest uppercase text-xs px-8 py-3 data-[state=active]:bg-gold data-[state=active]:text-ink rounded-none">Submissions</TabsTrigger>
+            <TabsTrigger value="publications" className="font-accent tracking-widest uppercase text-xs px-8 py-3 data-[state=active]:bg-gold data-[state=active]:text-ink rounded-none">Publications</TabsTrigger>
+            <TabsTrigger value="events" className="font-accent tracking-widest uppercase text-xs px-8 py-3 data-[state=active]:bg-gold data-[state=active]:text-ink rounded-none">Event Registrations</TabsTrigger>
             <TabsTrigger value="content" className="font-accent tracking-widest uppercase text-xs px-8 py-3 data-[state=active]:bg-gold data-[state=active]:text-ink rounded-none">Content (Thoughts & Riddles)</TabsTrigger>
           </TabsList>
           
@@ -286,7 +382,7 @@ export default function AdminDashboard() {
                       <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Date</TableHead>
                       <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Name</TableHead>
                       <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Email</TableHead>
-                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Subject</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Reason</TableHead>
                       <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Message</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -311,7 +407,7 @@ export default function AdminDashboard() {
                           </TableCell>
                           <TableCell className="font-body font-bold text-ink">{contact.name}</TableCell>
                           <TableCell className="font-body text-xs text-ink/70">{contact.email}</TableCell>
-                          <TableCell className="font-body text-xs text-gold font-medium">{contact.subject || "General"}</TableCell>
+                          <TableCell className="font-body text-xs text-gold font-medium">{contact.reason || "General"}</TableCell>
                           <TableCell className="font-body text-sm text-ink/80 max-w-sm">{contact.message}</TableCell>
                         </TableRow>
                       ))
@@ -398,15 +494,213 @@ export default function AdminDashboard() {
                             </span>
                           </TableCell>
                           <TableCell className="font-body">
+                            <div className="flex flex-wrap gap-1">
+                              {submission.fileName && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-ink text-ink font-accent text-xs hover:bg-ink hover:text-cream h-7 px-2"
+                                  onClick={() => window.open(`/api/submissions/${submission.id}/download`, "_blank")}
+                                >
+                                  <Download className="w-3.5 h-3.5 mr-1" /> File
+                                </Button>
+                              )}
+                              {submission.status !== "approved" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-green-600 text-green-700 font-accent text-xs hover:bg-green-600 hover:text-white h-7 px-2"
+                                  disabled={updateSubmissionStatusMutation.isPending}
+                                  onClick={() => updateSubmissionStatusMutation.mutate({ id: submission.id, status: "approved" })}
+                                >
+                                  <Check className="w-3.5 h-3.5 mr-1" /> Approve
+                                </Button>
+                              )}
+                              {submission.status !== "rejected" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-red-500 text-red-600 font-accent text-xs hover:bg-red-500 hover:text-white h-7 px-2"
+                                  disabled={updateSubmissionStatusMutation.isPending}
+                                  onClick={() => updateSubmissionStatusMutation.mutate({ id: submission.id, status: "rejected" })}
+                                >
+                                  <X className="w-3.5 h-3.5 mr-1" /> Reject
+                                </Button>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* 4. PUBLICATIONS TAB */}
+          <TabsContent value="publications">
+            <div className="bg-white border border-ink/10 p-6 shadow-sm">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="font-display text-2xl font-bold text-ink">Magazine Publications</h2>
+                  <p className="font-body text-xs text-ink/50 mt-1">Total: {publicationsList.length} publications</p>
+                </div>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => refetchPublications()}
+                    variant="outline"
+                    size="sm"
+                    className="border-ink text-ink hover:bg-ink hover:text-cream font-accent tracking-widest uppercase text-xs flex items-center gap-2"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Refresh
+                  </Button>
+                  <Button
+                    onClick={() => setShowPublicationForm(true)}
+                    size="sm"
+                    className="bg-gold text-ink font-accent tracking-widest uppercase text-xs flex items-center gap-2 hover:bg-ink hover:text-cream transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Publication
+                  </Button>
+                </div>
+              </div>
+
+              {showPublicationForm && (
+                <div className="bg-cream border border-ink/10 p-6 mb-6 rounded-sm">
+                  <h3 className="font-display text-xl font-bold text-ink mb-4">Upload New Publication</h3>
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    const form = e.currentTarget;
+                    const formData = new FormData(form);
+                    createPublicationMutation.mutate(formData);
+                  }}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block font-accent text-xs text-ink mb-2 uppercase tracking-wider">Title *</label>
+                        <Input name="title" required className="bg-white border-ink/20 text-sm" />
+                      </div>
+                      <div>
+                        <label className="block font-accent text-xs text-ink mb-2 uppercase tracking-wider">Author *</label>
+                        <Input name="author" defaultValue={user.name} required className="bg-white border-ink/20 text-sm" />
+                      </div>
+                      <div>
+                        <label className="block font-accent text-xs text-ink mb-2 uppercase tracking-wider">Category *</label>
+                        <select name="category" required className="w-full px-3 py-2 border border-ink/20 rounded-sm bg-white text-ink text-sm">
+                          <option value="Magazine">Magazine</option>
+                          <option value="Book">Book</option>
+                          <option value="Story">Story</option>
+                          <option value="Poem">Poem</option>
+                          <option value="Article">Article</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-accent text-xs text-ink mb-2 uppercase tracking-wider">Publish Date *</label>
+                        <Input name="publishDate" type="date" defaultValue={new Date().toISOString().split("T")[0]} required className="bg-white border-ink/20 text-sm" />
+                      </div>
+                      <div>
+                        <label className="block font-accent text-xs text-ink mb-2 uppercase tracking-wider">Pages</label>
+                        <Input name="pages" type="number" min="1" className="bg-white border-ink/20 text-sm" />
+                      </div>
+                      <div className="flex items-end gap-4 pb-1">
+                        <label className="flex items-center gap-2 text-sm font-body text-ink">
+                          <input type="checkbox" name="featured" value="true" className="rounded" />
+                          Featured
+                        </label>
+                        <label className="flex items-center gap-2 text-sm font-body text-ink">
+                          <input type="checkbox" name="isActive" value="true" defaultChecked className="rounded" />
+                          Active
+                        </label>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <label className="block font-accent text-xs text-ink mb-2 uppercase tracking-wider">Description *</label>
+                      <Textarea name="description" rows={3} required className="bg-white border-ink/20 text-sm" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block font-accent text-xs text-ink mb-2 uppercase tracking-wider">Cover Image</label>
+                        <Input name="coverImage" type="file" accept="image/jpeg,image/png,image/webp" className="bg-white border-ink/20 text-sm" />
+                      </div>
+                      <div>
+                        <label className="block font-accent text-xs text-ink mb-2 uppercase tracking-wider">PDF File *</label>
+                        <Input name="pdfFile" type="file" accept="application/pdf" required className="bg-white border-ink/20 text-sm" />
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <Button
+                        type="submit"
+                        disabled={createPublicationMutation.isPending}
+                        className="bg-gold text-ink font-accent tracking-widest uppercase text-xs"
+                      >
+                        {createPublicationMutation.isPending ? "Uploading..." : "Create Publication"}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowPublicationForm(false)}
+                        className="border-ink text-ink font-accent tracking-widest uppercase text-xs"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-ink/10 bg-cream/40">
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Title</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Author</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Category</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Date</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Stats</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {publicationsLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8">
+                          <Skeleton className="w-64 h-8 bg-ink/10 mx-auto" />
+                        </TableCell>
+                      </TableRow>
+                    ) : publicationsList.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8">
+                          <p className="font-body text-ink/60">No publications yet. Click "Add Publication" to upload one.</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      publicationsList.map((pub: any) => (
+                        <TableRow key={pub.id} className="border-ink/5 hover:bg-cream/20">
+                          <TableCell className="font-body font-bold text-ink">
+                            <div className="flex items-center gap-2">
+                              <BookOpen className="w-4 h-4 text-gold flex-shrink-0" />
+                              {pub.title}
+                              {pub.featured && (
+                                <span className="text-[0.6rem] bg-gold text-ink px-1.5 py-0.5 font-accent uppercase">Featured</span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-body text-xs">{pub.author}</TableCell>
+                          <TableCell className="font-body text-xs capitalize">{pub.category}</TableCell>
+                          <TableCell className="font-body text-xs">{pub.publishDate}</TableCell>
+                          <TableCell className="font-body text-xs text-ink/60">
+                            {pub.views || 0} views · {pub.downloads || 0} dl · {pub.likes || 0} likes
+                          </TableCell>
+                          <TableCell>
                             <Button
                               size="sm"
                               variant="outline"
-                              className="border-ink text-ink font-accent text-xs hover:bg-ink hover:text-cream h-7 px-2"
-                              onClick={() => {
-                                alert(`Submission Details:\n\nAuthor: ${submission.name} (${submission.email})\nTitle: ${submission.title}\nCategory: ${submission.category}\nStatus: ${submission.status}\nDescription:\n${submission.description}`);
-                              }}
+                              onClick={() => deletePublicationMutation.mutate(pub.id)}
+                              disabled={deletePublicationMutation.isPending}
+                              className="border-red-500 text-red-500 font-accent text-xs hover:bg-red-50"
                             >
-                              <Eye className="w-3.5 h-3.5 mr-1" /> View
+                              <Trash2 className="w-3 h-3" />
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -418,7 +712,67 @@ export default function AdminDashboard() {
             </div>
           </TabsContent>
 
-          {/* 4. CONTENT MANAGEMENT TAB */}
+          {/* 5. EVENT REGISTRATIONS TAB */}
+          <TabsContent value="events">
+            <div className="bg-white border border-ink/10 p-6 shadow-sm">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h2 className="font-display text-2xl font-bold text-ink">Event Registrations</h2>
+                  <p className="font-body text-xs text-ink/50 mt-1">Total: {eventRegistrations.length} registrations</p>
+                </div>
+                <Button
+                  onClick={() => refetchEventRegistrations()}
+                  variant="outline"
+                  size="sm"
+                  className="border-ink text-ink hover:bg-ink hover:text-cream font-accent tracking-widest uppercase text-xs flex items-center gap-2"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Refresh
+                </Button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-ink/10 bg-cream/40">
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Date</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">User ID</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Event</TableHead>
+                      <TableHead className="font-accent text-ink/60 uppercase tracking-widest text-xs">Event ID</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {eventRegistrationsLoading ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-8">
+                          <Skeleton className="w-64 h-8 bg-ink/10 mx-auto" />
+                        </TableCell>
+                      </TableRow>
+                    ) : eventRegistrations.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-8">
+                          <p className="font-body text-ink/60">No event registrations yet.</p>
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      eventRegistrations.map((reg: any) => (
+                        <TableRow key={reg.id} className="border-ink/5 hover:bg-cream/20">
+                          <TableCell className="font-body text-xs">
+                            {reg.registeredAt ? new Date(reg.registeredAt).toLocaleDateString() : "Recent"}
+                          </TableCell>
+                          <TableCell className="font-body text-xs text-ink/70 font-mono">{reg.userId?.slice(0, 8)}…</TableCell>
+                          <TableCell className="font-body font-medium">{reg.eventTitle}</TableCell>
+                          <TableCell className="font-body text-xs">{reg.eventId}</TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* 6. CONTENT MANAGEMENT TAB */}
           <TabsContent value="content">
             <div className="bg-white border border-ink/10 p-6 shadow-sm">
               <div className="flex justify-between items-center mb-6">

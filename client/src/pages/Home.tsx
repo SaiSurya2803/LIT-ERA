@@ -23,11 +23,7 @@ export default function Home() {
   ];
   
   const displayQuotes = scrollingContent.length > 0 ? scrollingContent : defaultContent;
-  
-  // Debug: Log to console
-  console.log('Content Items:', contentItems);
-  console.log('Scrolling Content:', scrollingContent);
-  console.log('Display Quotes:', displayQuotes);
+
   return (
     <div className="min-h-screen pt-24 pb-12">
       {/* Hero Section */}

@@ -33,11 +33,7 @@ export default function SubmissionModal({ isOpen, onClose }: SubmissionModalProp
     const files = e.target.files;
     if (files && files[0]) {
       const file = files[0];
-      console.log('File selected:', file);
-      console.log('File name:', file.name);
-      console.log('File size:', file.size);
-      console.log('File type:', file.type);
-      
+
       const allowedTypes = [
         'application/pdf',
         'application/msword',
@@ -46,19 +42,10 @@ export default function SubmissionModal({ isOpen, onClose }: SubmissionModalProp
       ];
       
       if (allowedTypes.includes(file.type)) {
-        console.log('File type is allowed, setting form data...');
-        setFormData(prev => {
-          console.log('Previous formData:', prev);
-          const newData = { ...prev, file };
-          console.log('New formData:', newData);
-          return newData;
-        });
+        setFormData(prev => ({ ...prev, file }));
       } else {
-        console.log('File type not allowed:', file.type);
         alert('Please upload a PDF, Word document, or text file');
       }
-    } else {
-      console.log('No files selected');
     }
   };
 
@@ -69,13 +56,6 @@ export default function SubmissionModal({ isOpen, onClose }: SubmissionModalProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('=== SUBMISSION DEBUG ===');
-    console.log('Current formData:', formData);
-    console.log('formData.file:', formData.file);
-    console.log('formData.file name:', formData.file?.name);
-    console.log('formData.file size:', formData.file?.size);
-    console.log('formData.file type:', formData.file?.type);
-    
     setIsSubmitting(true);
     
     try {
@@ -96,10 +76,7 @@ export default function SubmissionModal({ isOpen, onClose }: SubmissionModalProp
         credentials: 'include'
       });
 
-      console.log('=== RESPONSE ===');
-      console.log('Response status:', response.status);
       const responseData = await response.json();
-      console.log('Response data:', responseData);
 
       if (response.ok) {
         setSubmitStatus('success');

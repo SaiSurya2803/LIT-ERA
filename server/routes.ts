@@ -38,6 +38,13 @@ declare module "express-session" {
   }
 }
 
+// Helper: strip passwordHash before sending user to client
+function sanitizeUser(user: any) {
+  if (!user) return null;
+  const { passwordHash, ...safe } = user;
+  return safe;
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express,
@@ -65,7 +72,7 @@ export async function registerRoutes(
       if (!user) {
         return res.status(401).json({ message: "Not authenticated" });
       }
-      return res.json(user);
+      return res.json(sanitizeUser(user));
     } catch (error) {
       next(error);
     }
@@ -115,7 +122,7 @@ export async function registerRoutes(
         });
       }
       
-      return res.status(201).json(user);
+      return res.status(201).json(sanitizeUser(user));
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
@@ -150,7 +157,7 @@ export async function registerRoutes(
         });
       }
       
-      return res.json(user);
+      return res.json(sanitizeUser(user));
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
@@ -169,7 +176,7 @@ export async function registerRoutes(
             console.error("Logout error:", err);
             return res.status(500).json({ message: "Failed to logout" });
           }
-          res.clearCookie('connect.sid');
+          res.clearCookie('connect.sid', { path: '/' });
           return res.status(204).end();
         });
       } else {
@@ -188,7 +195,7 @@ export async function registerRoutes(
         return res.status(403).json({ message: "Forbidden: Admin access required" });
       }
       const usersList = await storage.getAllUsers();
-      return res.json(usersList);
+      return res.json(usersList.map(sanitizeUser));
     } catch (error) {
       next(error);
     }
@@ -608,32 +615,6 @@ export async function registerRoutes(
     }
   });
 
-  // File Upload for Submissions
-  app.post("/api/submissions/upload", async (req, res, next) => {
-    try {
-      // For now, we'll simulate file upload by returning a success response
-      // In a real implementation, you would use multer or similar middleware
-      // to handle file uploads and store them in a secure location
-      const submissionId = req.body.submissionId;
-      const fileName = req.body.fileName;
-      
-      if (!submissionId || !fileName) {
-        return res.status(400).json({ message: "Submission ID and file name are required" });
-      }
-      
-      // Simulate successful file upload
-      return res.status(200).json({ 
-        message: "File uploaded successfully",
-        fileName: fileName,
-        fileUrl: `/uploads/submissions/${fileName}`
-      });
-    } catch (error) {
-      console.error("File upload error:", error);
-      const message = (error as any)?.message || "Failed to upload file";
-      return res.status(500).json({ message });
-    }
-  });
-
   // File Download for Submissions
   app.get("/api/submissions/:id/download", async (req, res, next) => {
     try {
@@ -699,6 +680,31 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/submissions/:id/status", async (req, res, next) => {
+    try {
+      const user = (req as any).user;
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+
+      const { status } = z.object({
+        status: z.enum(["pending", "approved", "rejected"]),
+      }).parse(req.body);
+
+      const submission = await storage.updateSubmissionStatus(parseInt(req.params.id), status);
+      if (!submission) {
+        return res.status(404).json({ message: "Submission not found" });
+      }
+
+      return res.json(submission);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: err.errors[0]?.message || "Invalid status" });
+      }
+      next(err);
+    }
+  });
+
   // Event Registrations
   app.post("/api/events/:id/register", async (req, res, next) => {
     try {
@@ -748,6 +754,20 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/admin/event-registrations", async (req, res, next) => {
+    try {
+      const user = (req as any).user;
+      if (!user || !user.isAdmin) {
+        return res.status(403).json({ message: "Forbidden: Admin access required" });
+      }
+
+      const registrations = await storage.getAllEventRegistrations();
+      return res.json(registrations);
+    } catch (error) {
+      next(error);
+    }
+  });
+
   // MUN Registrations
   app.post("/api/mun/register", async (req, res, next) => {
     try {
@@ -773,7 +793,7 @@ export async function registerRoutes(
         name,
         email,
         phone: phone || null,
-        committee: committee || null,
+        committee: committee || "",
         experience: experience || null
       });
       
@@ -898,11 +918,14 @@ export async function registerRoutes(
         return res.status(404).json({ message: "Publication file not found" });
       }
       
-      // Increment downloads
-      await storage.incrementPublicationDownloads(parseInt(id));
-      
+      const inline = req.query.inline === 'true';
+      if (!inline) {
+        await storage.incrementPublicationDownloads(parseInt(id));
+      }
+
+      const disposition = inline ? 'inline' : 'attachment';
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `attachment; filename="${publication.pdfFileName || 'publication.pdf'}"`);
+      res.setHeader('Content-Disposition', `${disposition}; filename="${publication.pdfFileName || 'publication.pdf'}"`);
       
       if (publication.pdfData) {
         const fileBuffer = Buffer.from(publication.pdfData, 'base64');
@@ -1026,8 +1049,8 @@ export async function registerRoutes(
     }
   });
 
-  // Track publication download
-  app.post("/api/publications/:id/download", async (req, res, next) => {
+  // Track publication download (separate from GET download to avoid route conflict)
+  app.post("/api/publications/:id/track-download", async (req, res, next) => {
     try {
       const { id } = req.params;
       const pubId = parseInt(id);
@@ -1037,21 +1060,6 @@ export async function registerRoutes(
       return res.json({ success: true });
     } catch (error) {
       console.error("Download tracking error:", error);
-      return res.json({ success: false });
-    }
-  });
-
-  // Track publication view fallback for POST /api/publications/:id
-  app.post("/api/publications/:id", async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const pubId = parseInt(id);
-      if (!isNaN(pubId)) {
-        await storage.incrementPublicationViews(pubId);
-      }
-      return res.json({ success: true });
-    } catch (error) {
-      console.error("View tracking error:", error);
       return res.json({ success: false });
     }
   });

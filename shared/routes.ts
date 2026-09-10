@@ -13,6 +13,7 @@ import {
   puzzles,
   content,
   publications,
+  submissions,
 } from "./schema";
 
 export const errorSchemas = {
@@ -176,6 +177,19 @@ export const api = {
       path: "/api/content/:id" as const,
       responses: {
         204: z.undefined(),
+        404: errorSchemas.notFound,
+      },
+    },
+  },
+  submissions: {
+    updateStatus: {
+      method: "PATCH" as const,
+      path: "/api/submissions/:id/status" as const,
+      input: z.object({
+        status: z.enum(["pending", "approved", "rejected"]),
+      }),
+      responses: {
+        200: z.custom<typeof submissions.$inferSelect>(),
         404: errorSchemas.notFound,
       },
     },

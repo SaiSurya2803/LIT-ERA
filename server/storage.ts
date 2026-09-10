@@ -13,7 +13,7 @@ import {
   type MunRegistration, type InsertMunRegistration,
   type Publication, type InsertPublication,
 } from "../shared/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import crypto from "crypto";
 
 export interface IStorage {
@@ -45,9 +45,11 @@ export interface IStorage {
   createSubmission(submission: InsertSubmission): Promise<Submission>;
   getSubmissions(): Promise<Submission[]>;
   getSubmissionById(id: number): Promise<Submission | undefined>;
+  updateSubmissionStatus(id: number, status: string): Promise<Submission | undefined>;
 
   createEventRegistration(registration: InsertEventRegistration): Promise<EventRegistration>;
   getEventRegistrations(userId: string): Promise<EventRegistration[]>;
+  getAllEventRegistrations(): Promise<EventRegistration[]>;
   checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined>;
 
   createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration>;
@@ -115,7 +117,7 @@ export class DatabaseStorage implements IStorage {
   }
   async getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined> {
     const [p] = await db.select().from(puzzles)
-      .where(eq(puzzles.type, type));
+      .where(and(eq(puzzles.type, type), eq(puzzles.publishDate, date)));
     return p;
   }
   async deletePuzzlesByType(type: string): Promise<number> {
@@ -139,8 +141,8 @@ export class DatabaseStorage implements IStorage {
     return c;
   }
   async deleteContent(id: number): Promise<boolean> {
-    await db.delete(content).where(eq(content.id, id));
-    return true;
+    const deleted = await db.delete(content).where(eq(content.id, id)).returning({ id: content.id });
+    return deleted.length > 0;
   }
 
   async createSubmission(submission: InsertSubmission): Promise<Submission> {
@@ -154,6 +156,10 @@ export class DatabaseStorage implements IStorage {
     const [s] = await db.select().from(submissions).where(eq(submissions.id, id));
     return s;
   }
+  async updateSubmissionStatus(id: number, status: string): Promise<Submission | undefined> {
+    const [s] = await db.update(submissions).set({ status }).where(eq(submissions.id, id)).returning();
+    return s;
+  }
 
   async createEventRegistration(registration: InsertEventRegistration): Promise<EventRegistration> {
     const [r] = await db.insert(eventRegistrations).values(registration).returning();
@@ -162,9 +168,12 @@ export class DatabaseStorage implements IStorage {
   async getEventRegistrations(userId: string): Promise<EventRegistration[]> {
     return db.select().from(eventRegistrations).where(eq(eventRegistrations.userId, userId));
   }
+  async getAllEventRegistrations(): Promise<EventRegistration[]> {
+    return db.select().from(eventRegistrations).orderBy(desc(eventRegistrations.id));
+  }
   async checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined> {
     const [r] = await db.select().from(eventRegistrations)
-      .where(eq(eventRegistrations.userId, userId));
+      .where(and(eq(eventRegistrations.userId, userId), eq(eventRegistrations.eventId, eventId)));
     return r;
   }
 
@@ -229,8 +238,8 @@ export class DatabaseStorage implements IStorage {
     return p;
   }
   async deletePublication(id: number): Promise<boolean> {
-    await db.delete(publications).where(eq(publications.id, id));
-    return true;
+    const deleted = await db.delete(publications).where(eq(publications.id, id)).returning({ id: publications.id });
+    return deleted.length > 0;
   }
 }
 
