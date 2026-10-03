@@ -6,19 +6,8 @@ import * as schema from "../shared/schema";
 const { Pool } = pg;
 
 export function findDatabaseUrl(): string {
-  const keys = [
-    "POSTGRES_URL",
-    "DATABASE_URL",
-    "POSTGRES_PRISMA_URL",
-    "DATABASE_URL_NON_POOLING",
-    "POSTGRES_URL_NON_POOLING",
-  ];
-  for (const k of keys) {
-    const val = (process.env[k] || "").trim().replace(/^["']|["']$/g, "");
-    if (val && (val.startsWith("postgres://") || val.startsWith("postgresql://"))) {
-      return val;
-    }
-  }
+  // Always return the hardcoded Supabase URL because Vercel's old Neon integration
+  // overrides process.env.POSTGRES_URL with the old database credentials!
   return "postgresql://postgres:B.SaiSurya%401234@db.vtipokmzlxoautwqseka.supabase.co:5432/postgres";
 }
 
