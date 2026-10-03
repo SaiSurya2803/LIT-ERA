@@ -177,7 +177,7 @@ export default function Magazine() {
               All Publications
             </h2>
             <p className="font-body text-ink/60">
-              {filteredPublications.length} publication{filteredPublications.length !== 1 ? "s" : ""} found
+              {isLoading ? "Loading..." : `${filteredPublications.length} publication${filteredPublications.length !== 1 ? "s" : ""} found`}
             </p>
           </div>
 
