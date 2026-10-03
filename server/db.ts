@@ -8,7 +8,7 @@ const { Pool } = pg;
 export function findDatabaseUrl(): string {
   // Always return the hardcoded Supabase URL because Vercel's old Neon integration
   // overrides process.env.POSTGRES_URL with the old database credentials!
-  return "postgresql://postgres.vtipokmzlxoautwqseka:B.SaiSurya%401234@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres";
+  return "postgresql://postgres.vtipokmzlxoautwqseka:B.SaiSurya%401234@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres";
 }
 
 const rawUrl = findDatabaseUrl();
