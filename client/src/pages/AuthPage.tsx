@@ -104,11 +104,11 @@ export default function AuthPage() {
           )}
           <div className="space-y-1">
             <label className="font-accent text-[0.7rem] tracking-widest uppercase text-ink">
-              Email
+              Email / Username
             </label>
             <input
               required
-              type="email"
+              type="text"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="w-full border border-ink/20 px-3 py-2 font-body text-sm"

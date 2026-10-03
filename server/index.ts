@@ -44,8 +44,7 @@ app.use(
 
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
-// Serve uploads folder for static files (images, PDFs, etc.)
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 
 // Session store backed by Postgres
 app.use(
@@ -54,7 +53,7 @@ app.use(
       pool: pool as any,
       createTableIfMissing: true,
     }),
-    secret: process.env.SESSION_SECRET || "change-me-in-production",
+    secret: process.env.SESSION_SECRET || "litera-club-secret-key-production",
     resave: false,
     saveUninitialized: false,
     cookie: {

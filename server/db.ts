@@ -19,7 +19,7 @@ export function findDatabaseUrl(): string {
       return val;
     }
   }
-  return "";
+  return "postgresql://postgres:B.SaiSurya%401234@db.vtipokmzlxoautwqseka.supabase.co:5432/postgres";
 }
 
 const rawUrl = findDatabaseUrl();

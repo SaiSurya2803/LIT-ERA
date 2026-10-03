@@ -192,10 +192,57 @@ export default function AdminDashboard() {
 
   const createPublicationMutation = useMutation({
     mutationFn: async (formData: FormData) => {
+      let pdfUrl = null;
+      let pdfFileName = null;
+      let coverImageBase64 = null;
+
+      const pdfFile = formData.get('pdfFile') as File;
+      if (pdfFile && pdfFile.size > 0) {
+        const { supabase } = await import('@/lib/supabase');
+        const fileName = `${Date.now()}-${pdfFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const { error: uploadError } = await supabase.storage.from('publications').upload(fileName, pdfFile, { contentType: 'application/pdf' });
+        
+        if (uploadError) throw uploadError;
+        
+        const { data: publicUrlData } = supabase.storage.from('publications').getPublicUrl(fileName);
+        pdfUrl = publicUrlData.publicUrl;
+        pdfFileName = pdfFile.name;
+      }
+
+      const coverImage = formData.get('coverImage') as File;
+      if (coverImage && coverImage.size > 0) {
+        // We still use base64 for cover images because they are small, or we could also upload them to storage. Let's upload to storage to be clean!
+        const { supabase } = await import('@/lib/supabase');
+        const fileName = `cover-${Date.now()}-${coverImage.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const { error: uploadError } = await supabase.storage.from('publications').upload(fileName, coverImage, { contentType: coverImage.type });
+        
+        if (uploadError) throw uploadError;
+        
+        const { data: publicUrlData } = supabase.storage.from('publications').getPublicUrl(fileName);
+        coverImageBase64 = publicUrlData.publicUrl; // Store URL in coverImage field
+      }
+
+      const payload = {
+        title: formData.get('title'),
+        author: formData.get('author'),
+        category: formData.get('category'),
+        publishDate: formData.get('publishDate'),
+        pages: formData.get('pages'),
+        featured: formData.get('featured') === 'true',
+        isActive: formData.get('isActive') === 'true',
+        description: formData.get('description'),
+        coverImage: coverImageBase64,
+        pdfUrl,
+        pdfFileName
+      };
+
       const res = await fetch("/api/publications", {
         method: "POST",
+        headers: {
+          'Content-Type': 'application/json'
+        },
         credentials: "include",
-        body: formData,
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));

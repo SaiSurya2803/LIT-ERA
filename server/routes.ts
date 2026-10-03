@@ -1,36 +1,11 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import multer from "multer";
 import path from "path";
 import { existsSync } from "fs";
 import { storage } from "./storage";
 import { api } from "../shared/routes";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-
-// Configure multer for file uploads in memory
-const storageMulter = multer.memoryStorage();
-
-const upload = multer({
-  storage: storageMulter,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'text/plain'
-    ];
-    
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid file type. Only PDF, Word, and Text files are allowed.'));
-    }
-  }
-});
 
 declare module "express-session" {
   interface SessionData {
@@ -79,13 +54,13 @@ export async function registerRoutes(
   });
 
   const loginSchema = z.object({
-    email: z.string().email(),
+    email: z.string().min(1),
     password: z.string().min(6),
   });
 
   const registerSchema = z.object({
     name: z.string().min(1),
-    email: z.string().email(),
+    email: z.string().min(1),
     password: z.string().min(6),
     adminCode: z.string().optional(),
   });
@@ -435,6 +410,24 @@ export async function registerRoutes(
   // Seed DB with some initial events and a daily puzzle if none exist
   async function seedDatabase() {
     try {
+      // Seed Admin User
+      try {
+        const adminUser = await storage.getUserByEmail("admin");
+        if (!adminUser) {
+          const passwordHash = await bcrypt.hash("admin@1234", 10);
+          await storage.createUser({
+            name: "Administrator",
+            email: "admin",
+            passwordHash,
+            isAdmin: true,
+            club: "LIT'ERA",
+          });
+          console.log("Default admin created: admin / admin@1234");
+        }
+      } catch (err) {
+        // Admin seeding skipped
+      }
+
       // Seed events
       try {
         const existingEvents = await storage.getEvents();
@@ -521,10 +514,10 @@ export async function registerRoutes(
     });
   });
 
-  // Magazine Submissions with File Upload
-  app.post("/api/submissions", upload.single("file"), async (req, res, next) => {
+  // Magazine Submissions
+  app.post("/api/submissions", async (req, res, next) => {
     try {
-      const { name, email, title, category, description } = req.body;
+      const { name, email, title, category, description, fileUrl, originalFileName } = req.body;
       
       if (!name || !email || !title || !category || !description) {
         return res.status(400).json({ message: "All fields are required" });
@@ -536,11 +529,11 @@ export async function registerRoutes(
         title,
         category,
         description,
-        fileName: req.file ? req.file.originalname : null,
-        fileSize: req.file ? req.file.size : null,
-        originalFileName: req.file ? req.file.originalname : null,
-        filePath: null, // No longer storing on disk
-        fileData: req.file ? req.file.buffer.toString('base64') : null,
+        fileName: originalFileName || null,
+        fileSize: null,
+        originalFileName: originalFileName || null,
+        filePath: fileUrl || null,
+        fileData: null,
         status: "pending"
       };
       
@@ -568,6 +561,12 @@ export async function registerRoutes(
         return res.status(404).json({ message: "File not found" });
       }
       
+      if (submission.filePath && submission.filePath.startsWith('http')) {
+        const url = new URL(submission.filePath);
+        url.searchParams.set('download', submission.originalFileName || submission.fileName || 'submission.pdf');
+        return res.redirect(url.toString());
+      }
+
       // Set headers for file download
       res.setHeader('Content-Type', 'application/octet-stream');
       res.setHeader('Content-Disposition', `attachment; filename="${submission.originalFileName || submission.fileName}"`);
@@ -738,30 +737,7 @@ export async function registerRoutes(
   });
 
   // Publications API
-  const publicationUpload = multer({
-    storage: multer.memoryStorage(),
-    limits: {
-      fileSize: 50 * 1024 * 1024, // 50MB limit for publications
-    },
-    fileFilter: (req, file, cb) => {
-      if (file.fieldname === 'coverImage') {
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-        if (allowedTypes.includes(file.mimetype)) {
-          cb(null, true);
-        } else {
-          cb(new Error('Invalid image type. Only JPEG, PNG, and WebP are allowed.'));
-        }
-      } else if (file.fieldname === 'pdfFile') {
-        if (file.mimetype === 'application/pdf') {
-          cb(null, true);
-        } else {
-          cb(new Error('Invalid file type. Only PDF files are allowed.'));
-        }
-      } else {
-        cb(null, true);
-      }
-    }
-  });
+
 
   app.get(api.publications.list.path, async (req, res, next) => {
     try {
@@ -773,29 +749,22 @@ export async function registerRoutes(
     }
   });
 
-  app.post(api.publications.create.path, publicationUpload.fields([
-    { name: 'coverImage', maxCount: 1 },
-    { name: 'pdfFile', maxCount: 1 }
-  ]), async (req, res, next) => {
+  app.post(api.publications.create.path, async (req, res, next) => {
     try {
       const user = (req as any).user;
       if (!user || !user.isAdmin) {
         return res.status(403).json({ message: "Forbidden: Admin access required" });
       }
 
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      const coverImage = files?.coverImage?.[0];
-      const pdfFile = files?.pdfFile?.[0];
-
       const publicationData = {
         ...req.body,
         pages: req.body.pages ? parseInt(req.body.pages) : null,
-        featured: req.body.featured === 'true' || req.body.featured === true,
-        isActive: req.body.isActive === 'true' || req.body.isActive === true,
-        coverImage: coverImage ? `data:${coverImage.mimetype};base64,${coverImage.buffer.toString('base64')}` : null,
-        pdfFile: null, // No longer stored locally
-        pdfData: pdfFile ? pdfFile.buffer.toString('base64') : null,
-        pdfFileName: pdfFile ? pdfFile.originalname : null,
+        featured: req.body.featured === true || req.body.featured === 'true',
+        isActive: req.body.isActive === true || req.body.isActive === 'true',
+        coverImage: req.body.coverImage || null,
+        pdfFile: req.body.pdfUrl || null,
+        pdfData: null,
+        pdfFileName: req.body.pdfFileName || null,
       };
 
       const publication = await storage.createPublication(publicationData);
@@ -841,6 +810,15 @@ export async function registerRoutes(
       }
 
       const disposition = inline ? 'inline' : 'attachment';
+      
+      if (publication.pdfFile && publication.pdfFile.startsWith('http')) {
+        const url = new URL(publication.pdfFile);
+        if (!inline) {
+          url.searchParams.set('download', publication.pdfFileName || 'publication.pdf');
+        }
+        return res.redirect(url.toString());
+      }
+
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `${disposition}; filename="${publication.pdfFileName || 'publication.pdf'}"`);
       
@@ -860,10 +838,7 @@ export async function registerRoutes(
     }
   });
 
-  app.put("/api/publications/:id", publicationUpload.fields([
-    { name: 'coverImage', maxCount: 1 },
-    { name: 'pdfFile', maxCount: 1 }
-  ]), async (req, res, next) => {
+  app.put("/api/publications/:id", async (req, res, next) => {
     try {
       const user = (req as any).user;
       if (!user || !user.isAdmin) {
@@ -871,24 +846,18 @@ export async function registerRoutes(
       }
 
       const { id } = req.params;
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      const coverImage = files?.coverImage?.[0];
-      const pdfFile = files?.pdfFile?.[0];
-
       const updates: any = { ...req.body };
       
-      if (req.body.pages) updates.pages = parseInt(req.body.pages);
+      if (req.body.pages !== undefined) updates.pages = parseInt(req.body.pages);
       if (req.body.featured !== undefined) updates.featured = req.body.featured === 'true' || req.body.featured === true;
       if (req.body.isActive !== undefined) updates.isActive = req.body.isActive === 'true' || req.body.isActive === true;
       
-      if (coverImage) {
-        updates.coverImage = `data:${coverImage.mimetype};base64,${coverImage.buffer.toString('base64')}`;
-      }
+      if (req.body.coverImage) updates.coverImage = req.body.coverImage;
       
-      if (pdfFile) {
-        updates.pdfFile = null;
-        updates.pdfData = pdfFile.buffer.toString('base64');
-        updates.pdfFileName = pdfFile.originalname;
+      if (req.body.pdfUrl) {
+        updates.pdfFile = req.body.pdfUrl;
+        updates.pdfData = null;
+        updates.pdfFileName = req.body.pdfFileName;
       }
 
       const publication = await storage.updatePublication(parseInt(id as string), updates);

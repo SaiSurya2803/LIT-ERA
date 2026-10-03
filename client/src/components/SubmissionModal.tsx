@@ -59,20 +59,36 @@ export default function SubmissionModal({ isOpen, onClose }: SubmissionModalProp
     setIsSubmitting(true);
     
     try {
-      // Send to backend API with FormData
-      const data = new FormData();
-      data.append('name', formData.name);
-      data.append('email', formData.email);
-      data.append('title', formData.title);
-      data.append('category', formData.category);
-      data.append('description', formData.description);
+      let fileUrl = null;
+
       if (formData.file) {
-        data.append('file', formData.file);
+        const { supabase } = await import('@/lib/supabase');
+        const fileName = `${Date.now()}-${formData.file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+        const { error: uploadError } = await supabase.storage.from('submissions').upload(fileName, formData.file);
+        
+        if (uploadError) {
+          throw uploadError;
+        }
+        
+        const { data: publicUrlData } = supabase.storage.from('submissions').getPublicUrl(fileName);
+        fileUrl = publicUrlData.publicUrl;
       }
 
+      // Send to backend API
       const response = await fetch('/api/submissions', {
         method: 'POST',
-        body: data,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          title: formData.title,
+          category: formData.category,
+          description: formData.description,
+          fileUrl,
+          originalFileName: formData.file?.name
+        }),
         credentials: 'include'
       });
 

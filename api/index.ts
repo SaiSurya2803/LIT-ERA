@@ -16,7 +16,7 @@ app.set("trust proxy", 1);
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 
 app.use(
   session({
@@ -24,7 +24,7 @@ app.use(
       pool: pool as any,
       createTableIfMissing: true,
     }),
-    secret: process.env.SESSION_SECRET || "litera-secret-key-2026-production",
+    secret: process.env.SESSION_SECRET || "litera-club-secret-key-production",
     resave: false,
     saveUninitialized: false,
     cookie: {
