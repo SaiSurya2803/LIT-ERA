@@ -39,28 +39,7 @@ export const events = pgTable("events", {
   isActive: boolean("is_active").default(true),
 });
 
-export const gameScores = pgTable("game_scores", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
-  gameType: varchar("game_type", { length: 50 }).notNull(), // 'strands' or 'spellbee'
-  score: integer("score"),
-  completionTime: integer("completion_time"),
-  completedDate: timestamp("completed_date").defaultNow(),
-}, (table) => [
-  index("game_scores_game_type_idx").on(table.gameType),
-  index("game_scores_user_id_idx").on(table.userId),
-]);
 
-export const puzzles = pgTable("puzzles", {
-  id: serial("id").primaryKey(),
-  type: varchar("type", { length: 50 }).notNull(), // 'strands' or 'spellbee'
-  data: text("data").notNull(), // JSON stringified puzzle data
-  publishDate: varchar("publish_date", { length: 20 }).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-}, (table) => [
-  index("puzzles_type_date_idx").on(table.type, table.publishDate),
-  index("puzzles_publish_date_idx").on(table.publishDate),
-]);
 
 export const content = pgTable("content", {
   id: serial("id").primaryKey(),
@@ -118,16 +97,6 @@ export const eventRegistrations = pgTable("event_registrations", {
   registeredAt: timestamp("registered_at").defaultNow(),
 });
 
-export const munRegistrations = pgTable("mun_registrations", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id", { length: 36 }).references(() => users.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  email: text("email").notNull(),
-  phone: text("phone"),
-  committee: text("committee").notNull(),
-  experience: text("experience"),
-  registeredAt: timestamp("registered_at").defaultNow(),
-});
 
 // session table for connect-pg-simple
 export const sessions = pgTable("session", {
@@ -143,8 +112,6 @@ export const insertUserSchema = createInsertSchema(users).omit({
 });
 export const insertContactSchema = createInsertSchema(contactSubmissions).omit({ id: true, submissionDate: true });
 export const insertEventSchema = createInsertSchema(events).omit({ id: true });
-export const insertGameScoreSchema = createInsertSchema(gameScores).omit({ id: true, completedDate: true });
-export const insertPuzzleSchema = createInsertSchema(puzzles).omit({ id: true, createdAt: true });
 export const insertContentSchema = createInsertSchema(content).omit({ 
   id: true, 
   createdAt: true 
@@ -154,7 +121,6 @@ export const insertContentSchema = createInsertSchema(content).omit({
 });
 export const insertSubmissionSchema = createInsertSchema(submissions).omit({ id: true, submittedAt: true });
 export const insertEventRegistrationSchema = createInsertSchema(eventRegistrations).omit({ id: true, registeredAt: true });
-export const insertMunRegistrationSchema = createInsertSchema(munRegistrations).omit({ id: true, registeredAt: true });
 export const insertPublicationSchema = createInsertSchema(publications).omit({ id: true, createdAt: true, views: true, downloads: true, likes: true });
 
 export type User = typeof users.$inferSelect;
@@ -163,17 +129,11 @@ export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type InsertContact = z.infer<typeof insertContactSchema>;
 export type Event = typeof events.$inferSelect;
 export type InsertEvent = z.infer<typeof insertEventSchema>;
-export type GameScore = typeof gameScores.$inferSelect;
-export type InsertGameScore = z.infer<typeof insertGameScoreSchema>;
-export type Puzzle = typeof puzzles.$inferSelect;
-export type InsertPuzzle = z.infer<typeof insertPuzzleSchema>;
 export type Content = typeof content.$inferSelect;
 export type InsertContent = z.infer<typeof insertContentSchema>;
 export type Submission = typeof submissions.$inferSelect;
 export type InsertSubmission = z.infer<typeof insertSubmissionSchema>;
 export type EventRegistration = typeof eventRegistrations.$inferSelect;
 export type InsertEventRegistration = z.infer<typeof insertEventRegistrationSchema>;
-export type MunRegistration = typeof munRegistrations.$inferSelect;
-export type InsertMunRegistration = z.infer<typeof insertMunRegistrationSchema>;
 export type Publication = typeof publications.$inferSelect;
 export type InsertPublication = z.infer<typeof insertPublicationSchema>;

@@ -2,15 +2,11 @@ import { z } from "zod";
 import {
   insertContactSchema,
   insertEventSchema,
-  insertGameScoreSchema,
-  insertPuzzleSchema,
   insertContentSchema,
   insertPublicationSchema,
   users,
   contactSubmissions,
   events,
-  gameScores,
-  puzzles,
   content,
   publications,
   submissions,
@@ -105,47 +101,7 @@ export const api = {
       }
     }
   },
-  gameScores: {
-    create: {
-      method: 'POST' as const,
-      path: '/api/game-scores' as const,
-      input: insertGameScoreSchema,
-      responses: {
-        201: z.custom<typeof gameScores.$inferSelect>(),
-        400: errorSchemas.validation,
-      }
-    },
-    list: {
-      method: 'GET' as const,
-      path: '/api/game-scores' as const,
-      responses: { 200: z.array(z.custom<typeof gameScores.$inferSelect>()) }
-    }
-  },
-  puzzles: {
-    list: {
-      method: "GET" as const,
-      path: "/api/puzzles" as const,
-      responses: {
-        200: z.array(z.custom<typeof puzzles.$inferSelect>()),
-      },
-    },
-    create: {
-      method: "POST" as const,
-      path: "/api/puzzles" as const,
-      input: insertPuzzleSchema,
-      responses: {
-        201: z.custom<typeof puzzles.$inferSelect>(),
-        400: errorSchemas.validation,
-      },
-    },
-    daily: {
-      method: "GET" as const,
-      path: "/api/puzzles/daily/:type" as const,
-      responses: {
-        200: z.custom<typeof puzzles.$inferSelect>().nullable(),
-      },
-    },
-  },
+
   content: {
     list: {
       method: "GET" as const,

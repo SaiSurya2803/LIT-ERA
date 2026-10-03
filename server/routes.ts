@@ -209,95 +209,9 @@ export async function registerRoutes(
     }
   });
 
-  // Game Scores
-  app.post(api.gameScores.create.path, async (req, res, next) => {
-    try {
-      const input = api.gameScores.create.input.parse(req.body);
-      const user = (req as any).user;
-      if (user && !input.userId) {
-        input.userId = user.id;
-      }
-      const score = await storage.createGameScore(input);
-      return res.status(201).json(score);
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
-      }
-      const message = (err as any)?.message || "Failed to submit game score";
-      return res.status(500).json({ message });
-    }
-  });
 
-  app.get(api.gameScores.list.path, async (req, res, next) => {
-    try {
-      const scores = await storage.getGameScores();
-      return res.json(scores);
-    } catch (error) {
-      next(error);
-    }
-  });
 
-  // Puzzles
-  app.get(api.puzzles.list.path, async (req, res, next) => {
-    try {
-      const puzzlesList = await storage.getPuzzles();
-      return res.json(puzzlesList);
-    } catch (error) {
-      next(error);
-    }
-  });
 
-  app.post(api.puzzles.create.path, async (req, res, next) => {
-    try {
-      const user = (req as any).user;
-      if (!user || !user.isAdmin) {
-        return res.status(403).json({ message: "Forbidden: Admin access required" });
-      }
-      const input = api.puzzles.create.input.parse(req.body);
-      const puzzle = await storage.createPuzzle(input);
-      return res.status(201).json(puzzle);
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        return res.status(400).json({ message: err.errors[0]?.message || "Invalid input" });
-      }
-      const message = (err as any)?.message || "Failed to create puzzle";
-      return res.status(500).json({ message });
-    }
-  });
-
-  app.get("/api/puzzles/daily/:type", async (req, res, next) => {
-    try {
-      const { type } = req.params;
-      const today = new Date().toISOString().split('T')[0];
-      const puzzle = await storage.getDailyPuzzle(type, today);
-      return res.json(puzzle || null);
-    } catch (error) {
-      next(error);
-    }
-  });
-
-  // Admin: Cleanup old game data
-  app.delete("/api/admin/cleanup/:gameType", async (req, res, next) => {
-    try {
-      const user = (req as any).user;
-      if (!user || !user.isAdmin) {
-        return res.status(403).json({ message: "Forbidden: Admin access required" });
-      }
-
-      const { gameType } = req.params;
-      const puzzlesDeleted = await storage.deletePuzzlesByType(gameType);
-      const scoresDeleted = await storage.deleteGameScoresByType(gameType);
-
-      return res.json({
-        success: true,
-        message: `Cleanup completed for ${gameType}`,
-        puzzlesDeleted,
-        scoresDeleted
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
 
   // Content Management API
   app.get(api.content.list.path, async (req, res, next) => {
@@ -456,28 +370,7 @@ export async function registerRoutes(
         // Content seeding skipped
       }
       
-      // Seed daily puzzle
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const existingPuzzle = await storage.getDailyPuzzle("strands", today);
-        if (!existingPuzzle) {
-          await storage.createPuzzle({
-            type: "strands",
-            publishDate: today,
-            data: JSON.stringify({
-              grid: [
-                ["B", "O", "O", "K", "S"],
-                ["W", "O", "R", "D", "S"],
-                ["P", "O", "E", "M", "S"]
-              ],
-              words: ["BOOKS", "WORDS", "POEMS"],
-              theme: "Literary Terms"
-            })
-          });
-        }
-      } catch (puzzleError: any) {
-        // Puzzle seeding skipped
-      }
+
     } catch (error) {
       // Don't throw - seeding is non-critical
     }
@@ -660,55 +553,6 @@ export async function registerRoutes(
     }
   });
 
-  // MUN Registrations
-  app.post("/api/mun/register", async (req, res, next) => {
-    try {
-      const user = (req as any).user;
-      if (!user) {
-        return res.status(401).json({ message: "Authentication required" });
-      }
-      
-      const { name, email, phone, institution, committee, experience } = req.body;
-      
-      if (!name || !email) {
-        return res.status(400).json({ message: "Name and email are required" });
-      }
-      
-      // Check if already registered
-      const existing = await storage.checkMunRegistration(user.id);
-      if (existing) {
-        return res.status(400).json({ message: "Already registered for MUN" });
-      }
-      
-      const registration = await storage.createMunRegistration({
-        userId: user.id,
-        name,
-        email,
-        phone: phone || null,
-        committee: committee || "",
-        experience: experience || null
-      });
-      
-      return res.status(201).json(registration);
-    } catch (error) {
-      const message = (error as any)?.message || "Failed to register for MUN";
-      return res.status(500).json({ message });
-    }
-  });
-
-  app.get("/api/mun/registrations", async (req, res, next) => {
-    try {
-      const user = (req as any).user;
-      if (!user || !user.isAdmin) {
-        return res.status(403).json({ message: "Forbidden: Admin access required" });
-      }
-      
-      const registrations = await storage.getMunRegistrations();
-      return res.json(registrations);
-    } catch (error) {
-      next(error);
-    }
-  });
 
   // Publications API
 

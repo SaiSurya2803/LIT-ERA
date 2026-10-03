@@ -3,12 +3,9 @@ import type {
   User, InsertUser, 
   ContactSubmission, InsertContact,
   Event, InsertEvent,
-  GameScore, InsertGameScore,
-  Puzzle, InsertPuzzle,
   Content, InsertContent,
   Submission, InsertSubmission,
   EventRegistration, InsertEventRegistration,
-  MunRegistration, InsertMunRegistration,
   Publication, InsertPublication 
 } from "../shared/schema";
 import crypto from "crypto";
@@ -22,13 +19,6 @@ export interface IStorage {
   getContacts(): Promise<ContactSubmission[]>;
   createEvent(event: InsertEvent): Promise<Event>;
   getEvents(): Promise<Event[]>;
-  createGameScore(score: InsertGameScore): Promise<GameScore>;
-  getGameScores(): Promise<GameScore[]>;
-  createPuzzle(puzzle: InsertPuzzle): Promise<Puzzle>;
-  getPuzzles(): Promise<Puzzle[]>;
-  getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined>;
-  deletePuzzlesByType(type: string): Promise<number>;
-  deleteGameScoresByType(gameType: string): Promise<number>;
   createContent(content: InsertContent): Promise<Content>;
   getContent(): Promise<Content[]>;
   updateContent(id: number, updates: Partial<InsertContent>): Promise<Content | undefined>;
@@ -41,9 +31,6 @@ export interface IStorage {
   getEventRegistrations(userId: string): Promise<EventRegistration[]>;
   getAllEventRegistrations(): Promise<EventRegistration[]>;
   checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined>;
-  createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration>;
-  getMunRegistrations(): Promise<MunRegistration[]>;
-  checkMunRegistration(userId: string): Promise<MunRegistration | undefined>;
   createPublication(publication: InsertPublication): Promise<Publication>;
   getPublications(): Promise<Publication[]>;
   getPublicationById(id: number): Promise<Publication | undefined>;
@@ -91,36 +78,6 @@ export class SupabaseStorage implements IStorage {
   async getEvents(): Promise<Event[]> {
     const { data } = await supabase.from('events').select().order('id', { ascending: false });
     return data || [];
-  }
-
-  async createGameScore(score: InsertGameScore): Promise<GameScore> {
-    const { data } = await supabase.from('game_scores').insert(score).select().single();
-    return data as GameScore;
-  }
-  async getGameScores(): Promise<GameScore[]> {
-    const { data } = await supabase.from('game_scores').select().order('score', { ascending: false });
-    return data || [];
-  }
-
-  async createPuzzle(puzzle: InsertPuzzle): Promise<Puzzle> {
-    const { data } = await supabase.from('puzzles').insert(puzzle).select().single();
-    return data as Puzzle;
-  }
-  async getPuzzles(): Promise<Puzzle[]> {
-    const { data } = await supabase.from('puzzles').select();
-    return data || [];
-  }
-  async getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined> {
-    const { data } = await supabase.from('puzzles').select().eq('type', type).eq('publish_date', date).single();
-    return data || undefined;
-  }
-  async deletePuzzlesByType(type: string): Promise<number> {
-    const { data } = await supabase.from('puzzles').delete().eq('type', type).select();
-    return data?.length || 0;
-  }
-  async deleteGameScoresByType(gameType: string): Promise<number> {
-    const { data } = await supabase.from('game_scores').delete().eq('game_type', gameType).select();
-    return data?.length || 0;
   }
 
   async createContent(contentItem: InsertContent): Promise<Content> {
@@ -171,19 +128,6 @@ export class SupabaseStorage implements IStorage {
   }
   async checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined> {
     const { data } = await supabase.from('event_registrations').select().eq('user_id', userId).eq('event_id', eventId).single();
-    return data || undefined;
-  }
-
-  async createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration> {
-    const { data } = await supabase.from('mun_registrations').insert(registration).select().single();
-    return data as MunRegistration;
-  }
-  async getMunRegistrations(): Promise<MunRegistration[]> {
-    const { data } = await supabase.from('mun_registrations').select().order('id', { ascending: false });
-    return data || [];
-  }
-  async checkMunRegistration(userId: string): Promise<MunRegistration | undefined> {
-    const { data } = await supabase.from('mun_registrations').select().eq('user_id', userId).single();
     return data || undefined;
   }
 
