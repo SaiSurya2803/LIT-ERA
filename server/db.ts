@@ -1,28 +1,7 @@
-import "dotenv/config";
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import * as schema from "../shared/schema";
+import { createClient } from "@supabase/supabase-js";
 
-const { Pool } = pg;
+const supabaseUrl = "https://vtipokmzlxoautwqseka.supabase.co";
+// Using anon key with RLS disabled on tables
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0aXBva216bHhvYXV0d3FzZWthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMzQ2MTYsImV4cCI6MjEwNjYxMDYxNn0.6A73dd-rs6Tpzp2WefoSz_GoIIiSi_NC2X-uPRj8qTU";
 
-export function findDatabaseUrl(): string {
-  // Always return the hardcoded Supabase URL because Vercel's old Neon integration
-  // overrides process.env.POSTGRES_URL with the old database credentials!
-  return "postgresql://postgres.vtipokmzlxoautwqseka:B.SaiSurya%401234@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres";
-}
-
-const rawUrl = findDatabaseUrl();
-
-if (!rawUrl) {
-  console.warn("⚠️ [DATABASE] No PostgreSQL URL found in environment.");
-}
-
-export const isConfigured = !!rawUrl;
-
-const pool = new Pool({
-  connectionString: rawUrl || "postgres://localhost:5432/postgres",
-  ssl: rawUrl && !rawUrl.includes("localhost") ? { rejectUnauthorized: false } : undefined,
-});
-
-export const db = drizzle(pool, { schema });
-export { pool };
+export const supabase = createClient(supabaseUrl, supabaseKey);

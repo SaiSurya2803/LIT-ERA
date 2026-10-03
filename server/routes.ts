@@ -7,11 +7,7 @@ import { api } from "../shared/routes";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 
-declare module "express-session" {
-  interface SessionData {
-    userId?: string;
-  }
-}
+
 
 // Helper: strip passwordHash before sending user to client
 function sanitizeUser(user: any) {
@@ -89,12 +85,7 @@ export async function registerRoutes(
 
       if (req.session) {
         req.session.userId = user.id;
-        await new Promise<void>((resolve) => {
-          req.session.save((err) => {
-            if (err) console.error("Session save warning:", err);
-            resolve();
-          });
-        });
+
       }
       
       return res.status(201).json(sanitizeUser(user));
@@ -124,12 +115,7 @@ export async function registerRoutes(
 
       if (req.session) {
         req.session.userId = user.id;
-        await new Promise<void>((resolve) => {
-          req.session.save((err) => {
-            if (err) console.error("Session save warning:", err);
-            resolve();
-          });
-        });
+
       }
       
       return res.json(sanitizeUser(user));
@@ -145,18 +131,9 @@ export async function registerRoutes(
 
   app.post(["/api/auth/logout", "/auth/logout"], (req, res, next) => {
     try {
-      if (req.session) {
-        req.session.destroy((err) => {
-          if (err) {
-            console.error("Logout error:", err);
-            return res.status(500).json({ message: "Failed to logout" });
-          }
-          res.clearCookie('connect.sid', { path: '/' });
-          return res.status(204).end();
-        });
-      } else {
-        return res.status(204).end();
-      }
+      req.session = null;
+      res.clearCookie('litera_session', { path: '/' });
+      return res.status(204).end();
     } catch (error) {
       next(error);
     }

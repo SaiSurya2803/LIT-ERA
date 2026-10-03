@@ -1,19 +1,16 @@
-import { db } from "./db";
-import {
-  users, contactSubmissions, events, gameScores, puzzles,
-  content, submissions, eventRegistrations, munRegistrations, publications,
-  type User, type InsertUser,
-  type ContactSubmission, type InsertContact,
-  type Event, type InsertEvent,
-  type GameScore, type InsertGameScore,
-  type Puzzle, type InsertPuzzle,
-  type Content, type InsertContent,
-  type Submission, type InsertSubmission,
-  type EventRegistration, type InsertEventRegistration,
-  type MunRegistration, type InsertMunRegistration,
-  type Publication, type InsertPublication,
+import { supabase } from "./db";
+import type { 
+  User, InsertUser, 
+  ContactSubmission, InsertContact,
+  Event, InsertEvent,
+  GameScore, InsertGameScore,
+  Puzzle, InsertPuzzle,
+  Content, InsertContent,
+  Submission, InsertSubmission,
+  EventRegistration, InsertEventRegistration,
+  MunRegistration, InsertMunRegistration,
+  Publication, InsertPublication 
 } from "../shared/schema";
-import { eq, desc, and } from "drizzle-orm";
 import crypto from "crypto";
 
 export interface IStorage {
@@ -21,41 +18,32 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
-
   createContact(contact: InsertContact): Promise<ContactSubmission>;
   getContacts(): Promise<ContactSubmission[]>;
-
   createEvent(event: InsertEvent): Promise<Event>;
   getEvents(): Promise<Event[]>;
-
   createGameScore(score: InsertGameScore): Promise<GameScore>;
   getGameScores(): Promise<GameScore[]>;
-
   createPuzzle(puzzle: InsertPuzzle): Promise<Puzzle>;
   getPuzzles(): Promise<Puzzle[]>;
   getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined>;
   deletePuzzlesByType(type: string): Promise<number>;
   deleteGameScoresByType(gameType: string): Promise<number>;
-
-  createContent(contentItem: InsertContent): Promise<Content>;
+  createContent(content: InsertContent): Promise<Content>;
   getContent(): Promise<Content[]>;
   updateContent(id: number, updates: Partial<InsertContent>): Promise<Content | undefined>;
   deleteContent(id: number): Promise<boolean>;
-
   createSubmission(submission: InsertSubmission): Promise<Submission>;
   getSubmissions(): Promise<Submission[]>;
   getSubmissionById(id: number): Promise<Submission | undefined>;
   updateSubmissionStatus(id: number, status: string): Promise<Submission | undefined>;
-
   createEventRegistration(registration: InsertEventRegistration): Promise<EventRegistration>;
   getEventRegistrations(userId: string): Promise<EventRegistration[]>;
   getAllEventRegistrations(): Promise<EventRegistration[]>;
   checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined>;
-
   createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration>;
   getMunRegistrations(): Promise<MunRegistration[]>;
   checkMunRegistration(userId: string): Promise<MunRegistration | undefined>;
-
   createPublication(publication: InsertPublication): Promise<Publication>;
   getPublications(): Promise<Publication[]>;
   getPublicationById(id: number): Promise<Publication | undefined>;
@@ -66,162 +54,181 @@ export interface IStorage {
   deletePublication(id: number): Promise<boolean>;
 }
 
-export class DatabaseStorage implements IStorage {
+export class SupabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    const { data } = await supabase.from('users').select().eq('id', id).single();
+    if (!data) return undefined;
+    return { ...data, passwordHash: data.password_hash } as User;
   }
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
+    const { data } = await supabase.from('users').select().eq('email', email).single();
+    if (!data) return undefined;
+    return { ...data, passwordHash: data.password_hash } as User;
   }
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = crypto.randomUUID();
-    const [user] = await db.insert(users).values({ ...insertUser, id }).returning();
-    return user;
+    const { data } = await supabase.from('users').insert({ ...insertUser, password_hash: insertUser.passwordHash, id }).select().single();
+    return { ...data, passwordHash: data.password_hash } as User;
   }
   async getAllUsers(): Promise<User[]> {
-    return db.select().from(users);
+    const { data } = await supabase.from('users').select();
+    return data || [];
   }
 
   async createContact(contact: InsertContact): Promise<ContactSubmission> {
-    const [c] = await db.insert(contactSubmissions).values(contact).returning();
-    return c;
+    const { data } = await supabase.from('contact_submissions').insert(contact).select().single();
+    return data as ContactSubmission;
   }
   async getContacts(): Promise<ContactSubmission[]> {
-    return db.select().from(contactSubmissions).orderBy(desc(contactSubmissions.id));
+    const { data } = await supabase.from('contact_submissions').select().order('id', { ascending: false });
+    return data || [];
   }
 
   async createEvent(event: InsertEvent): Promise<Event> {
-    const [e] = await db.insert(events).values(event).returning();
-    return e;
+    const { data } = await supabase.from('events').insert(event).select().single();
+    return data as Event;
   }
   async getEvents(): Promise<Event[]> {
-    return db.select().from(events).orderBy(desc(events.id));
+    const { data } = await supabase.from('events').select().order('id', { ascending: false });
+    return data || [];
   }
 
   async createGameScore(score: InsertGameScore): Promise<GameScore> {
-    const [s] = await db.insert(gameScores).values(score).returning();
-    return s;
+    const { data } = await supabase.from('game_scores').insert(score).select().single();
+    return data as GameScore;
   }
   async getGameScores(): Promise<GameScore[]> {
-    return db.select().from(gameScores).orderBy(desc(gameScores.score));
+    const { data } = await supabase.from('game_scores').select().order('score', { ascending: false });
+    return data || [];
   }
 
   async createPuzzle(puzzle: InsertPuzzle): Promise<Puzzle> {
-    const [p] = await db.insert(puzzles).values(puzzle).returning();
-    return p;
+    const { data } = await supabase.from('puzzles').insert(puzzle).select().single();
+    return data as Puzzle;
   }
   async getPuzzles(): Promise<Puzzle[]> {
-    return db.select().from(puzzles);
+    const { data } = await supabase.from('puzzles').select();
+    return data || [];
   }
   async getDailyPuzzle(type: string, date: string): Promise<Puzzle | undefined> {
-    const [p] = await db.select().from(puzzles)
-      .where(and(eq(puzzles.type, type), eq(puzzles.publishDate, date)));
-    return p;
+    const { data } = await supabase.from('puzzles').select().eq('type', type).eq('publish_date', date).single();
+    return data || undefined;
   }
   async deletePuzzlesByType(type: string): Promise<number> {
-    const deleted = await db.delete(puzzles).where(eq(puzzles.type, type)).returning();
-    return deleted.length;
+    const { data } = await supabase.from('puzzles').delete().eq('type', type).select();
+    return data?.length || 0;
   }
   async deleteGameScoresByType(gameType: string): Promise<number> {
-    const deleted = await db.delete(gameScores).where(eq(gameScores.gameType, gameType)).returning();
-    return deleted.length;
+    const { data } = await supabase.from('game_scores').delete().eq('game_type', gameType).select();
+    return data?.length || 0;
   }
 
   async createContent(contentItem: InsertContent): Promise<Content> {
-    const [c] = await db.insert(content).values(contentItem).returning();
-    return c;
+    const { data } = await supabase.from('content').insert(contentItem).select().single();
+    return data as Content;
   }
   async getContent(): Promise<Content[]> {
-    return db.select().from(content).orderBy(desc(content.id));
+    const { data } = await supabase.from('content').select().order('id', { ascending: false });
+    return data || [];
   }
   async updateContent(id: number, updates: Partial<InsertContent>): Promise<Content | undefined> {
-    const [c] = await db.update(content).set(updates).where(eq(content.id, id)).returning();
-    return c;
+    const { data } = await supabase.from('content').update(updates).eq('id', id).select().single();
+    return data || undefined;
   }
   async deleteContent(id: number): Promise<boolean> {
-    const deleted = await db.delete(content).where(eq(content.id, id)).returning({ id: content.id });
-    return deleted.length > 0;
+    const { data } = await supabase.from('content').delete().eq('id', id).select();
+    return (data && data.length > 0) ? true : false;
   }
 
   async createSubmission(submission: InsertSubmission): Promise<Submission> {
-    const [s] = await db.insert(submissions).values(submission).returning();
-    return s;
+    const { data } = await supabase.from('submissions').insert(submission).select().single();
+    return data as Submission;
   }
   async getSubmissions(): Promise<Submission[]> {
-    return db.select().from(submissions).orderBy(desc(submissions.id));
+    const { data } = await supabase.from('submissions').select().order('id', { ascending: false });
+    return data || [];
   }
   async getSubmissionById(id: number): Promise<Submission | undefined> {
-    const [s] = await db.select().from(submissions).where(eq(submissions.id, id));
-    return s;
+    const { data } = await supabase.from('submissions').select().eq('id', id).single();
+    return data || undefined;
   }
   async updateSubmissionStatus(id: number, status: string): Promise<Submission | undefined> {
-    const [s] = await db.update(submissions).set({ status }).where(eq(submissions.id, id)).returning();
-    return s;
+    const { data } = await supabase.from('submissions').update({ status }).eq('id', id).select().single();
+    return data || undefined;
   }
 
   async createEventRegistration(registration: InsertEventRegistration): Promise<EventRegistration> {
-    const [r] = await db.insert(eventRegistrations).values(registration).returning();
-    return r;
+    const { data } = await supabase.from('event_registrations').insert(registration).select().single();
+    return data as EventRegistration;
   }
   async getEventRegistrations(userId: string): Promise<EventRegistration[]> {
-    return db.select().from(eventRegistrations).where(eq(eventRegistrations.userId, userId));
+    const { data } = await supabase.from('event_registrations').select().eq('user_id', userId);
+    return data || [];
   }
   async getAllEventRegistrations(): Promise<EventRegistration[]> {
-    return db.select().from(eventRegistrations).orderBy(desc(eventRegistrations.id));
+    const { data } = await supabase.from('event_registrations').select().order('id', { ascending: false });
+    return data || [];
   }
   async checkEventRegistration(userId: string, eventId: number): Promise<EventRegistration | undefined> {
-    const [r] = await db.select().from(eventRegistrations)
-      .where(and(eq(eventRegistrations.userId, userId), eq(eventRegistrations.eventId, eventId)));
-    return r;
+    const { data } = await supabase.from('event_registrations').select().eq('user_id', userId).eq('event_id', eventId).single();
+    return data || undefined;
   }
 
   async createMunRegistration(registration: InsertMunRegistration): Promise<MunRegistration> {
-    const [r] = await db.insert(munRegistrations).values(registration).returning();
-    return r;
+    const { data } = await supabase.from('mun_registrations').insert(registration).select().single();
+    return data as MunRegistration;
   }
   async getMunRegistrations(): Promise<MunRegistration[]> {
-    return db.select().from(munRegistrations).orderBy(desc(munRegistrations.id));
+    const { data } = await supabase.from('mun_registrations').select().order('id', { ascending: false });
+    return data || [];
   }
   async checkMunRegistration(userId: string): Promise<MunRegistration | undefined> {
-    const [r] = await db.select().from(munRegistrations).where(eq(munRegistrations.userId, userId));
-    return r;
+    const { data } = await supabase.from('mun_registrations').select().eq('user_id', userId).single();
+    return data || undefined;
   }
 
   async createPublication(publication: InsertPublication): Promise<Publication> {
-    const [p] = await db.insert(publications).values(publication).returning();
-    return p;
+    const { data } = await supabase.from('publications').insert(publication).select().single();
+    return data as Publication;
   }
   async getPublications(): Promise<Publication[]> {
-    // Fetch all then strip pdfData to avoid huge payloads
-    const rows = await db.select().from(publications).orderBy(desc(publications.id));
-    return rows.map(r => ({ ...r, pdfData: null }));
+    const { data } = await supabase.from('publications').select('*').order('id', { ascending: false });
+    if (!data) return [];
+    return data.map(pub => ({
+      ...pub,
+      coverImage: pub.cover_image,
+      pdfFile: pub.pdf_file,
+      pdfFileName: pub.pdf_file_name,
+      pdfData: pub.pdf_data,
+      publishDate: pub.publish_date,
+      isActive: pub.is_active,
+      createdAt: pub.created_at ? new Date(pub.created_at) : null,
+    })) as Publication[];
   }
   async getPublicationById(id: number): Promise<Publication | undefined> {
-    const [p] = await db.select().from(publications).where(eq(publications.id, id));
-    return p;
+    const { data } = await supabase.from('publications').select().eq('id', id).single();
+    return data || undefined;
   }
   async incrementPublicationViews(id: number): Promise<void> {
-    const [pub] = await db.select({ views: publications.views }).from(publications).where(eq(publications.id, id));
-    if (pub) await db.update(publications).set({ views: (pub.views || 0) + 1 }).where(eq(publications.id, id));
+    const { data } = await supabase.from('publications').select('views').eq('id', id).single();
+    if (data) await supabase.from('publications').update({ views: (data.views || 0) + 1 }).eq('id', id);
   }
   async incrementPublicationDownloads(id: number): Promise<void> {
-    const [pub] = await db.select({ downloads: publications.downloads }).from(publications).where(eq(publications.id, id));
-    if (pub) await db.update(publications).set({ downloads: (pub.downloads || 0) + 1 }).where(eq(publications.id, id));
+    const { data } = await supabase.from('publications').select('downloads').eq('id', id).single();
+    if (data) await supabase.from('publications').update({ downloads: (data.downloads || 0) + 1 }).eq('id', id);
   }
   async incrementPublicationLikes(id: number): Promise<void> {
-    const [pub] = await db.select({ likes: publications.likes }).from(publications).where(eq(publications.id, id));
-    if (pub) await db.update(publications).set({ likes: (pub.likes || 0) + 1 }).where(eq(publications.id, id));
+    const { data } = await supabase.from('publications').select('likes').eq('id', id).single();
+    if (data) await supabase.from('publications').update({ likes: (data.likes || 0) + 1 }).eq('id', id);
   }
   async updatePublication(id: number, updates: Partial<InsertPublication>): Promise<Publication | undefined> {
-    const [p] = await db.update(publications).set(updates).where(eq(publications.id, id)).returning();
-    return p;
+    const { data } = await supabase.from('publications').update(updates).eq('id', id).select().single();
+    return data || undefined;
   }
   async deletePublication(id: number): Promise<boolean> {
-    const deleted = await db.delete(publications).where(eq(publications.id, id)).returning({ id: publications.id });
-    return deleted.length > 0;
+    const { data } = await supabase.from('publications').delete().eq('id', id).select();
+    return (data && data.length > 0) ? true : false;
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new SupabaseStorage();

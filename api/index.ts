@@ -1,14 +1,10 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
-import session from "express-session";
+import cookieSession from "cookie-session";
 import cors from "cors";
 import path from "path";
 import { createServer } from "http";
 import { registerRoutes } from "../server/routes";
-import connectPgSimple from "connect-pg-simple";
-import { findDatabaseUrl, pool } from "../server/db";
-
-const PostgresSessionStore = connectPgSimple(session);
 
 const app = express();
 app.set("trust proxy", 1);
@@ -17,21 +13,15 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
-
+// Using cookie-session to completely bypass Vercel DB pooling issues!
 app.use(
-  session({
-    store: new PostgresSessionStore({
-      pool: pool as any,
-      createTableIfMissing: true,
-    }),
-    secret: process.env.SESSION_SECRET || "litera-club-secret-key-production",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 24 * 60 * 60 * 1000,
-    },
+  cookieSession({
+    name: "litera_session",
+    keys: [process.env.SESSION_SECRET || "litera-club-secret-key-production"],
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    httpOnly: true
   })
 );
 

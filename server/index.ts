@@ -3,12 +3,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import { pool } from "./db";
+import cookieSession from "cookie-session";
 import path from "path";
-
-const PostgresSessionStore = connectPgSimple(session);
 
 // Global error handlers
 process.on("uncaughtException", (error) => {
@@ -46,23 +42,16 @@ app.use(express.urlencoded({ extended: false, limit: "50mb" }));
 
 
 
-// Session store backed by Postgres
+// Session store backed by cookie-session
 app.use(
-  session({
-    store: new PostgresSessionStore({
-      pool: pool as any,
-      createTableIfMissing: true,
-    }),
-    secret: process.env.SESSION_SECRET || "litera-club-secret-key-production",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      path: "/",
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000
-    },
-  }),
+  cookieSession({
+    name: "litera_session",
+    keys: [process.env.SESSION_SECRET || "litera-club-secret-key-production"],
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    httpOnly: true
+  })
 );
 
 export function log(message: string, source = "express") {
