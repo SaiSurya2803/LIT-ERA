@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import path from "path";
-import { existsSync } from "fs";
+
 import { storage } from "./storage";
 import { api } from "../shared/routes";
 import { z } from "zod";
@@ -567,18 +567,15 @@ export async function registerRoutes(
         return res.redirect(url.toString());
       }
 
-      // Set headers for file download
-      res.setHeader('Content-Type', 'application/octet-stream');
-      res.setHeader('Content-Disposition', `attachment; filename="${submission.originalFileName || submission.fileName}"`);
-      
+      // Set headers for file download (fallback for base64 only if needed)
       if (submission.fileData) {
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Disposition', `attachment; filename="${submission.originalFileName || submission.fileName}"`);
         const fileBuffer = Buffer.from(submission.fileData, 'base64');
         return res.send(fileBuffer);
-      } else if (submission.filePath && existsSync(submission.filePath)) {
-        return res.sendFile(submission.filePath);
-      } else {
-        return res.status(404).json({ message: "File data not available" });
       }
+      
+      return res.status(404).json({ message: "File data not available" });
     } catch (error) {
       const message = (error as any)?.message || "Failed to download file";
       return res.status(500).json({ message });
@@ -819,18 +816,13 @@ export async function registerRoutes(
         return res.redirect(url.toString());
       }
 
-      res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', `${disposition}; filename="${publication.pdfFileName || 'publication.pdf'}"`);
-      
       if (publication.pdfData) {
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `${disposition}; filename="${publication.pdfFileName || 'publication.pdf'}"`);
         const fileBuffer = Buffer.from(publication.pdfData, 'base64');
         return res.send(fileBuffer);
-      } else if (publication.pdfFile) {
-        const filePath = path.join(process.cwd(), publication.pdfFile);
-        if (existsSync(filePath)) {
-          return res.sendFile(filePath);
-        }
       }
+      
       return res.status(404).json({ message: "File not found on server" });
     } catch (error) {
       const message = (error as any)?.message || "Failed to download publication";
